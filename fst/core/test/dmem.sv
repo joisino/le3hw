@@ -4,6 +4,9 @@ module dmem( input logic clk, main_mem_write,
 
    logic [15:0] RAM[65535:0];
 
+   initial
+     $readmemb( "dmem.bin", RAM );
+   
    assign main_mem_dat = RAM[main_mem_read_adr];
 
    always_ff @(posedge clk)

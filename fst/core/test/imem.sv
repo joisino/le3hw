@@ -4,7 +4,7 @@ module imem( input logic [15:0] inst_mem_adr,
    logic [15:0] RAM[65535:0];
 
    initial
-     $readmemb( "load.dat", RAM );
+     $readmemb( "imem.bin", RAM );
 
    assign inst = RAM[inst_mem_adr];
 endmodule
