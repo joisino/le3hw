@@ -2,9 +2,6 @@ module ALU( input logic [3:0] op,
             input logic [15:0] a, b,
             output logic [15:0] res,
             output logic S, Z, C, V );
-
-   logic [16:0] buffer;
-   logic [31:0] buffer_to;
    
    always_comb begin
       C <= 0;
@@ -29,13 +26,13 @@ module ALU( input logic [3:0] op,
           res <= { a, a } >> b;
         10: begin
            if( b > 0 )
-              { buffer, C } <= ( a >> (b-1) );
+             { res, C } <= ( a >> (b-1) );
            else
              res <= a >> b;
         end
         11: begin
            if( b > 0 )
-              { buffer, C } <= ( a >>> (b-1) );
+              { res, C } <= ( a >>> (b-1) );
            else
              res <= a >>> b;
         end
