@@ -1,8 +1,8 @@
-`timescale 1 ns/ 1ps
+`timescale 1 ns/ 100 ps
 module testbench();
 
    logic clk, reset;
-   logic [15:0] inst_mem_adr;
+   logic [15:0] pc;
    logic [15:0] inst;
 
    logic [15:0] main_mem_read_adr;

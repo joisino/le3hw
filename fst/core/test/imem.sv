@@ -1,4 +1,4 @@
-module imem( input logic [15:0] inst_mem_adr,
+module imem( input logic [15:0] pc,
              output logic [15:0] inst );
 
    logic [15:0] RAM[65535:0];
@@ -6,7 +6,7 @@ module imem( input logic [15:0] inst_mem_adr,
    initial
      $readmemb( "imem.bin", RAM );
 
-   assign inst = RAM[inst_mem_adr];
+   assign inst = RAM[pc];
 endmodule
        
 
