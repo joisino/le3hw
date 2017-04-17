@@ -12,6 +12,6 @@ module main_mem( input logic clk,
       else adr = main_mem_read_adr;
    end
    
-   dmem dmem( adr, clk, adr, main_mem_write, main_mem_dat );
+   dmem dmem( adr, clk, main_mem_write_dat, main_mem_write, main_mem_dat );
    
 endmodule
