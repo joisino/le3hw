@@ -1,4 +1,4 @@
-module fst( input logic         clk,
+module core( input logic         clk,
             input logic         reset,
 
             input logic [15:0]  in_dat,
@@ -6,7 +6,7 @@ module fst( input logic         clk,
             output logic [15:0] out_dat,
             output logic        is_halt,
 
-            output logic [15:0] inst_mem_adr,
+            output logic [15:0] pc,
             input logic [15:0]  inst,
 
             output logic [15:0] main_mem_read_adr,
@@ -15,7 +15,8 @@ module fst( input logic         clk,
             output logic [15:0] main_mem_write_adr,
             output logic [15:0] main_mem_write_dat );
 
-   logic [15:0] pc, nextpc, pcinc;
+   logic 	jump;
+   logic [15:0] nextpc, pcinc;
    logic        regwrite, regwrite_adr_controll;
    logic [2:0]  register_write_adr;
    logic [15:0] regwrite_data;
@@ -30,7 +31,6 @@ module fst( input logic         clk,
    logic        next_S, next_Z, next_C, next_V;
    
    flopr pc_flopr( clk, reset, 1'b1, nextpc, pc );
-   assign inst_mem_adr = pc;
    assign pcinc = pc + 1;
    mux mux_pc( pcinc, ALUres, jump, nextpc );
    controller core_controller( .* );

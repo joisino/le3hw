@@ -1,11 +1,13 @@
-module fst( input logic clk, reset );
+module fst( input logic clk, reset_n,
+	    output logic [15:0] pc_out );
 
    logic         clk_n;
+   logic 	 reset;
    logic [15:0]  in_dat;
    logic         out_en;
    logic [15:0]  out_dat;
    logic         is_halt;
-   logic [15:0]  inst_mem;
+   logic [15:0]  pc;
    logic [15:0]  inst;
    logic [15:0]  main_mem_read_adr;
    logic [15:0]  main_mem_dat;
@@ -13,7 +15,10 @@ module fst( input logic clk, reset );
    logic [15:0]  main_mem_write_adr;
    logic [15:0]  main_mem_write_dat;
 
-   assign clk_n <= ~clk;
+   assign pc_out = pc;
+
+   assign clk_n = ~clk;
+   assign reset = ~reset_n;
    
    inst_mem inst_mem( .clk(clk_n), .* );
    main_mem main_mem( .clk(clk_n), .* );
