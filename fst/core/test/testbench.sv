@@ -16,8 +16,8 @@ module testbench();
    logic [15:0] out_dat;
    logic        is_halt;
 
-   fst core( .* );
-   // fst core( .clk(clk), .reset(reset), .inst_mem_adr(inst_mem_adr), .inst(inst), .main_mem_read_adr(main_mem_read_adr), .main_mem_dat(main_mem_dat), .main_mem_write(main_mem_write), .main_mem_write_adr(main_mem_write_adr), .main_mem_write_dat(main_mem_write_dat), .in_dat(in_dat), .out_en(out_en), .out_dat(out_dat), .is_halt(is_halt) );
+   core core( .* );
+   // core core( .clk(clk), .reset(reset), .inst_mem_adr(inst_mem_adr), .inst(inst), .main_mem_read_adr(main_mem_read_adr), .main_mem_dat(main_mem_dat), .main_mem_write(main_mem_write), .main_mem_write_adr(main_mem_write_adr), .main_mem_write_dat(main_mem_write_dat), .in_dat(in_dat), .out_en(out_en), .out_dat(out_dat), .is_halt(is_halt) );
    imem imem( .* );
    dmem dmem( .* );
    
