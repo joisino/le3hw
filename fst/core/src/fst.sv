@@ -13,12 +13,24 @@ module fst( input logic clk, reset_n );
    logic         main_mem_write;
    logic [15:0]  main_mem_write_adr;
    logic [15:0]  main_mem_write_dat;
+   logic 	 halting;
+   logic [31:0]  counter;
    
    assign clk_n = ~clk;
-   assign reset = ~reset_n;
+   assign reset = ~reset_n | halting;
    
    inst_mem inst_mem( .clk(clk), .* );
    main_mem main_mem( .clk(clk_n), .* );
    core core( .* );
+
+   always_ff @( posedge clk ) begin
+      halting = halting | is_halt;
+      if( !halting ) begin
+	 counter <= counter + 1;
+      end
+      if( !reset_n ) begin
+	 halting = 0;
+      end
+   end
    
 endmodule
