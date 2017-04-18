@@ -2,7 +2,7 @@
 module testbench();
 
    logic clk, reset;
-   logic [15:0] pc;
+   logic [15:0] nextpc;
    logic [15:0] inst;
 
    logic [15:0] main_mem_read_adr;
