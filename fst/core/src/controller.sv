@@ -15,7 +15,7 @@ module controller( input logic        flushed,
 
                    output logic       regwrite_cur, 
                    
-                   output logic       is_halt, 
+                   output logic       is_halt_id, 
                    output logic       main_mem_write_id,
                    output logic       jump,
                    output logic       regwrite_id, regwrite_adr_controll,
@@ -87,7 +87,7 @@ module controller( input logic        flushed,
    
    always_comb begin
       jump_inst <= 0;
-      is_halt <= 0;
+      is_halt_id <= 0;
       main_mem_write_id <= 0;
       regwrite_id <= 0;
       regwrite_adr_controll <= 0;
@@ -159,10 +159,10 @@ module controller( input logic        flushed,
                    ALUsrcB_controll_id <= 3;
                 end
                 13: begin
-                   out_en <= 1;
+                   out_en <= !data_hazard;
                 end
                 15: begin
-                   is_halt <= 1;
+                   is_halt_id <= 1;
                 end
               endcase
            end

@@ -11,7 +11,7 @@ module reginvalid( input logic clk, reset,
       else begin
          if( regwrite )
            register_invalid[regwrite_adr] <= 0;
-         else if( regwrite_cur )
+         if( regwrite_cur )
            register_invalid[regwrite_adr_id] <= 1;
       end
    end

@@ -9,6 +9,7 @@ module idex( input logic clk, reset, en_idex, flush_idex,
              input logic         main_mem_write_id,
              input logic [1:0]   regwrite_dat_controll_id,
              input logic         regwrite_id,
+             input logic         is_halt_id,
              output logic [15:0] pcinc_ex,
              output logic [15:0] rd1_ex, rd2_ex,
              output logic [3:0]  d_ex,
@@ -18,7 +19,8 @@ module idex( input logic clk, reset, en_idex, flush_idex,
              output logic [3:0]  ALUop,
              output logic        main_mem_write_ex,
              output logic [1:0]  regwrite_dat_controll_ex,
-             output logic        regwrite_ex );
+             output logic        regwrite_ex,
+             output logic        is_halt_ex );
 
    
    flopr pcinc_flop( clk, reset | flush_idex, en_idex, pcinc_id, pcinc_ex );
@@ -33,5 +35,6 @@ module idex( input logic clk, reset, en_idex, flush_idex,
    flopr #(1) main_mem_write_flop( clk, reset | flush_idex, en_idex, main_mem_write_id, main_mem_write_ex );
    flopr #(2) regwrite_dat_controll_flop( clk, reset | flush_idex, en_idex, regwrite_dat_controll_id, regwrite_dat_controll_ex );
    flopr #(1) regwrite_flop( clk, reset | flush_idex, en_idex, regwrite_id, regwrite_ex );
+   flopr #(1) is_halt_flop( clk, reset | flush_idex, en_idex, is_halt_id, is_halt_ex );
 
 endmodule

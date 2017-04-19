@@ -17,7 +17,7 @@ module decode( input logic         clk, reset,
                output logic [3:0]  ALUop_id,
                output logic [15:0] out_dat,
                output logic        out_en,
-               output logic        is_halt,
+               output logic        is_halt_id,
                output logic        main_mem_write_id,
                output logic [1:0]  regwrite_dat_controll_id ,
                output logic        regwrite_id,
@@ -35,7 +35,7 @@ module decode( input logic         clk, reset,
    logic regwrite_cur;
 
    controller core_controller( .* );
-   jumpstate jstate( .* );
+   jumpstate jstate( .reset(reset|jump), .* );
    reginvalid reginvalid( .reset(reset|jump), .* );
    mux #(3) mux_regwrite_adr( inst_id[10:8], inst_id[13:11], regwrite_adr_controll, regwrite_adr_id );
    regfile register_file( clk, reset, regwrite, inst_id[13:11], inst_id[10:8], regwrite_adr, regwrite_dat, rd1_id, rd2_id );

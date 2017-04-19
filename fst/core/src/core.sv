@@ -34,6 +34,7 @@ module core( input logic         clk,
    logic [15:0] extended_d_id, extended_d_ex, extended_d_mem, extended_d_wb;
    logic [2:0]  regwrite_adr_id, regwrite_adr_ex, regwrite_adr_mem, regwrite_adr;
    logic [15:0] regwrite_dat;
+   logic        is_halt_id, is_halt_ex;
    logic [1:0]  ALUsrcA_controll_id, ALUsrcA_controll;
    logic [1:0]  ALUsrcB_controll_id, ALUsrcB_controll;
    logic [3:0]  ALUop_id, ALUop;
