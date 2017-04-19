@@ -1,4 +1,6 @@
-module fst( input logic clk, reset_n );
+module fst( input logic clk, reset_n,
+	    output logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
+	    output logic [7:0] controll );
    
    logic         clk_n;
    logic 	 reset;
@@ -23,11 +25,11 @@ module fst( input logic clk, reset_n );
    main_mem main_mem( .clk(clk_n), .* );
    core core( .* );
 
+   counter cnter( .clk(clk), .reset_n(reset_n), .stp(halting), .* );
+   
+   
    always_ff @( posedge clk ) begin
       halting = halting | is_halt;
-      if( !halting ) begin
-	 counter <= counter + 1;
-      end
       if( !reset_n ) begin
 	 halting = 0;
       end

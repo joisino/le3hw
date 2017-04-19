@@ -2,8 +2,10 @@
 module fst_testbench();
 
    logic clk, reset_n;
+   logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h;
+   logic [7:0] controll );
 
-   fst fst( .clk(clk), .reset_n(reset_n) );
+   fst fst( .clk(clk), .reset_n(reset_n), .* );
 
    always
      begin
