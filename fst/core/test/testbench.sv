@@ -1,4 +1,4 @@
-`timescale 1 ns/ 1ps
+`timescale 1 ns/ 100 ps
 module testbench();
 
    logic clk, reset;

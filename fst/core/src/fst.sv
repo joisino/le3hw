@@ -1,22 +1,38 @@
-module fst( input logic clk, reset );
-
+module fst( input logic clk, reset_n,
+	    output logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
+	    output logic [7:0] controll );
+   
    logic         clk_n;
+   logic 	 reset;
    logic [15:0]  in_dat;
    logic         out_en;
    logic [15:0]  out_dat;
    logic         is_halt;
-   logic [15:0]  inst_mem;
+   logic [15:0]  nextpc;
    logic [15:0]  inst;
    logic [15:0]  main_mem_read_adr;
    logic [15:0]  main_mem_dat;
    logic         main_mem_write;
    logic [15:0]  main_mem_write_adr;
    logic [15:0]  main_mem_write_dat;
-
-   assign clk_n <= ~clk;
+   logic 	 halting;
+   logic [31:0]  counter;
    
-   inst_mem inst_mem( .clk(clk_n), .* );
+   assign clk_n = ~clk;
+   assign reset = ~reset_n | halting;
+   
+   inst_mem inst_mem( .clk(clk), .* );
    main_mem main_mem( .clk(clk_n), .* );
    core core( .* );
+
+   counter cnter( .clk(clk), .reset_n(reset_n), .stp(halting), .* );
+   
+   
+   always_ff @( posedge clk ) begin
+      halting = halting | is_halt;
+      if( !reset_n ) begin
+	 halting = 0;
+      end
+   end
    
 endmodule

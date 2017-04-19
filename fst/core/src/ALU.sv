@@ -9,9 +9,9 @@ module ALU( input logic [3:0] op,
 
       case( op )
         0:
-          { C, res } <= a + b;
+          { C, res } <= { 1'b0, a } + { 1'b0, b };
         1, 5:
-          { C, res } <= a - b;
+          { C, res } <= { 1'b0, a } + { 1'b0, -b };
         2:
           res <= a & b;
         3:
@@ -48,9 +48,9 @@ module ALU( input logic [3:0] op,
       Z <= ( res == 0 );
       case( op )
         0:
-          V <= ( a[15] == b[15] ) & C;
+          V <= ( a[15] == b[15] ) & ( a[15] != res[15] );
         1, 5:
-          V <= ( a[15] != b[15] ) & C;
+          V <= ( a[15] != b[15] ) & ( a[15] != res[15] );
         default:
           V <= 0;
       endcase

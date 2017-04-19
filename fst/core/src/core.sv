@@ -1,4 +1,4 @@
-module fst( input logic         clk,
+module core( input logic         clk,
             input logic         reset,
 
             input logic [15:0]  in_dat,
