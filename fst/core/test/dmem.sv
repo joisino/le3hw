@@ -9,7 +9,7 @@ module dmem( input logic clk, main_mem_write,
    
    assign main_mem_dat = RAM[main_mem_read_adr];
 
-   always_ff @(posedge clk)
+   always_ff @(negedge clk)
      if( main_mem_write ) RAM[main_mem_write_adr] = main_mem_write_dat;
 endmodule
  
