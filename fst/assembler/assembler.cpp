@@ -34,12 +34,13 @@ std::string d_to_b( std::string s, int b, bool sign = false ){
   return res;
 }
 
+int inst_cnt = 0;
 std::string decode( std::string inst ){
   std::vector<std::string> arithmetics = { "ADD", "SUB", "AND", "OR", "XOR", "CMP", "MOV"};
   std::vector<std::string> shifts = { "SLL", "SLR", "SRL", "SRA" };
   std::stringstream stin( inst );
   std::string op, res = "";
-  std::cerr << inst << std::endl;
+  std::cerr << inst_cnt++ << " " << inst << std::endl;
   stin >> op;
   if( find( arithmetics.begin(), arithmetics.end(), op ) != arithmetics.end() ){
     res += "11";
@@ -139,8 +140,15 @@ std::string decode( std::string inst ){
     assert( rb[0] == 'r' );
     res += d_to_b( rb.substr( 1 ) , 3 );
     res += d_to_b( d, 8, true );
-  } else if( op == "LI" ){
-    res += "10000";
+  } else if( op == "LI" or op == "ADDI" or op == "CMPI" ){
+    res += "10";
+    if( op == "LI" ){
+      res += "000";
+    } else if( op == "ADDI" ){
+      res += "001";
+    } else if( op == "CMPI" ){
+      res += "010";
+    }
     std::string rb, d;
     stin >> rb;
     stin >> d;
@@ -217,7 +225,10 @@ int main( int argc, char **argv ){
     std::string w = insts[i];
     if( w.substr( 0 , 2 ) == "10" and ( w.substr( 2 , 3 ) == "100" or w.substr( 2 , 3 ) == "111" ) ){
       std::string label = w.substr( 8 );
-      assert( label_to_address.find( label ) != label_to_address.end() );
+      if( label_to_address.find( label ) == label_to_address.end() ){
+        std::cout << "LAVEL " << label << " NOT FOUND" << std::endl;
+        assert( false );
+      }
       insts[i] = w.substr( 0 , 8 ) + d_to_b( std::to_string( label_to_address[label] - ( i + 1 ) ) , 8, true );
     }
   }
