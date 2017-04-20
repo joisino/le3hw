@@ -13,7 +13,7 @@ module decode( input logic         clk, reset,
                output logic [3:0]  d_id,
                output logic [15:0] extended_d_id,
                output logic [2:0]  regwrite_adr_id,
-               output logic [1:0]  ALUsrcA_controll_id, ALUsrcB_controll_id,
+               output logic [2:0]  ALUsrcA_controll_id, ALUsrcB_controll_id,
                output logic [3:0]  ALUop_id,
                output logic [15:0] out_dat,
                output logic        out_en,
@@ -31,14 +31,15 @@ module decode( input logic         clk, reset,
    logic regwrite_adr_controll;
    logic [2:0] jump_inst;
    logic [2:0] jump_state;
-   logic [7:0] register_invalid;
+   logic [2:0] register_invalid[7:0];
    logic regwrite_cur;
+   logic from_main_mem;
 
    controller core_controller( .* );
    jumpstate jstate( .reset(reset|jump), .* );
    reginvalid reginvalid( .reset(reset|jump), .* );
    mux #(3) mux_regwrite_adr( inst_id[10:8], inst_id[13:11], regwrite_adr_controll, regwrite_adr_id );
-   regfile register_file( clk, reset, regwrite, inst_id[13:11], inst_id[10:8], regwrite_adr, regwrite_dat, rd1_id, rd2_id );
+   regfile register_file( clk, reset, regwrite, inst_id[13:11], inst_id[10:8], regwrite_adr, regwrite_dat, register_invalid, rd1_id, rd2_id );
    assign out_dat = rd1_id;
    signext sign_extend( inst_id[7:0], extended_d_id );
    assign d_id = inst_id[3:0];

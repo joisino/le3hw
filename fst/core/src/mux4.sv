@@ -7,13 +7,13 @@ module mux4
    always_comb begin
       case(en)
         0:
-          e = a;
+          e <= a;
         1:
-          e = b;
+          e <= b;
         2:
-          e = c;
+          e <= c;
         3:
-          e = d;
+          e <= d;
       endcase // case (en)
    end
 endmodule

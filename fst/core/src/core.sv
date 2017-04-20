@@ -9,21 +9,21 @@
 `include "writeback.sv"
 
 module core( input logic         clk,
-            input logic         reset,
+             input logic         reset,
 
-            input logic [15:0]  in_dat,
-            output logic        out_en,
-            output logic [15:0] out_dat,
-            output logic        is_halt,
+             input logic [15:0]  in_dat,
+             output logic        out_en,
+             output logic [15:0] out_dat,
+             output logic        is_halt,
 
-            output logic [15:0] pc,
-            input logic [15:0]  inst,
+             output logic [15:0] pc,
+             input logic [15:0]  inst,
 
-            output logic [15:0] main_mem_read_adr,
-            input logic [15:0]  main_mem_dat,
-            output logic        main_mem_write,
-            output logic [15:0] main_mem_write_adr,
-            output logic [15:0] main_mem_write_dat );
+             output logic [15:0] main_mem_read_adr,
+             input logic [15:0]  main_mem_dat,
+             output logic        main_mem_write,
+             output logic [15:0] main_mem_write_adr,
+             output logic [15:0] main_mem_write_dat );
 
    logic [15:0] pcinc, pcinc_id, pcinc_ex;
    logic        jump;
@@ -33,10 +33,10 @@ module core( input logic         clk,
    logic [3:0] d_id, d_ex;
    logic [15:0] extended_d_id, extended_d_ex, extended_d_mem, extended_d_wb;
    logic [2:0]  regwrite_adr_id, regwrite_adr_ex, regwrite_adr_mem, regwrite_adr;
-   logic [15:0] regwrite_dat;
+   logic [15:0] regwrite_dat_mem, regwrite_dat_wb, regwrite_dat;
    logic        is_halt_id, is_halt_ex;
-   logic [1:0]  ALUsrcA_controll_id, ALUsrcA_controll;
-   logic [1:0]  ALUsrcB_controll_id, ALUsrcB_controll;
+   logic [2:0]  ALUsrcA_controll_id, ALUsrcA_controll;
+   logic [2:0]  ALUsrcB_controll_id, ALUsrcB_controll;
    logic [3:0]  ALUop_id, ALUop;
    logic        main_mem_write_id, main_mem_write_ex;
    logic [15:0] main_mem_dat_wb;
