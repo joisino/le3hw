@@ -129,6 +129,15 @@ module controller( input logic        flushed,
                    regwrite_id <= 1;
                    regwrite_dat_controll_id <= 3;
                 end
+                1: begin // ADDI
+                   regwrite_id <= 1;
+                   ALUop_id <= 0;
+                   ALUsrcB_controll_id <= 2;
+                end
+                2: begin // CMPI
+                   ALUop_id <= 5;
+                   ALUsrcB_controll_id <= 2;
+                end
                 4: begin // B
                    jump_inst <= 1;
                    ALUsrcA_controll_id <= 1;
