@@ -3,7 +3,7 @@
 `include "core.sv"
 `include "ledcounter.sv"
 
-module fst( input logic clk, reset_n,
+module fst( input logic clk_in, reset_n,
 	    output logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
 	    output logic [7:0] controll,
             output logic halting,
@@ -23,11 +23,14 @@ module fst( input logic clk, reset_n,
    logic [15:0]  main_mem_write_adr;
    logic [15:0]  main_mem_write_dat;
    logic [31:0]  counter;
+   logic 	 clk;
    
    assign pc_out = pc;
 
    assign clk_n = ~clk;
    assign reset = ~reset_n | halting;
+
+   pll( clk_in, clk );
    
    inst_mem inst_mem( .clk(clk_n), .* );
    main_mem main_mem( .clk(clk_n), .* );
