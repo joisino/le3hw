@@ -39,6 +39,8 @@ enum All_op {
 	OP_ADDI,
 	OP_CMPI,
 	OP_B,
+	OP_BAL,
+	OP_BR ,
 
 	OP_ADD,
 	OP_SUB,
@@ -67,6 +69,8 @@ std::map<All_op, std::string>op_map = {
 	{OP_ADDI, "OP_ADDI"},
 	{OP_CMPI, "OP_CMPI"},
 	{OP_B   , "OP_B   "},
+	{OP_BAL , "OP_BAL "},
+	{OP_BR  , "OP_BR  "},
 					  
 	{OP_ADD , "OP_ADD "},
 	{OP_SUB , "OP_SUB "},
@@ -125,8 +129,8 @@ struct Operation {
 		CMPI=2,
 
 		B   =4,
-
-
+		BAL =5,
+		BR  =6,
 		IS_IF = 7,
 	};
 	int d;
@@ -335,7 +339,17 @@ struct Load_store :Operation {
 		int ra_ = two_to_i(st.substr(2, 3));
 		int rb_ = two_to_i(st.substr(5, 3));
 		int d_ = two_to_i(st.substr(8, 8));
-		if (d_ >= 128)d_ = d_ - 256;
+		if (136>d_&&d_ >= 128) {
+			int k = d_ - 128;
+			d_ = 1 << (k + 7);
+		}
+		else if (144 > d_&&d_>136) {
+			int k = d_ - 136;
+			d_ = (1 << (k + 8))-1;
+		}
+		else if (d_ >= 128) {
+			d_ = d_ - 256;
+		}
 		op1 = op1_; ra = ra_;
 		rb = rb_; d = d_;
 	}
@@ -375,7 +389,17 @@ struct Imme_goto : Operation {
 		Op2 op2_ = static_cast<Op2>(two_to_i(st.substr(2, 3)));
 		int rb_ = two_to_i(st.substr(5, 3));
 		int d_ = two_to_i(st.substr(8, 8));
-		if (d_ >= 128)d_ = d_ - 256;
+		if (136>d_&&d_ >= 128) {
+			int k = d_ - 128;
+			d_ = 1 << (k + 7);
+		}
+		else if (144 > d_&&d_>136) {
+			int k = d_ - 136;
+			d_ = (1 << (k + 8)) - 1;
+		}
+		else if (d_ >= 128) {
+			d_ = d_ - 256;
+		}
 		op1 = op1_; op2 = op2_;
 		rb = rb_; d = d_;
 	}
@@ -393,11 +417,22 @@ struct Imme_goto : Operation {
 		case CMPI:
 			use_counter[OP_CMPI]++;
 			f_sub(mem.reg[rb], d, mem.flags);
-			assert(false);
+			break;
 
 		case B:
 			use_counter[OP_B]++;
 			mem.pc += d;
+			break;
+
+		case BAL:
+			use_counter[OP_BAL]++;
+			mem.reg[0] = mem.pc+1;
+			mem.pc += d;
+			break;
+
+		case BR:
+			use_counter[OP_BR]++;
+			mem.pc = mem.reg[0]-1;
 			break;
 
 		default:
@@ -427,7 +462,17 @@ struct If : Operation {
 		assert(op2_ == IS_IF);
 		Cond cond_ = static_cast<Cond>(two_to_i(st.substr(5, 3)));
 		int d_ = two_to_i(st.substr(8, 8));
-		if (d_ >= 128)d_ = d_ - 256;
+		if (136>d_&&d_ >= 128) {
+			int k = d_ - 128;
+			d_ = 1 << (k + 7);
+		}
+		else if (144 > d_&&d_>136) {
+			int k = d_ - 136;
+			d_ = (1 << (k + 8)) - 1;
+		}
+		else if (d_ >= 128) {
+			d_ = d_ - 256;
+		}
 		op1 = op1_; op2 = op2_;
 		cond = cond_; d = d_;
 	}
@@ -456,8 +501,6 @@ struct If : Operation {
 		Operation::play(mem, use_counter);
 	}
 };
-
-#define STR(var) #var
 
 int main(int argc, char **argv) {
 	if (argc != 2) {
@@ -561,16 +604,24 @@ int main(int argc, char **argv) {
 			std::cout << "**Sorted**" << std::endl;
 			std::cout << "Clock is " << nowclock << std::endl;
 			int sum = 0;
+			int k = 0;
 			for (auto c : operation_counter) {
 				if (op_map.find(c.first) == op_map.end())std::cout << "no name" << std::endl;
-				std::cout << std::setw(10)<<op_map[c.first] << " "<<std::setw(6) << c.second << std::endl;
+				std::cout << std::setw(10) << op_map[c.first] << " " << std::setw(6) << c.second;
+				k++;
+				if (k % 4 == 0)std::cout << std::endl;
+				else std::cout << " ";
 				sum += c.second;
 			}
-			std::cout << "PC_Counter" << std::endl;
+			k = 0;
+			std::cout <<std::endl<< "PC_Counter" << std::endl;
 			for (auto c : place_counter) {
-				std::cout << std::setw(5) << c.first << " : " <<std::setw(8)<< c.second<<" times" << std::endl;
+				std::cout << std::setw(5) << c.first << " : " << std::setw(7) << c.second << " times";
+				k++;
+				if (k % 1 == 0)std::cout << std::endl;
+				else std::cout << " ";
 			}
-			std::cout << "Sum: " << sum << std::endl;
+			std::cout  << std::endl<< "Sum: " << sum << std::endl;
 		}
 		else {
 			for (int i = 0; i < 1024; ++i) {
