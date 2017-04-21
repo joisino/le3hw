@@ -1,4 +1,7 @@
-module counter( input logic        clk,
+`include "tencounter.sv"
+`include "leddecoder.sv"
+
+module ledcounter( input logic        clk,
 		input logic        reset_n,
 		input logic        stp,
 		output logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
@@ -16,14 +19,14 @@ module counter( input logic        clk,
    tenc tg( .ad(carry_f), .cur(cg), .nex(cg), .carry(carry_g), .* );
    tenc th( .ad(carry_g), .cur(ch), .nex(ch), .carry(carry_h), .* );
 
-   decoder da( ca, seg_a );
-   decoder db( cb, seg_b );
-   decoder dc( cc, seg_c );
-   decoder dd( cd, seg_d );
-   decoder de( ce, seg_e );
-   decoder df( cf, seg_f );
-   decoder dg( cg, seg_g );
-   decoder dh( ch, seg_h );
+   leddecoder da( ca, seg_a );
+   leddecoder db( cb, seg_b );
+   leddecoder dc( cc, seg_c );
+   leddecoder dd( cd, seg_d );
+   leddecoder de( ce, seg_e );
+   leddecoder df( cf, seg_f );
+   leddecoder dg( cg, seg_g );
+   leddecoder dh( ch, seg_h );
 
    assign controll = 8'b0000_0001;
    

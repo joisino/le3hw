@@ -1,4 +1,4 @@
-module decoder( input logic [3:0] in,
+module leddecoder( input logic [3:0] in,
 		output logic [7:0] out );
 
    always_comb begin
