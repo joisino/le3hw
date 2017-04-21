@@ -14,6 +14,7 @@ module jumppred( input logic clk, reset,
    logic [15:0] jump_table [15:0];
    logic [15:0] jump_table_valid;
    logic [1:0] pred_shift_register;
+   logic [7:0] pcinc_history;
 
    assign jump_cannot_predict = jump & (!pred_shift_register[0]);
    assign jump_pred_adr_miss = ( jump & ( jump_pred_adr != ALUres_mem ) & pred_shift_register[1] ) | jump_cannot_predict;
@@ -27,13 +28,14 @@ module jumppred( input logic clk, reset,
          jump_pred_busy <= 0;
          pcinc_evac <= 0;
          jump_table_valid <= 0;
+         pred_shift_register <= 0;
       end else begin
          if( jump_pred ) begin
             pcinc_evac <= pcinc_id;
          end
          if( jump_cannot_predict ) begin // predict not jump, but really jump
-            jump_table[ pcinc_evac[3:0] ] <= ALUres_mem;
-            jump_table_valid[ pcinc_evac[3:0] ] <= 1;
+            jump_table[ pcinc_history[7:4] ] <= ALUres_mem;
+            jump_table_valid[ pcinc_history[7:4] ] <= 1;
          end else begin
             if( jump_pred_adr_miss ) begin // predict jump, and jump, but the address is not correct
                jump_table[ pcinc_evac[3:0] ] <= ALUres_mem;
@@ -46,6 +48,7 @@ module jumppred( input logic clk, reset,
             jump_pred_busy <= 0;
          end
          pred_shift_register <= { pred_shift_register[0], jump_pred };
+         pcinc_history <= { pcinc_history[3:0], pcinc_id[3:0] };
       end
    end
    
