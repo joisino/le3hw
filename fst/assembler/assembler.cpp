@@ -157,9 +157,11 @@ std::string decode( std::string inst ){
     res += d_to_b( rb.substr( 1 ) , 3 );
 
     res += d_to_b( d, 8, true );
-  } else if( op == "B" or op == "BE" or op == "BLT" or op == "BLE" or op == "BNE" ){
+  } else if( op == "B" or op == "BAL" or op == "BE" or op == "BLT" or op == "BLE" or op == "BNE" ){
     if( op == "B" ){
       res += "10100000";
+    } else if( op == "BAL" ){
+      res += "10101000";
     } else if( op == "BE" ){
       res += "10111000";
     } else if( op == "BLT" ){
@@ -172,6 +174,15 @@ std::string decode( std::string inst ){
     std::string d;
     stin >> d;
     res += d;
+  } else if( op == "BR" ){
+    res += "10110";
+    
+    std::string rb;
+    stin >> rb;
+    assert( rb[0] == 'r' );
+    res += d_to_b( rb.substr( 1 ) , 3 );
+
+    res += "00000000";
   } else {
     puts( "OP not exist" );
     assert( false );
@@ -223,7 +234,8 @@ int main( int argc, char **argv ){
   // convert label to address
   for( int i = 0; i < (int)insts.size(); i++ ){
     std::string w = insts[i];
-    if( w.substr( 0 , 2 ) == "10" and ( w.substr( 2 , 3 ) == "100" or w.substr( 2 , 3 ) == "111" ) ){
+    std::string op2 = w.substr( 2 , 3 );
+    if( w.substr( 0 , 2 ) == "10" and ( op2 == "100" or op2 == "101" or op2 == "111" ) ){
       std::string label = w.substr( 8 );
       if( label_to_address.find( label ) == label_to_address.end() ){
         std::cout << "LAVEL " << label << " NOT FOUND" << std::endl;

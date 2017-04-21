@@ -19,7 +19,8 @@ module decode( input logic         clk, reset,
                output logic        out_en,
                output logic        is_halt_id,
                output logic        main_mem_write_id,
-               output logic [1:0]  regwrite_dat_controll_id ,
+               output logic [1:0]  regwrite_dat_controll_id,
+               output logic        from_main_mem_id, 
                output logic        regwrite_id,
                output logic        jump,
                output logic        en_ifid, flush_ifid,
@@ -33,7 +34,6 @@ module decode( input logic         clk, reset,
    logic [2:0] jump_state;
    logic [2:0] register_invalid[7:0];
    logic regwrite_cur;
-   logic from_main_mem;
 
    controller core_controller( .* );
    jumpstate jstate( .reset(reset|jump), .* );

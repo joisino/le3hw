@@ -6,7 +6,7 @@ module controller( input logic        flushed,
                    output logic [2:0] jump_inst,
 
                    input logic [2:0]  register_invalid [7:0],
-                   output logic       from_main_mem,
+                   output logic       from_main_mem_id,
                    
                    output logic       en_ifid, flush_ifid,
                    output logic       en_idex, flush_idex,
@@ -79,7 +79,7 @@ module controller( input logic        flushed,
          flush_ifid <= 1;
          flush_idex <= 1;
          flush_exmem <= 1;
-         flush_memwb <= 1;
+         // flush_memwb <= 1; // when jump, mem phase dealing with jump inst
       end else if( data_hazard ) begin
          en_pc <= 0;
          en_ifid <= 0;
@@ -98,7 +98,7 @@ module controller( input logic        flushed,
       ALUsrcB_controll_id <= 0;
       ALUop_id <= 15;
       regwrite_dat_controll_id <= 0;
-      from_main_mem <= 0;
+      from_main_mem_id <= 0;
 
       case( register_invalid[ra] )
          2: ALUsrcB_controll_id <= 4;
@@ -115,9 +115,8 @@ module controller( input logic        flushed,
            0:  begin // LD
               regwrite_id <= 1;
               ALUsrcB_controll_id <= 2;
-              regwrite_dat_controll_id <= 2;
               regwrite_adr_controll <= 1;
-              from_main_mem <= 1;
+              from_main_mem_id <= 1;
            end
            1: begin // ST
               main_mem_write_id <= 1;
@@ -141,6 +140,18 @@ module controller( input logic        flushed,
                 4: begin // B
                    jump_inst <= 1;
                    ALUsrcA_controll_id <= 1;
+                   ALUsrcB_controll_id <= 2;
+                end
+                5: begin // BAL
+                   jump_inst <= 1;
+                   ALUsrcA_controll_id <= 1;
+                   ALUsrcB_controll_id <= 2;
+                   regwrite_id <= 1;
+                   regwrite_dat_controll_id <= 2;
+                   regwrite_adr_controll <= 0;
+                end
+                6: begin // BR
+                   jump_inst <= 1;
                    ALUsrcB_controll_id <= 2;
                 end
                 7: begin

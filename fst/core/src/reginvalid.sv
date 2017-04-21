@@ -1,6 +1,6 @@
 module reginvalid( input logic clk, reset,
                    input logic        regwrite_cur,
-                   input logic        from_main_mem, 
+                   input logic        from_main_mem_id, 
                    input logic [2:0]  regwrite_adr_id, 
                    output logic [2:0] register_invalid [7:0] );
    
@@ -25,7 +25,7 @@ module reginvalid( input logic clk, reset,
       nex[6] <= 0;
       nex[7] <= 0;
       if( regwrite_cur ) begin
-         if( from_main_mem ) nex[regwrite_adr_id] <= 1;
+         if( from_main_mem_id ) nex[regwrite_adr_id] <= 1;
          else nex[regwrite_adr_id] <= 2;
       end
    end
