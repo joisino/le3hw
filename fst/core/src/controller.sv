@@ -180,8 +180,9 @@ module controller( input logic        flushed,
                 5: begin 
                 end
                 6: begin
+                   ALUsrcA_controll_id <= 2;
                    regwrite_id <= 1;
-                   regwrite_dat_controll_id <= 1;
+                   regwrite_dat_controll_id <= 0;
                 end
                 8, 9, 10, 11: begin
                    regwrite_id <= 1;
