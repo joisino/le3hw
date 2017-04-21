@@ -25,7 +25,7 @@ module jumppred( input logic clk, reset,
             pcinc_evac <= pcinc_id;
             jump_pred_busy <= 1;
          end
-         if( jump_pred_miss ) begin
+         if( jump_pred_adr_miss ) begin
             jump_pred_adr <= ALUres_mem;
          end
          if( jump_state != 0 ) begin
