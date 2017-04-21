@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include  <iomanip>
 #include <fstream>
 #include <sstream>
@@ -12,6 +12,14 @@
 
 const bool DEBUG = true;
 
+const int REGISTER_SIZE = 8;
+const int MAIN_MEMORY_SIZE = 2048;
+
+const int REGISTER_BIT = 16;
+const int REGISTER_MAX = (1 << (REGISTER_BIT - 1)) - 1;
+const int REGISTER_MIN = -(1 << (REGISTER_BIT - 1));
+
+
 
 int two_to_i(std::string st) {
 	int sum = 0;
@@ -21,6 +29,25 @@ int two_to_i(std::string st) {
 	}
 	return sum;
 }
+
+struct Data {
+	int pc;
+	std::vector<int>reg;
+	std::vector<int>main_mem;
+	struct Flags {
+		bool z;//is zero?
+		bool s;//is smaller than zero?
+		bool c;//is carried over?
+		bool v;//is overflow?
+		Flags() :z(false), s(false), c(false), v(false) {
+
+		}
+	}flags;
+	bool finish_flag;
+	Data() :pc(0),reg(8), main_mem(2048),flags(),finish_flag(false) {
+
+	}
+};
 
 struct Operation {
 	enum Name {
@@ -48,8 +75,8 @@ struct Operation {
 		IS_IF =7,
 	};
 	int d;
-	virtual void play(int &pc, std::vector<int>&r, std::vector<int>&m, int& Z, int& S, int& V, bool& finish_flag) {
-		pc++;
+	virtual void play(Data&mem) {
+		mem.pc++;
 	}
 };
 struct Calc_put :Operation {
@@ -84,66 +111,99 @@ struct Calc_put :Operation {
 		op1 = op1_; rs = rs_; rd = rd_;
 		op3 = op3_; d = d_;
 	}
+	
 
-	virtual void play(int &pc, std::vector<int>&r, std::vector<int>&m,int& Z,int& S,int& V,bool& finish_flag) {
-		Z = false;
-		S = false;
-		V = false;
-		assert(op1 == 3);
+	virtual void play(Data&mem) {
+		mem.flags.z = false;
+		mem.flags.s = false;
+		mem.flags.v = false;
+		bool C = false;
+		assert(op1 == IS_CALC_PUT);
+		int result = NAN;
 		switch (op3){
 		case ADD:
-			r[rd] += r[rs];
+			result= mem.reg[rd] + mem.reg[rs];
+			if (result > REGISTER_MAX) {
+				result -= (REGISTER_MAX - REGISTER_MIN + 1);
+				mem.flags.v = true; mem.flags.c = true;
+			}
+			if (result < REGISTER_MIN) {
+				result += (REGISTER_MAX - REGISTER_MIN + 1);
+				mem.flags.v = true; mem.flags.c = true;
+			}
+			mem.reg[rd] = result;
 			break;
+
 		case SUB:
-			r[rd] -= r[rs];
+			mem.reg[rd] -= mem.reg[rs];
 			break;
+
 		case AND:
-			r[rd] &= r[rs];
+			result = mem.reg[rd] &= mem.reg[rs];
 			break;
+
 		case OR:
-			r[rd] |= r[rs];
+			result = mem.reg[rd] |= mem.reg[rs];
 			break;
+
 		case XOR:
-			r[rd] ^= r[rs];
+			result = mem.reg[rd] ^= mem.reg[rs];
 			break;
+
 		case CMP: {
-			int num = r[rd] - r[rs];
-			if (num < 0)S = true;
-			if (num == 0)Z = true;
-			if (abs(V) >= 1 << 15)V = true;
+			result = mem.reg[rd] - mem.reg[rs];
+			if (result > REGISTER_MAX) {
+				result -= (REGISTER_MAX - REGISTER_MIN + 1);
+				mem.flags.v = true; mem.flags.c = true;
+			}
+			if (result < REGISTER_MIN) {
+				result += (REGISTER_MAX - REGISTER_MIN + 1);
+				mem.flags.v = true; mem.flags.c = true;
+			}
 			break;
 		}
+				   
 		case MOV:
-			r[rd] = r[rs];
+			result = mem.reg[rd] = mem.reg[rs];
 			break;
+
 		case SLL:
-			r[rd] <<= d;
+			mem.reg[rd] <<= d;
 			break;
+
 		case SLR:
 			assert(d <= 16);
-			r[rd] = (short(r[rd] << d) | short(r[rd] >> (16 - d)));
+			mem.reg[rd] = (short(mem.reg[rd] << d) | short(mem.reg[rd] >> (16 - d)));
 			break;
+
 		case SRL:
-			r[rd] = static_cast<unsigned int>(r[rd]) >> d;
+			mem.reg[rd] = static_cast<unsigned int>(mem.reg[rd]) >> d;
 			break;
+
 		case SRA:
-			r[rd] >>= d;
-			assert(false);
+			mem.reg[rd] >>= d;
 			break;
+
 		case IN:
 			assert(false);
 			break;
+
 		case OUT:
 			break;
 
 		case HLT:
-			finish_flag = true;
+			mem.finish_flag = true;
 			break;
+
 		default:
 			assert(false);
 			break;
 		}
-		Operation::play(pc,r,m,Z,S,V,finish_flag);
+		if (result != NAN) {
+			if (result < 0)mem.flags.s = true;
+			if (result == 0)mem.flags.z = true;
+		}
+		Operation::play(mem);
 	}
 };
 struct Load_store :Operation {
@@ -159,18 +219,20 @@ struct Load_store :Operation {
 		op1 = op1_; ra = ra_;
 		rb = rb_; d = d_;
 	}
-	virtual void play(int &pc, std::vector<int>&r, std::vector<int>&m, int& Z, int& S, int& V, bool& finish_flag) {
+	virtual void play(Data&mem) {
 		switch (op1) {
 		case LD:
-			r[ra] = m[r[rb] + d];
+			mem.reg[ra] = mem.main_mem[mem.reg[rb] + d];
 			break;
+
 		case ST:
-			m[r[rb] + d] = r[ra];
+			mem.main_mem[mem.reg[rb] + d] = mem.reg[ra];
 			break;
+
 		default:
 			assert(false);
 		}
-		Operation::play(pc, r, m, Z, S, V, finish_flag);
+		Operation::play(mem);
 	}
 
 };
@@ -190,18 +252,20 @@ struct Imme_goto : Operation {
 		op1 = op1_; op2 = op2_;
 		rb = rb_; d = d_;
 	}
-	virtual void play(int &pc, std::vector<int>&r, std::vector<int>&m, int& Z, int& S, int& V, bool& finish_flag) {
+	virtual void play(Data&mem) {
 		switch (op2) {
 		case LI:
-			r[rb] = d;
+			mem.reg[rb] = d;
 			break;
+
 		case B:
-			pc += d;
+			mem.pc += d;
 			break;
+
 		default:
 			assert(false);
 		}
-		Operation::play(pc, r, m, Z, S, V, finish_flag);
+		Operation::play(mem);
 	}
 };
 struct If : Operation {
@@ -229,24 +293,28 @@ struct If : Operation {
 		op1 = op1_; op2 = op2_;
 		cond = cond_; d = d_;
 	}
-	virtual void play(int &pc, std::vector<int>&r, std::vector<int>&m, int& Z, int& S, int& V, bool& finish_flag) {
+	virtual void play(Data&mem) {
 		switch (cond) {
 		case BE:
-			if (Z)pc += d;
+			if (mem.flags.z)mem.pc += d;
 			break;
+
 		case BLT:
-			if (S^V)pc += d;
+			if (mem.flags.s^mem.flags.v)mem.pc += d;
 			break;
+
 		case BLE:
-			if (Z || (S^V))pc += d;
+			if (mem.flags.z || (mem.flags.s^mem.flags.v))mem.pc += d;
 			break;
+
 		case BNE:
-			if (!Z)pc += d;
+			if (!mem.flags.z)mem.pc += d;
 			break;
+
 		default:
 			assert(false);
 		}
-		Operation::play(pc, r, m, Z, S, V, finish_flag);
+		Operation::play(mem);
 	}
 };
 
@@ -312,32 +380,33 @@ int main(int argc, char **argv) {
 	}
 	int nowclock = 0;
 	int pc = 0;
-	int Z, S, V;
 	std::vector<int>r(8);
-	std::vector<int>m(2048);
 	std::random_device rnd;
 	std::mt19937 mt(rnd());
 	std::uniform_int_distribution<> randomizer(-32768, 32767);
 	
 	for (size_t k = 0; k < 3; ++k) {
-		for (int i = 0; i < 1024; ++i) {
-			m[i + 1024] = randomizer(mt);
+		Data data;
+		{
+
+			std::vector<int>m(2048);
+			for (int i = 0; i < 1024; ++i) {
+				m[i + 1024] = randomizer(mt);
+			}
+			if (k == 1)sort(m.begin() + 1024, m.begin() + 2048);
+			if (k == 2)sort(m.begin() + 1024, m.begin() + 2048, std::greater<int>());
+			data.main_mem = m;
 		}
-		if (k == 1)sort(m.begin() + 1024, m.begin() + 2048);
-		if (k == 2)sort(m.begin() + 1024, m.begin() + 2048, std::greater<int>());
 		if (k == 0)std::cout << "-----RANDOM -----" << std::endl;
 		if (k == 1)std::cout << "-----GREATER-----" << std::endl;
 		if (k == 2)std::cout << "-----LESS   -----" << std::endl;
-		while (1) {
-			bool finish_flag = false;
-			if (pc >= static_cast<int>(ops.size())) {
-				assert(false);
-			}
-			std::shared_ptr<Operation> nowop = ops[pc];
-			nowop->play(pc, r, m, Z, S, V, finish_flag);
+		while (1) {	
+			assert(pc < static_cast<int>(ops.size()));
+			std::shared_ptr<Operation> nowop = ops[data.pc];
+			nowop->play(data);
 			nowclock++;
 
-			if (finish_flag) {
+			if (data.finish_flag) {
 				break;
 			}
 			if (nowclock > 1e7) {
@@ -346,19 +415,19 @@ int main(int argc, char **argv) {
 			}
 		}
 
-		if (is_sorted(m.begin() + 1024, m.begin() + 1024 * 2)) {
+		if (is_sorted(data.main_mem.begin() + 1024, data.main_mem.begin() + 1024 * 2)) {
 			std::cout << "**Sorted**" << std::endl;
 			std::cout << "Clock is " << nowclock << std::endl;
 		}
 		else {
 			for (int i = 0; i < 1024; ++i) {
-				std::cout << std::setw(6) << std::right << m[i + 1024];
+				std::cout << std::setw(6) << std::right << data.main_mem[i + 1024];
 				if (i % 8 == 7)std::cout << std::endl;
 				else std::cout << " ";
 			}
 			std::cout << "Not Sorted" << std::endl;
 			std::cout << "Clock is " << nowclock << std::endl;
-			return 0;
+			//return 0;
 		}
 	}
 	
