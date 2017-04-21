@@ -36,6 +36,8 @@ enum All_op {
 	OP_ST,
 
 	OP_LI,
+	OP_ADDI,
+	OP_CMPI,
 	OP_B,
 
 	OP_ADD,
@@ -58,27 +60,29 @@ enum All_op {
 	OP_IF,
 };
 std::map<All_op, std::string>op_map = {
-	{OP_LD,	 "OP_LD "},
-	{OP_ST,	 "OP_ST "},
-
-	{OP_LI,	 "OP_LI "},
-	{OP_B,	 "OP_B  "},
-
-	{OP_ADD, "OP_ADD"},
-	{OP_SUB, "OP_SUB"},
-	{OP_AND, "OP_AND"},
-	{OP_OR,	 "OP_OR "}	,
-	{OP_XOR, "OP_XOR"},
-	{OP_CMP, "OP_CMP"},
-	{OP_MOV, "OP_MOV"},
-	{OP_SLL, "OP_SLL"},
-	{OP_SLR, "OP_SLR"},
-	{OP_SRL, "OP_SRL"},
-	{OP_SRA, "OP_SRA"},
-	{OP_IN,	 "OP_IN,"},
-	{OP_OUT, "OP_OUT"},
-	{OP_HLT, "OP_HLT"},
-	{OP_IF,	 "OP_IF "}
+	{OP_LD  , "OP_LD  "},
+	{OP_ST  , "OP_ST  "},
+					  
+	{OP_LI  , "OP_LI  "},
+	{OP_ADDI, "OP_ADDI"},
+	{OP_CMPI, "OP_CMPI"},
+	{OP_B   , "OP_B   "},
+					  
+	{OP_ADD , "OP_ADD "},
+	{OP_SUB , "OP_SUB "},
+	{OP_AND , "OP_AND "},
+	{OP_OR  , "OP_OR  "}	,
+	{OP_XOR , "OP_XOR "},
+	{OP_CMP , "OP_CMP "},
+	{OP_MOV , "OP_MOV "},
+	{OP_SLL , "OP_SLL "},
+	{OP_SLR , "OP_SLR "},
+	{OP_SRL , "OP_SRL "},
+	{OP_SRA , "OP_SRA "},
+	{OP_IN  , "OP_IN, "},
+	{OP_OUT , "OP_OUT "},
+	{OP_HLT , "OP_HLT "},
+	{OP_IF  , "OP_IF  "}
 };
 
 struct Data {
@@ -117,52 +121,15 @@ struct Operation {
 	Op1 op1;
 	enum Op2 {
 		LI = 0,
+		ADDI=1,
+		CMPI=2,
 
-
-
-		B = 4,
+		B   =4,
 
 
 		IS_IF = 7,
 	};
 	int d;
-	
-	virtual void play(Data&mem, std::map<All_op, int>&use_counter) {
-		mem.pc++;
-	}
-};
-struct Calc_put :Operation {
-	int rs;
-	int rd;
-	enum Op3 {
-		ADD = 0,
-		SUB = 1,
-		AND = 2,
-		OR = 3,
-		XOR = 4,
-		CMP = 5,
-		MOV = 6,
-
-		SLL = 8,
-		SLR = 9,
-		SRL = 10,
-		SRA = 11,
-		IN = 12,
-		OUT = 13,
-
-		HLT = 15,
-	};
-	Op3 op3;
-	Calc_put(const std::string&st) {
-		name = Name::Calc_put;
-		Op1 op1_ = static_cast<Op1>(two_to_i(st.substr(0, 2)));
-		int rs_ = two_to_i(st.substr(2, 3));
-		int rd_ = two_to_i(st.substr(5, 3));
-		Op3 op3_ = static_cast<Op3>(two_to_i(st.substr(8, 4)));
-		int d_ = two_to_i(st.substr(12, 4));
-		op1 = op1_; rs = rs_; rd = rd_;
-		op3 = op3_; d = d_;
-	}
 	void f_check(int& result, Data::Flags&flags) {
 		if (result > REGISTER_MAX) {
 			result -= (REGISTER_MAX - REGISTER_MIN + 1);
@@ -175,6 +142,7 @@ struct Calc_put :Operation {
 		if (result < 0)flags.s = true;
 		if (result == 0)flags.z = true;
 	}
+
 
 
 	int f_add(const int l, const int r, Data::Flags&flags) {
@@ -235,6 +203,44 @@ struct Calc_put :Operation {
 		if (result == 0)flags.z = true;
 		return result;
 	}
+
+	virtual void play(Data&mem, std::map<All_op, int>&use_counter) {
+		mem.pc++;
+	}
+};
+struct Calc_put :Operation {
+	int rs;
+	int rd;
+	enum Op3 {
+		ADD = 0,
+		SUB = 1,
+		AND = 2,
+		OR  = 3,
+		XOR = 4,
+		CMP = 5,
+		MOV = 6,
+
+		SLL = 8,
+		SLR = 9,
+		SRL = 10,
+		SRA = 11,
+		IN  = 12,
+		OUT = 13,
+
+		HLT = 15,
+	};
+	Op3 op3;
+	Calc_put(const std::string&st) {
+		name = Name::Calc_put;
+		Op1 op1_ = static_cast<Op1>(two_to_i(st.substr(0, 2)));
+		int rs_ = two_to_i(st.substr(2, 3));
+		int rd_ = two_to_i(st.substr(5, 3));
+		Op3 op3_ = static_cast<Op3>(two_to_i(st.substr(8, 4)));
+		int d_ = two_to_i(st.substr(12, 4));
+		op1 = op1_; rs = rs_; rd = rd_;
+		op3 = op3_; d = d_;
+	}
+
 
 	virtual void play(Data&mem, std::map<All_op, int>&use_counter) {
 		mem.flags.z = false;
@@ -377,12 +383,17 @@ struct Imme_goto : Operation {
 		switch (op2) {
 		case LI:
 			use_counter[OP_LI]++;
-			mem.reg[rb] = d;
+			mem.reg[rb] = f_mov(mem.reg[rb], d, mem.flags);
 			break;
-		//case ADDI:
-		//	use_counter[OP_ADDI]++;
-		//	mem.reg[rb] += d;
-		//	break;
+		case ADDI:
+			use_counter[OP_ADDI]++;
+			mem.reg[rb]=f_add(mem.reg[rb],d,mem.flags);
+			break;
+
+		case CMPI:
+			use_counter[OP_CMPI]++;
+			f_sub(mem.reg[rb], d, mem.flags);
+			assert(false);
 
 		case B:
 			use_counter[OP_B]++;
