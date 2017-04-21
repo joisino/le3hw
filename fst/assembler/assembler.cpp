@@ -7,7 +7,26 @@
 #include <algorithm>
 #include <cassert>
 
-std::string d_to_b( std::string s, int b, bool sign = false ){
+
+std::string d_to_b( std::string s, int b ){
+  int num = 0;
+  for( char c : s ){
+    assert( '0' <= c && c <= '9' );
+    num = num * 10 + (int)( c - '0' );
+  }
+  assert( num < ( 1 << b ) );
+  std::string res = "";
+  for( int i = 0; i < b; i++ ){
+    char c = '0' + num % 2;
+    res += c;
+    num /= 2;
+  }
+  reverse( res.begin(), res.end() );
+  return res;
+}
+
+std::string extend( std::string s ){
+  int b = 8;
   bool minus = false;
   if( s[0] == '-' ){
     minus = true;
@@ -15,12 +34,20 @@ std::string d_to_b( std::string s, int b, bool sign = false ){
   }
   int num = 0;
   for( char c : s ){
+    assert( '0' <= c && c <= '9' );
     num = num * 10 + (int)( c - '0' );
   }
-  assert( num < ( 1 << b ) );
-  if( sign ){
-    assert( num < ( 1 << (b-1) ) );
+  for( int i = 0; i < 8; i++ ){
+    if( num == ( 1 << (i+7) ) ){
+      return "10000" + d_to_b( std::to_string( i ), 3 );
+    }
   }
+  for( int i = 0; i < 8; i++ ){
+    if( num == ( 1 << (i+8) ) - 1 ){
+      return "10001" + d_to_b( std::to_string( i ), 3 );
+    }
+  }
+  assert( num < ( 1 << (b-1) ) );
   if( minus ){
     num = ( 1 << b ) - num;
   }
@@ -139,7 +166,7 @@ std::string decode( std::string inst ){
 
     assert( rb[0] == 'r' );
     res += d_to_b( rb.substr( 1 ) , 3 );
-    res += d_to_b( d, 8, true );
+    res += extend( d );
   } else if( op == "LI" || op == "ADDI" || op == "CMPI" ){
     res += "10";
     if( op == "LI" ){
@@ -156,7 +183,7 @@ std::string decode( std::string inst ){
     assert( rb[0] == 'r' );
     res += d_to_b( rb.substr( 1 ) , 3 );
 
-    res += d_to_b( d, 8, true );
+    res += extend( d );
   } else if( op == "B" || op == "BAL" || op == "BE" || op == "BLT" || op == "BLE" || op == "BNE" ){
     if( op == "B" ){
       res += "10100000";
@@ -241,7 +268,7 @@ int main( int argc, char **argv ){
         std::cout << "LAVEL " << label << " NOT FOUND" << std::endl;
         assert( false );
       }
-      insts[i] = w.substr( 0 , 8 ) + d_to_b( std::to_string( label_to_address[label] - ( i + 1 ) ) , 8, true );
+      insts[i] = w.substr( 0 , 8 ) + extend( std::to_string( label_to_address[label] - ( i + 1 ) ) );
     }
   }
 
