@@ -41,6 +41,6 @@ module decode( input logic         clk, reset,
    mux #(3) mux_regwrite_adr( inst_id[10:8], inst_id[13:11], regwrite_adr_controll, regwrite_adr_id );
    regfile register_file( clk, reset, regwrite, inst_id[13:11], inst_id[10:8], regwrite_adr, regwrite_dat, register_invalid, rd1_id, rd2_id );
    assign out_dat = rd1_id;
-   extende xtend( inst_id[7:0], extended_d_id );
+   extend extend( inst_id[7:0], extended_d_id );
    assign d_id = inst_id[3:0];
 endmodule

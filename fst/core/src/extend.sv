@@ -17,7 +17,7 @@ module extend( input logic [7:0] a,
            6: res <= 16'b0010000000000000;
            7: res <= 16'b0100000000000000;
          endcase
-      end else if( a[7:3] == '5b10001 ) begin
+      end else if( a[7:3] == 5'b10001 ) begin
          case( a[2:0] )
            0: res <= 16'b0000000011111111;
            1: res <= 16'b0000000111111111;
