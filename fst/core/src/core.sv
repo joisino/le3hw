@@ -26,7 +26,11 @@ module core( input logic         clk,
              output logic [15:0] main_mem_write_dat );
 
    logic [15:0] pcinc, pcinc_id, pcinc_ex, pcinc_mem;
-   logic        jump;
+   logic        jump_pred;
+   logic [15:0] jump_pred_adr;
+   logic        jump_pred_miss;
+   logic        jump_pred_adr_miss;
+   logic [15:0] pcinc_evac;
    logic [15:0] inst_id;
    logic [15:0] rd1_id, rd1_ex, rd1_mem, rd1_wb;
    logic [15:0] rd2_id, rd2_ex;

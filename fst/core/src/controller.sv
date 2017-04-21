@@ -7,6 +7,13 @@ module controller( input logic        flushed,
 
                    input logic [2:0]  register_invalid [7:0],
                    output logic       from_main_mem_id,
+
+                   input logic        jump_pred, 
+                   input logic        jump_pred_miss,
+                   input logic        jump_pred_adr_miss,
+                   input logic        jump_pred_busy, 
+
+                   output logic       flush_decode,
                    
                    output logic       en_ifid, flush_ifid,
                    output logic       en_idex, flush_idex,
@@ -76,15 +83,19 @@ module controller( input logic        flushed,
       en_memwb <= 1;
       flush_memwb <= 0;
       en_pc <= 1;
-      if( jump ) begin
+      flush_decode <= 0;
+      if( jump_pred_miss | jump_pred_adr_miss ) begin
          flush_ifid <= 1;
          flush_idex <= 1;
          flush_exmem <= 1;
          // flush_memwb <= 1; // when jump, mem phase dealing with jump inst
-      end else if( data_hazard ) begin
+          flush_decode <= 1;
+      end else if( data_hazard | ( jump_pred_busy & jump_inst != 0 ) ) begin
          en_pc <= 0;
          en_ifid <= 0;
          flush_idex <= 1;
+      end else if( jump_pred ) begin
+         flush_ifid <= 1;
       end
    end
    
