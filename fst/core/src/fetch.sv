@@ -18,9 +18,9 @@ module fetch( input logic clk,
 
    always_comb begin
       nextpc <= pcinc;
-      if( jump_pred ) nextpc <= jump_pred_adr;
+      if( jump_pred_adr_miss ) nextpc <= ALUres_mem;
       else if( jump_pred_miss ) nextpc <= pcinc_evac;
-      else if( jump_pred_adr_miss ) nextpc <= ALUres_mem;
+      else if( jump_pred ) nextpc <= jump_pred_adr;
    end
    
 endmodule

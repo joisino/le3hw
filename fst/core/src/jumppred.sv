@@ -27,11 +27,13 @@ module jumppred( input logic clk, reset,
       if( reset ) begin
          jump_pred_busy <= 0;
          pcinc_evac <= 0;
+         pcinc_history <= 0;
          jump_table_valid <= 0;
          pred_shift_register <= 0;
       end else begin
          if( jump_pred ) begin
             pcinc_evac <= pcinc_id;
+            jump_pred_busy <= 1;
          end
          if( jump_cannot_predict ) begin // predict not jump, but really jump
             jump_table[ pcinc_history[7:4] ] <= ALUres_mem;
