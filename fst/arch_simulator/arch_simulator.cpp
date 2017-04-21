@@ -379,6 +379,10 @@ struct Imme_goto : Operation {
 			use_counter[OP_LI]++;
 			mem.reg[rb] = d;
 			break;
+		//case ADDI:
+		//	use_counter[OP_ADDI]++;
+		//	mem.reg[rb] += d;
+		//	break;
 
 		case B:
 			use_counter[OP_B]++;
@@ -510,7 +514,8 @@ int main(int argc, char **argv) {
 	for (size_t k = 0; k < 3; ++k) {
 		int nowclock = 0;
 		Data data;
-		std::map<All_op, int>use_counter;
+		std::map<All_op, int>operation_counter;
+		std::map<int, int>place_counter;
 		{
 
 			std::vector<int>m(2048);
@@ -528,7 +533,8 @@ int main(int argc, char **argv) {
 			data.flags.c = false;
 			assert(pc < static_cast<int>(ops.size()));
 			std::shared_ptr<Operation> nowop = ops[data.pc];
-			nowop->play(data, use_counter);
+			place_counter[data.pc]++;
+			nowop->play(data, operation_counter);
 			nowclock++;
 
 			if (data.finish_flag) {
@@ -544,9 +550,14 @@ int main(int argc, char **argv) {
 			std::cout << "**Sorted**" << std::endl;
 			std::cout << "Clock is " << nowclock << std::endl;
 			int sum = 0;
-			for (auto c : use_counter) {
+			for (auto c : operation_counter) {
+				if (op_map.find(c.first) == op_map.end())std::cout << "no name" << std::endl;
 				std::cout << std::setw(10)<<op_map[c.first] << " "<<std::setw(6) << c.second << std::endl;
 				sum += c.second;
+			}
+			std::cout << "PC_Counter" << std::endl;
+			for (auto c : place_counter) {
+				std::cout << std::setw(5) << c.first << " : " <<std::setw(8)<< c.second<<" times" << std::endl;
 			}
 			std::cout << "Sum: " << sum << std::endl;
 		}
