@@ -28,7 +28,7 @@ module controller( input logic        flushed,
    logic [1:0] op;
    logic [2:0] ra, rb;
 
-   logic [4:0] ty;
+   logic [3:0] ty;
 
    logic data_hazard;
 
@@ -50,7 +50,6 @@ module controller( input logic        flushed,
    end
    
    always_comb begin
-      jump <= 0;
       case( jump_state )
         1: // B
           jump <= 1;
@@ -62,6 +61,8 @@ module controller( input logic        flushed,
           jump <= Z_wb | ( S_wb ^ V_wb );
         5: // BNE
           jump <= !Z_wb;
+	default:
+	  jump <= 0;
       endcase
    end
 
