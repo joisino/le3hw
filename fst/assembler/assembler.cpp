@@ -122,7 +122,7 @@ std::string decode( std::string inst ){
     res += "0000";
   } else if( op == "HLT" ){
     res = "1100000011110000";
-  } else if( op == "LD" or op == "ST" ){
+  } else if( op == "LD" || op == "ST" ){
     if( op == "LD" ){
       res += "00";
     } else if( op == "ST" ){
@@ -140,7 +140,7 @@ std::string decode( std::string inst ){
     assert( rb[0] == 'r' );
     res += d_to_b( rb.substr( 1 ) , 3 );
     res += d_to_b( d, 8, true );
-  } else if( op == "LI" or op == "ADDI" or op == "CMPI" ){
+  } else if( op == "LI" || op == "ADDI" || op == "CMPI" ){
     res += "10";
     if( op == "LI" ){
       res += "000";
@@ -157,7 +157,7 @@ std::string decode( std::string inst ){
     res += d_to_b( rb.substr( 1 ) , 3 );
 
     res += d_to_b( d, 8, true );
-  } else if( op == "B" or op == "BAL" or op == "BE" or op == "BLT" or op == "BLE" or op == "BNE" ){
+  } else if( op == "B" || op == "BAL" || op == "BE" || op == "BLT" || op == "BLE" || op == "BNE" ){
     if( op == "B" ){
       res += "10100000";
     } else if( op == "BAL" ){
@@ -200,7 +200,7 @@ int main( int argc, char **argv ){
   
   std::ifstream ifs( argv[1] );
 
-  if( not ifs ){
+  if( ! ifs ){
     std::cout << "File Not Found" << std::endl;
     return 1;
   }
@@ -216,7 +216,7 @@ int main( int argc, char **argv ){
         break;
       }
     }
-    while( ( not buffer.empty() ) and buffer.back() == ' ' ){
+    while( ( ! buffer.empty() ) && buffer.back() == ' ' ){
       buffer.pop_back();
     }
     if( buffer.empty() ){
@@ -235,7 +235,7 @@ int main( int argc, char **argv ){
   for( int i = 0; i < (int)insts.size(); i++ ){
     std::string w = insts[i];
     std::string op2 = w.substr( 2 , 3 );
-    if( w.substr( 0 , 2 ) == "10" and ( op2 == "100" or op2 == "101" or op2 == "111" ) ){
+    if( w.substr( 0 , 2 ) == "10" && ( op2 == "100" || op2 == "101" || op2 == "111" ) ){
       std::string label = w.substr( 8 );
       if( label_to_address.find( label ) == label_to_address.end() ){
         std::cout << "LAVEL " << label << " NOT FOUND" << std::endl;
