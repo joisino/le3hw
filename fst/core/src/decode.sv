@@ -1,5 +1,6 @@
 `include "jumpstate.sv"
 `include "reginvalid.sv"
+`include "jumppred.sv"
 
 module decode( input logic         clk, reset,
                input logic         flushed,
@@ -16,8 +17,8 @@ module decode( input logic         clk, reset,
                output logic [2:0]  regwrite_adr_id,
                output logic [2:0]  ALUsrcA_controll_id, ALUsrcB_controll_id,
                output logic [3:0]  ALUop_id,
-               output logic [15:0] out_dat,
-               output logic        out_en,
+               output logic [15:0] out_dat_id,
+               output logic        out_en_id,
                output logic        is_halt_id,
                output logic        main_mem_write_id,
                output logic [1:0]  regwrite_dat_controll_id,
@@ -49,7 +50,7 @@ module decode( input logic         clk, reset,
    reginvalid reginvalid( .reset(reset|flush_decode), .* );
    mux #(3) mux_regwrite_adr( inst_id[10:8], inst_id[13:11], regwrite_adr_controll, regwrite_adr_id );
    regfile register_file( clk, reset, regwrite, inst_id[13:11], inst_id[10:8], regwrite_adr, regwrite_dat, register_invalid, rd1_id, rd2_id );
-   assign out_dat = rd1_id;
+   assign out_dat_id = rd1_id;
    extend extend( inst_id[7:0], extended_d_id );
    assign d_id = inst_id[3:0];
 endmodule
