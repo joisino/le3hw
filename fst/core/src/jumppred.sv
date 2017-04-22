@@ -16,16 +16,15 @@ module jumppred( input logic clk, reset,
    logic [1:0] pred_shift_register;
    logic [7:0] pcinc_history;
 
-   assign jump_cannot_predict = jump & (!pred_shift_register[0]);
-   assign jump_pred_adr_miss = ( jump & ( jump_pred_adr != ALUres_mem ) & pred_shift_register[1] ) | jump_cannot_predict;
-   assign jump_pred_miss = (!jump) & ( jump_state != 0 ) & pred_shift_register[1];
+   assign jump_cannot_predict = jump & (!pred_shift_register[1]);
+   assign jump_pred_adr_miss = ( jump & pred_shift_register[1] & ( jump_table[pcinc_history[7:4]] != ALUres_mem ) ) | jump_cannot_predict;
+   assign jump_pred_miss = (!jump) & pred_shift_register[1];
    assign jump_pred = (!jump_pred_busy) & (jump_inst != 0) & jump_table_valid[ pcinc_id[3:0] ];
    assign jump_pred_adr = jump_table[ pcinc_id[3:0] ];
-   assign jump_busy = pred_shift_register[0] | pred_shift_register[1];
+   assign jump_pred_busy = pred_shift_register[0] | pred_shift_register[1];
 
    always_ff @(posedge clk) begin
       if( reset ) begin
-         jump_pred_busy <= 0;
          pcinc_evac <= 0;
          pcinc_history <= 0;
          jump_table_valid <= 0;
@@ -33,11 +32,11 @@ module jumppred( input logic clk, reset,
       end else begin
          if( jump_pred ) begin
             pcinc_evac <= pcinc_id;
-            jump_pred_busy <= 1;
-         end
+         end             
          if( jump_cannot_predict ) begin // predict not jump, but really jump
             jump_table[ pcinc_history[7:4] ] <= ALUres_mem;
             jump_table_valid[ pcinc_history[7:4] ] <= 1;
+            pred_shift_register <= 0;
          end else begin
             if( jump_pred_adr_miss ) begin // predict jump, and jump, but the address is not correct
                jump_table[ pcinc_evac[3:0] ] <= ALUres_mem;
@@ -45,11 +44,8 @@ module jumppred( input logic clk, reset,
             if( jump_pred_miss ) begin // predict jump, but really not jump
                jump_table_valid[ pcinc_evac[3:0] ] <= 0;
             end
+            pred_shift_register <= { pred_shift_register[0], jump_pred };
          end
-         if( pred_shift_register[1] ) begin
-            jump_pred_busy <= 0;
-         end
-         pred_shift_register <= { pred_shift_register[0], jump_pred };
          pcinc_history <= { pcinc_history[3:0], pcinc_id[3:0] };
       end
    end

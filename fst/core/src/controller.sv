@@ -28,7 +28,8 @@ module controller( input logic        flushed,
                    output logic       jump,
                    output logic       regwrite_id, regwrite_adr_controll,
                    output logic       out_en_id,
-                   output logic [2:0] ALUsrcA_controll_id, ALUsrcB_controll_id,
+                   output logic [1:0] ALUsrcA_controll_id, ALUsrcB_controll_id,
+                   output logic [1:0] ra_controll_id, rb_controll_id,
                    output logic [3:0] ALUop_id,
                    output logic [1:0] regwrite_dat_controll_id );
 
@@ -38,6 +39,8 @@ module controller( input logic        flushed,
    logic [3:0] ty;
 
    logic data_hazard;
+
+   logic use_ra, use_rb;
 
    assign regwrite_cur = regwrite_id & (!flush_idex) & en_idex;
 
@@ -50,9 +53,8 @@ module controller( input logic        flushed,
 
    always_comb begin
       data_hazard <= 0;
-      if( ( ALUsrcB_controll_id == 0 & register_invalid[ra] == 1 ) |
-          ( ALUsrcA_controll_id == 0 & register_invalid[rb] == 1 ) |
-          ( op == 3 & ty == 13 & register_invalid[ra] != 0 ) )
+      if( ( use_ra & register_invalid[ra] == 1 ) |
+          ( use_rb & register_invalid[rb] == 1 ) )
         data_hazard <= 1;
    end
    
@@ -111,26 +113,33 @@ module controller( input logic        flushed,
       ALUop_id <= 15;
       regwrite_dat_controll_id <= 0;
       from_main_mem_id <= 0;
+      use_ra <= 0;
+      use_rb <= 0;
 
       case( register_invalid[ra] )
-         2: ALUsrcB_controll_id <= 4;
-         3: ALUsrcB_controll_id <= 5;
+        2: ra_controll_id <= 1;
+        3: ra_controll_id <= 2;
+        default: ra_controll_id <= 0;
       endcase
 
       case( register_invalid[rb] )
-         2: ALUsrcA_controll_id <= 4;
-         3: ALUsrcA_controll_id <= 5;
+        2: rb_controll_id <= 1;
+        3: rb_controll_id <= 2;
+        default: rb_controll_id <= 0;
       endcase
       
       if( !flushed ) begin      
          case( op )
            0:  begin // LD
+              use_rb <= 1;
               regwrite_id <= 1;
               ALUsrcB_controll_id <= 2;
               regwrite_adr_controll <= 1;
               from_main_mem_id <= 1;
            end
            1: begin // ST
+              use_ra <= 1;
+              use_rb <= 1;
               main_mem_write_id <= 1;
               ALUsrcB_controll_id <= 2;
            end
@@ -141,11 +150,13 @@ module controller( input logic        flushed,
                    regwrite_dat_controll_id <= 3;
                 end
                 1: begin // ADDI
+                   use_rb <= 1;
                    regwrite_id <= 1;
                    ALUop_id <= 0;
                    ALUsrcB_controll_id <= 2;
                 end
                 2: begin // CMPI
+                   use_rb <= 1;
                    ALUop_id <= 5;
                    ALUsrcB_controll_id <= 2;
                 end
@@ -187,16 +198,22 @@ module controller( input logic        flushed,
               ALUop_id <= ty;
               case(ty)
                 0, 1, 2, 3, 4: begin
+                   use_ra <= 1;
+                   use_rb <= 1;
                    regwrite_id <= 1;
                 end
-                5: begin 
+                5: begin
+                   use_ra <= 1;
+                   use_rb <= 1;
                 end
-                6: begin
+                6: begin // MOV
+                   use_ra <= 1;
                    ALUsrcA_controll_id <= 2;
                    regwrite_id <= 1;
                    regwrite_dat_controll_id <= 0;
                 end
                 8, 9, 10, 11: begin
+                   use_rb <= 1;
                    regwrite_id <= 1;
                    ALUsrcB_controll_id <= 1;
                 end
@@ -206,6 +223,7 @@ module controller( input logic        flushed,
                    ALUsrcB_controll_id <= 3;
                 end
                 13: begin
+                   use_ra <= 1;
                    out_en_id <= 1;
                 end
                 15: begin

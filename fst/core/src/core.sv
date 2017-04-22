@@ -32,7 +32,7 @@ module core( input logic         clk,
    logic        jump_pred_adr_miss;
    logic [15:0] pcinc_evac;
    logic [15:0] inst_id;
-   logic [15:0] rd1_id, rd1_ex, rd1_mem, rd1_wb;
+   logic [15:0] rd1_id, rd1_ex, rd1_ex2, rd1_mem, rd1_wb;
    logic [15:0] rd2_id, rd2_ex;
    logic [3:0]  d_id, d_ex;
    logic [15:0] extended_d_id, extended_d_ex, extended_d_mem, extended_d_wb;
@@ -41,8 +41,10 @@ module core( input logic         clk,
    logic        is_halt_id, is_halt_ex;
    logic        out_en_id, out_en_ex;
    logic [15:0] out_dat_id, out_dat_ex;   
-   logic [2:0]  ALUsrcA_controll_id, ALUsrcA_controll;
-   logic [2:0]  ALUsrcB_controll_id, ALUsrcB_controll;
+   logic [1:0]  ALUsrcA_controll_id, ALUsrcA_controll;
+   logic [1:0]  ALUsrcB_controll_id, ALUsrcB_controll;
+   logic [1:0]  ra_controll_id, ra_controll;
+   logic [1:0]  rb_controll_id, rb_controll;
    logic [3:0]  ALUop_id, ALUop;
    logic        main_mem_write_id, main_mem_write_ex;
    logic [15:0] main_mem_dat_wb;

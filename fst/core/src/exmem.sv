@@ -2,7 +2,7 @@ module exmem( input logic clk, reset, en_exmem, flush_exmem,
               input logic [15:0]  ALUres_ex,
               input logic         S_ex, C_ex, Z_ex, V_ex,
               input logic [15:0]  pcinc_ex, 
-              input logic [15:0]  rd1_ex,
+              input logic [15:0]  rd1_ex2,
               input logic [15:0]  extended_d_ex,
               input logic [2:0]   regwrite_adr_ex,
               input logic         main_mem_write_ex,
@@ -33,7 +33,7 @@ module exmem( input logic clk, reset, en_exmem, flush_exmem,
    flopr #(1) Z_flop( clk, reset | flush_exmem, en_exmem, Z_ex, Z_mem );
    flopr #(1) V_flop( clk, reset | flush_exmem, en_exmem, V_ex, V_mem );
    flopr pcinc_flop( clk, reset | flush_exmem, en_exmem, pcinc_ex, pcinc_mem );
-   flopr rd1_flop( clk, reset | flush_exmem, en_exmem, rd1_ex, rd1_mem );
+   flopr rd1_flop( clk, reset | flush_exmem, en_exmem, rd1_ex2, rd1_mem );
    flopr extended_d_flop( clk, reset | flush_exmem, en_exmem, extended_d_ex, extended_d_mem );
    flopr #(3) regwrite_adr_flop( clk, reset | flush_exmem, en_exmem, regwrite_adr_ex, regwrite_adr_mem );
    flopr #(1) main_mem_write_flop( clk, reset | flush_exmem, en_exmem, main_mem_write_ex, main_mem_write );
