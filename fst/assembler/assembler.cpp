@@ -210,6 +210,8 @@ std::string decode( std::string inst ){
     res += d_to_b( rb.substr( 1 ) , 3 );
 
     res += "00000000";
+  } else if( op == "NOP" ){
+    res += "1000100000000000";
   } else {
     puts( "OP not exist" );
     assert( false );
