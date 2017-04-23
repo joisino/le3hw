@@ -5,9 +5,9 @@ MAIN:
 JUN:
         LD r5 r3 1023
         LD r6 r3 1024
+        ADDI r3 1
         CMP r6 r5
         BLT JUNEND
-        ADDI r3 1
         CMP r3 r2
         BLE JUN
 JUNOK:
@@ -17,9 +17,9 @@ JUNEND:
 GYAKU:
         LD r5 r3 1023
         LD r6 r3 1024
+        ADDI r3 1
         CMP r5 r6
         BLT GYAKUEND
-        ADDI r3 1
         CMP r3 r2
         BLE GYAKU
 GYAKUOK:
@@ -59,6 +59,7 @@ RADIXSORT:
         ST r3 r2 0      # it++
         CMPI r4 1024    # M: array size
         BLT RADIXSORT
+        HLT
         LI r4 0         # r4 is an iterator for array position
         LI r3 512       # r3 is an iterator for bucket
         LI r1 8192      # 8192 = 512 * 16
@@ -67,12 +68,17 @@ MINUS:
         LD r2 r3 0      # r2 is the end position
         CMP r1 r2
         BE MINUSNEXT    # if empty, go next
+        MOV r5 r2
+        SUB r5 r1
+        CMPI r5 1
+        BE MINSERTEND    # if size == 1, skip insert sort
         BAL INSERT
+MINSERTEND:      
         MOV r5 r1
 MINUSMOV:
         LD r6 r5 0
-        ST r6 r4 1024   # a[r4] <- bucket[r3][r5]
         ADDI r5 1
+        ST r6 r4 1024   # a[r4] <- bucket[r3][r5]
         ADDI r4 1
         CMP r5 r2
         BLT MINUSMOV
@@ -87,12 +93,17 @@ PLUS:
         LD r2 r3 0      # r2 is the end position
         CMP r1 r2
         BE PLUSNEXT     # if empty, go next
+        MOV r5 r2
+        SUB r5 r1
+        CMPI r5 1
+        BE PINSERTEND    # if size == 1, skip insert sort
         BAL INSERT
+PINSERTEND:      
         MOV r5 r1
 PLUSMOV:
         LD r6 r5 0
-        ST r6 r4 1024
         ADDI r5 1
+        ST r6 r4 1024
         ADDI r4 1
         CMP r5 r2
         BLT PLUSMOV
@@ -105,11 +116,9 @@ PLUSNEXT:
         NOP
         NOP
         NOP
-INSERT:
+INSERT:                         # size must be >= 2
         MOV r5 r1
         ADDI r5 1
-        CMP r2 r5
-        BLE INSERTLOOPEND       # if the size <= 1, do nothing
 INSERTLOOP:
         LD r6 r5 0              # r6(tmp) <- data[i]
         MOV r7 r5               # j
