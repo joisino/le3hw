@@ -9,9 +9,9 @@ module ALU( input logic [3:0] op,
 
       case( op )
         0:
-          { C, res } <= { 1'b0, a } + { 1'b0, b };
+          { C, res } <= a + b;
         1, 5:
-          { C, res } <= { 1'b0, a } + { 1'b0, -b };
+          { C, res } <= a - b;
         2:
           res <= a & b;
         3:
