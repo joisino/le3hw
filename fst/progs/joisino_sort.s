@@ -4,27 +4,25 @@ MAIN:
         LI r2 1023
         LI r3 1
 JUN:
-        CMP r3 r2
-        BE JUNOK
         LD r5 r3 1023
         LD r6 r3 1024
         CMP r6 r5
         BLT JUNEND
         ADDI r3 1
-        B JUN
+        CMP r3 r2
+        BLE JUN
 JUNOK:
         HLT
 JUNEND:
         LI r3 1
 GYAKU:
-        CMP r2 r3
-        BLT GYAKUOK
         LD r5 r3 1023
         LD r6 r3 1024
         CMP r5 r6
         BLT GYAKUEND
         ADDI r3 1
-        B GYAKU
+        CMP r3 r2
+        BLE GYAKU
 GYAKUOK:
         MOV r3 r2
         ADD r3 r1
@@ -34,11 +32,10 @@ REV:
         LD r6 r1 1024
         ST r5 r1 1024
         ST r6 r2 1024
-        CMP r3 r1
-        BE REVEND
         ADDI r1 1
         ADDI r2 -1
-        B REV
+        CMP r1 r3
+        BLE REV
 REVEND:
         HLT
 GYAKUEND:
@@ -52,29 +49,29 @@ QUICKSORT:
         ST r5 r7 3
         ST r6 r7 4
         ADDI r7 5
-        MOV r3 r2  # r2 - r1 <= 16 -> intro sort
+        MOV r3 r2  # r2 - r1 <= 16 -> insert sort
         SUB r3 r1  # 
         CMPI r3 16 #
-        BLE INTRO  #
+        BLE INSERT #
         MOV r4 r1
         ADD r4 r2
         SRL r4 1
         LD r4 r4 1024 # pivot
 LOOP:
-LOOPI:  
+LOOPI:
         LD r5 r1 1024 # a[i]
-        CMP r4 r5
-        BLE LOOPIEND
         ADDI r1 1 # i++
-        B LOOPI
+        CMP r5 r4
+        BLT LOOPI
 LOOPIEND:
+        ADDI r1 -1
 LOOPJ:
         LD r6 r2 1024 # a[j]
-        CMP r6 r4
-        BLE LOOPJEND
         ADDI r2 -1 # j--
-        B LOOPJ
+        CMP r4 r6
+        BLT LOOPJ
 LOOPJEND:
+        ADDI r2 1
         CMP r2 r1
         BLE LOOPEND
         ST r6 r1 1024
@@ -101,27 +98,30 @@ RET:
         LD r5 r7 3
         LD r6 r7 4
         BR r0
-INTRO:
+INSERT:
         MOV r3 r1
         ADDI r3 1
-INTROLOOP:
         CMP r2 r3
-        BLT INTROLOOPEND
-        LD r4 r3 1024 # r4(tmp) <- data[i]
-        MOV r6 r3 # j
-INTROLOOPIN:    
-        LD r5 r6 1023 # r5 <- data[j-1]
-        CMP r5 r4
-        BLE INTROLOOPINEND
-        ST r5 r6 1024 # data[j] <- r5
-        ADDI r6 -1
-        CMP r6 r1
-        BE INTROLOOPINEND
-        B INTROLOOPIN
-INTROLOOPINEND:
-        ST r4 r6 1024 # data[j] <- r4(tmp)
+        BLT INSERTLOOPEND       # if the size <= 1, do nothing
+INSERTLOOP:
+        LD r4 r3 1024           # r4(tmp) <- data[i]
+        MOV r5 r3               # j
+INSERTLOOPIN:    
+        LD r6 r5 1023           # r6 <- data[j-1]
+        CMP r6 r4               
+        BLE INSERTLOOPINEND     # if data[j-1] <= tmp, break
+        ST r6 r5 1024           # data[j] <- data[j-1]
+        ADDI r5 -1              # j--
+        CMP r1 r5
+        BLT INSERTLOOPIN        # if r1 < j, continue
+INSERTLOOPINEND:
+        ST r4 r5 1024           # data[j] <- r4(tmp)
         ADDI r3 1
-        B INTROLOOP
-INTROLOOPEND:
+        CMP r3 r2
+        BLE INSERTLOOP
+INSERTLOOPEND:  
         B RET
-        
+        NOP
+        NOP
+        NOP
+        NOP
