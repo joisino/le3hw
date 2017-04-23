@@ -29,7 +29,8 @@ module controller( input logic        flushed,
                    output logic       regwrite_id, regwrite_adr_controll,
                    output logic       out_en_id,
                    output logic [1:0] ALUsrcA_controll_id, ALUsrcB_controll_id,
-                   output logic [1:0] ra_controll_id, rb_controll_id,
+                   output logic [1:0] forwardingA_controll_id, forwardingB_controll_id,
+                   output logic [1:0] forwarding_ra_controll_id,
                    output logic [3:0] ALUop_id,
                    output logic [1:0] regwrite_dat_controll_id );
 
@@ -100,6 +101,29 @@ module controller( input logic        flushed,
          flush_ifid <= 1;
       end
    end
+
+   always_comb begin
+      forwardingA_controll_id <= 0;
+      forwardingB_controll_id <= 0;
+      forwarding_ra_controll_id <= 0;
+
+      if( ALUsrcA_controll_id == 0 )
+         case( register_invalid[rb] )
+           2: forwardingA_controll_id <= 1;
+           3: forwardingA_controll_id <= 2;
+         endcase
+      
+      if( ALUsrcB_controll_id == 0 )
+        case( register_invalid[ra] )
+          2: forwardingB_controll_id <= 1;
+          3: forwardingB_controll_id <= 2;
+        endcase
+
+      case( register_invalid[ra] )
+        2: forwarding_ra_controll_id <= 1;
+        3: forwarding_ra_controll_id <= 2;
+      endcase
+   end
    
    always_comb begin
       jump_inst <= 0;
@@ -115,18 +139,6 @@ module controller( input logic        flushed,
       from_main_mem_id <= 0;
       use_ra <= 0;
       use_rb <= 0;
-
-      case( register_invalid[ra] )
-        2: ra_controll_id <= 1;
-        3: ra_controll_id <= 2;
-        default: ra_controll_id <= 0;
-      endcase
-
-      case( register_invalid[rb] )
-        2: rb_controll_id <= 1;
-        3: rb_controll_id <= 2;
-        default: rb_controll_id <= 0;
-      endcase
       
       if( !flushed ) begin      
          case( op )

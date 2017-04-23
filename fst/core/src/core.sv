@@ -43,8 +43,9 @@ module core( input logic         clk,
    logic [15:0] out_dat_id, out_dat_ex;   
    logic [1:0]  ALUsrcA_controll_id, ALUsrcA_controll;
    logic [1:0]  ALUsrcB_controll_id, ALUsrcB_controll;
-   logic [1:0]  ra_controll_id, ra_controll;
-   logic [1:0]  rb_controll_id, rb_controll;
+   logic [1:0]  forwardingA_controll_id, forwardingA_controll;
+   logic [1:0]  forwardingB_controll_id, forwardingB_controll;
+   logic [1:0]  forwarding_ra_controll_id, forwarding_ra_controll;
    logic [3:0]  ALUop_id, ALUop;
    logic        main_mem_write_id, main_mem_write_ex;
    logic [15:0] main_mem_dat_wb;

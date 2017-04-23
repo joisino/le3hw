@@ -5,7 +5,8 @@ module idex( input logic clk, reset, en_idex, flush_idex,
              input logic [15:0]  extended_d_id,
              input logic [2:0]   regwrite_adr_id,
              input logic [1:0]   ALUsrcA_controll_id, ALUsrcB_controll_id,
-             input logic [1:0]   ra_controll_id, rb_controll_id,
+             input logic [1:0]   forwardingA_controll_id, forwardingB_controll_id,
+             input logic [1:0]   forwarding_ra_controll_id,
              input logic [3:0]   ALUop_id,
              input logic         main_mem_write_id,
              input logic [1:0]   regwrite_dat_controll_id,
@@ -20,7 +21,8 @@ module idex( input logic clk, reset, en_idex, flush_idex,
              output logic [15:0] extended_d_ex,
              output logic [2:0]  regwrite_adr_ex,
              output logic [1:0]  ALUsrcA_controll, ALUsrcB_controll,
-             output logic [1:0]  ra_controll, rb_controll,
+             output logic [1:0]  forwardingA_controll, forwardingB_controll,
+             output logic [1:0]  forwarding_ra_controll,
              output logic [3:0]  ALUop,
              output logic        main_mem_write_ex,
              output logic [1:0]  regwrite_dat_controll_ex,
@@ -39,8 +41,9 @@ module idex( input logic clk, reset, en_idex, flush_idex,
    flopr #(3) regwrite_adr_flop( clk, reset | flush_idex, en_idex, regwrite_adr_id, regwrite_adr_ex );
    flopr #(2) ALUsrcA_controll_flop( clk, reset | flush_idex, en_idex, ALUsrcA_controll_id, ALUsrcA_controll );
    flopr #(2) ALUsrcB_controll_flop( clk, reset | flush_idex, en_idex, ALUsrcB_controll_id, ALUsrcB_controll );
-   flopr #(2) ra_controll_flop( clk, reset | flush_idex, en_idex, ra_controll_id, ra_controll );
-   flopr #(2) rb_controll_flop( clk, reset | flush_idex, en_idex, rb_controll_id, rb_controll );
+   flopr #(2) forwardingA_controll_flop( clk, reset | flush_idex, en_idex, forwardingA_controll_id, forwardingA_controll );
+   flopr #(2) forwardingB_controll_flop( clk, reset | flush_idex, en_idex, forwardingB_controll_id, forwardingB_controll );
+   flopr #(2) forwarding_ra_controll_flop( clk, reset | flush_idex, en_idex, forwarding_ra_controll_id, forwarding_ra_controll );
    flopr #(4) ALUop_flop( clk, reset | flush_idex, en_idex, ALUop_id, ALUop );
    flopr #(1) main_mem_write_flop( clk, reset | flush_idex, en_idex, main_mem_write_id, main_mem_write_ex );
    flopr #(2) regwrite_dat_controll_flop( clk, reset | flush_idex, en_idex, regwrite_dat_controll_id, regwrite_dat_controll_ex );
