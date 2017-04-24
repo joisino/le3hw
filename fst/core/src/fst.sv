@@ -67,9 +67,9 @@ module fst
    ledcounter cnter( .clk(clk), .reset_n(reset_n), .stp(halting), .* );
    
    always_ff @( posedge clk ) begin
-      halting = halting | is_halt;
+      halting <= halting | is_halt;
       if( !reset_n ) begin
-	 halting = 0;
+	 halting <= 0;
       end
 
       reset_n <= reset_n_in;
