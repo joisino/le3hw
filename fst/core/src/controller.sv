@@ -25,6 +25,9 @@ module controller( input logic        flushed,
                    
                    output logic       is_halt_id, 
                    output logic       main_mem_write_id,
+                   output logic       main_mem_read_id,
+                   input logic        lock_ac,
+                   output logic       lock_en, unlock_en,
                    output logic       jump,
                    output logic       regwrite_id, regwrite_adr_controll,
                    output logic       out_en_id,
@@ -93,7 +96,7 @@ module controller( input logic        flushed,
          flush_exmem <= 1;
          // flush_memwb <= 1; // when jump, mem phase dealing with jump inst
           flush_decode <= 1;
-      end else if( data_hazard | ( jump_pred_busy & jump_inst != 0 ) ) begin
+      end else if( data_hazard | ( jump_pred_busy & jump_inst != 0 ) | ( ( lock_en | unlock_en ) & (!lock_ac) ) ) begin
          en_pc <= 0;
          en_ifid <= 0;
          flush_idex <= 1;
@@ -128,6 +131,7 @@ module controller( input logic        flushed,
    always_comb begin
       jump_inst <= 0;
       is_halt_id <= 0;
+      main_mem_read_id <= 0; 
       main_mem_write_id <= 0;
       regwrite_id <= 0;
       regwrite_adr_controll <= 0;
@@ -139,6 +143,8 @@ module controller( input logic        flushed,
       from_main_mem_id <= 0;
       use_ra <= 0;
       use_rb <= 0;
+      lock_en <= 0;
+      unlock_en <= 0;
       
       if( !flushed ) begin      
          case( op )
@@ -148,6 +154,7 @@ module controller( input logic        flushed,
               ALUsrcB_controll_id <= 2;
               regwrite_adr_controll <= 1;
               from_main_mem_id <= 1;
+              main_mem_read_id <= 1;
            end
            1: begin // ST
               use_ra <= 1;
@@ -171,6 +178,13 @@ module controller( input logic        flushed,
                    use_rb <= 1;
                    ALUop_id <= 5;
                    ALUsrcB_controll_id <= 2;
+                end
+                3: begin // LOCK, UNLOCK
+                   if( inst_id[10] ) begin // UNLOCK
+                      unlock_en <= 1;
+                   end else begin // LOCK
+                      lock_en <= 1;
+                   end
                 end
                 4: begin // B
                    jump_inst <= 1;

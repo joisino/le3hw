@@ -11,6 +11,7 @@ module decode( input logic         clk, reset,
                input logic [15:0]  regwrite_dat,
                input logic         regwrite,
                input logic [15:0]  ALUres_mem,
+               input logic         lock_ac,
                output logic [15:0] rd1_id , rd2_id,
                output logic [3:0]  d_id,
                output logic [15:0] extended_d_id,
@@ -23,6 +24,9 @@ module decode( input logic         clk, reset,
                output logic        out_en_id,
                output logic        is_halt_id,
                output logic        main_mem_write_id,
+               output logic        main_mem_read_id,
+               output logic [9:0]  lock_adr,
+               output logic        lock_en, unlock_en,
                output logic [1:0]  regwrite_dat_controll_id,
                output logic        from_main_mem_id, 
                output logic        regwrite_id,
@@ -55,4 +59,5 @@ module decode( input logic         clk, reset,
    assign out_dat_id = rd1_id;
    extend extend( inst_id[7:0], extended_d_id );
    assign d_id = inst_id[3:0];
+   assign lock_adr = inst_id[9:0];
 endmodule

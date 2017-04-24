@@ -20,10 +20,16 @@ module core( input logic         clk,
              input logic [15:0]  inst,
 
              output logic [15:0] main_mem_read_adr,
-             input logic [15:0]  main_mem_dat,
-             output logic        main_mem_write,
              output logic [15:0] main_mem_write_adr,
-             output logic [15:0] main_mem_write_dat );
+             output logic [15:0] main_mem_write_dat
+             output logic        main_mem_write,
+             output logic        main_mem_read, 
+             input logic [15:0]  main_mem_dat,
+             input logic         main_mem_ac,
+             output logic [15:0] lock_adr,
+             output logic        lock_en,
+             output logic        unlock_en,
+             input logic         lock_ac );
 
    logic [15:0] pcinc, pcinc_id, pcinc_ex, pcinc_mem;
    logic        jump_pred;
@@ -48,6 +54,7 @@ module core( input logic         clk,
    logic [1:0]  forwarding_ra_controll_id, forwarding_ra_controll;
    logic [3:0]  ALUop_id, ALUop;
    logic        main_mem_write_id, main_mem_write_ex;
+   logic        main_mem_read_id, main_mem_read_ex;
    logic [15:0] main_mem_dat_wb;
    logic        regwrite_id, regwrite_ex, regwrite_mem, regwrite;
    logic [1:0]  regwrite_dat_controll_id, regwrite_dat_controll_ex, regwrite_dat_controll;
