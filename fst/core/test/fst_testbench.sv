@@ -2,12 +2,13 @@
 module fst_testbench();
 
    logic clk, reset_n;
+   logic [15:0] in_dat;
    logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h;
    logic [7:0] controll;
    logic halting;
    logic [15:0] pc;
 
-   fst fst( .clk(clk), .reset_n(reset_n), .seg_a(seg_a), .seg_b(seg_b), .seg_c(seg_c), .seg_d(seg_d), .seg_e(seg_e), .seg_f(seg_f), .seg_g(seg_g), .seg_h(seg_h), .controll(controll),  .halting(halting), .pc_out(pc) );
+   fst fst( .clk_in(clk), .reset_n_in(reset_n), .in_dat(in_dat), .seg_a(seg_a), .seg_b(seg_b), .seg_c(seg_c), .seg_d(seg_d), .seg_e(seg_e), .seg_f(seg_f), .seg_g(seg_g), .seg_h(seg_h), .controll(controll),  .halting(halting), .pc_out(pc) );
 
    always
      begin

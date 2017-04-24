@@ -1,6 +1,7 @@
 `include "jumpstate.sv"
 `include "reginvalid.sv"
 `include "jumppred.sv"
+`include "hazard.sv"
 
 module decode( input logic         clk, reset,
                input logic         flushed,
@@ -45,10 +46,18 @@ module decode( input logic         clk, reset,
    logic flush_decode;
    logic jump;
    logic jump_pred_busy;
+   logic use_ra, use_rb;
+   logic [2:0] ra, rb;
+
+   
+   
+   assign regwrite_cur = regwrite_id & (!flush_idex) & en_idex;
    
    controller core_controller( .* );
-   jumpstate jstate( .reset(reset|flush_decode), .* );
-   jumppred jpred( .* );
+   hazard hazard( .* );
+   forwarding forwarding( .* );
+   jumpstate jumpstate( .reset(reset|flush_decode), .* );
+   jumppred jumppred( .* );
    reginvalid reginvalid( .reset(reset|flush_decode), .* );
    mux #(3) mux_regwrite_adr( inst_id[10:8], inst_id[13:11], regwrite_adr_controll, regwrite_adr_id );
    regfile register_file( clk, reset, regwrite, inst_id[13:11], inst_id[10:8], regwrite_adr, regwrite_dat, register_invalid, rd1_id, rd2_id );
