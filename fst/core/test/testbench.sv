@@ -20,8 +20,8 @@ module testbench
    logic [C-1:0] lock_ac;
 
    logic [15:0]  in_dat;
-   logic         out_en;
-   logic [15:0]  out_dat;
+   logic [C-1:0] out_en;
+   logic [15:0]  out_dat [C-1:0];
    logic [C-1:0] is_halt;
 
    for( genvar i = 0; i < C; i++ ) begin : generate_core
@@ -39,6 +39,8 @@ module testbench
                  .pc(pc[i]),
                  .inst(inst[i]),
                  .is_halt(is_halt[i]),
+                 .out_en(out_en[i]),
+                 .out_dat(out_dat[i]),
                  .* );
    end
 
