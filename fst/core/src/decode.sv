@@ -24,7 +24,6 @@ module decode( input logic         clk, reset,
                output logic [1:0]  forwardingA_controll_id, forwardingB_controll_id,
                output logic [1:0]  forwarding_ra_controll_id,
                output logic [3:0]  ALUop_id,
-               output logic [15:0] out_dat_id,
                output logic        out_en_id,
                output logic        is_halt_id,
                output logic        main_mem_write_id,
@@ -58,7 +57,6 @@ module decode( input logic         clk, reset,
    logic [2:0] ra, rb;
    
    assign regwrite_cur = regwrite_id & (!flush_idex) & en_idex;
-   assign out_dat_id = rd1_id;
    assign d_id = inst_id[3:0];
    assign lock_adr = inst_id[9:0];
 
