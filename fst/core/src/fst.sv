@@ -9,8 +9,7 @@ module fst
      input logic [15:0]  in_dat,
      output logic [7:0]  seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
      output logic [7:0]  controll,
-     output logic        halting,
-     output logic [15:0] pc_out );
+     output logic        halting );
    
    logic         clk_n;
    logic 	 reset;
@@ -33,16 +32,13 @@ module fst
    logic [31:0]  counter;
    logic 	 clk;
    logic 	 reset_n;
-   
-   assign pc_out = pc;
 
    assign clk_n = ~clk;
    assign reset = ~reset_n | halting;
 
    pll( clk_in, clk );
 
-   integer i;
-   for( i = 0; i < C; i++ ) begin : generate_core
+   for( genvar i = 0; i < C; i++ ) begin : generate_core
       core core( .main_mem_read_adr(main_mem_read_adr[i]),
                  .main_mem_write_adr(main_mem_write_adr[i]),
                  .main_mem_write_dat(main_mem_write_dat[i]),

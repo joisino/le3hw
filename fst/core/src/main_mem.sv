@@ -41,15 +41,16 @@ module main_mem
       end
    end
 
+
    always_comb begin
       lock_ac <= 0;      
       if( unlock_en[0] ) begin
          lock_ac <= 2'b01;
       end else if( unlock_en[1] ) begin
          lock_ac <= 2'b10;
-      end else if( lock_en[0] ) begin
+      end else if( lock_en[0] & (!mutex[lock_adr[0]]) ) begin
          lock_ac <= 2'b01;
-      end else if( lock_en[1] ) begin
+      end else if( lock_en[1] & (!mutex[lock_adr[1]]) ) begin
          lock_ac <= 2'b10;
       end
    end
@@ -61,9 +62,9 @@ module main_mem
          mutex[ lock_adr[0] ] <= 0;
       end else if( unlock_en[1] ) begin
          mutex[ lock_adr[1] ] <= 0;
-      end else if( lock_en[0] ) begin
+      end else if( lock_en[0] & (!mutex[lock_adr[0]]) ) begin
          mutex[ lock_adr[0] ] <= 1;
-      end else if( lock_en[1] ) begin
+      end else if( lock_en[1] & (!mutex[lock_adr[1]]) ) begin
          mutex[ lock_adr[1] ] <= 1;
       end
    end

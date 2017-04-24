@@ -1,4 +1,6 @@
-module jumpstate( input logic clk, reset,
+module jumpstate( input logic        clk, reset,
+                  input logic        flush_decode,
+                  input logic        memory_waiting,       
                   input logic [2:0]  jump_inst,
                   input logic        S_wb, Z_wb, C_wb, V_wb,
                   input logic        jump_pred_busy,
@@ -25,10 +27,12 @@ module jumpstate( input logic clk, reset,
    end
                
    always_ff @(posedge clk) begin
-      if( reset )
+      if( reset | flush_decode )
         state <= 0;
       else begin
-         if( jump_pred_busy )
+         if( memory_waiting )
+           state <= state;
+         else if( jump_pred_busy )
            state <= { state[2:0], 3'b0 };
          else 
            state <= { state[2:0], jump_inst };

@@ -21,12 +21,12 @@ module core( input logic         clk,
 
              output logic [15:0] main_mem_read_adr,
              output logic [15:0] main_mem_write_adr,
-             output logic [15:0] main_mem_write_dat
+             output logic [15:0] main_mem_write_dat,
              output logic        main_mem_write,
              output logic        main_mem_read, 
              input logic [15:0]  main_mem_dat,
              input logic         main_mem_ac,
-             output logic [15:0] lock_adr,
+             output logic [9:0]  lock_adr,
              output logic        lock_en,
              output logic        unlock_en,
              input logic         lock_ac );

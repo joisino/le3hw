@@ -1,4 +1,6 @@
-module reginvalid( input logic clk, reset,
+module reginvalid( input logic        clk, reset,
+                   input logic        flush_decode,
+                   input logic        memory_waiting, 
                    input logic        regwrite_cur,
                    input logic        from_main_mem_id, 
                    input logic [2:0]  regwrite_adr_id, 
@@ -6,13 +8,15 @@ module reginvalid( input logic clk, reset,
    
    logic [1:0] nex[7:0];
 
-   integer i;
-   for( i = 0; i < 8; i++ ) begin : generate_reginvalid_cnt
-      reginvalidcnt reginvalidcnt( clk, reset, nex[i], register_invalid[i], register_invalid[i] );
+   for( genvar i = 0; i < 8; i++ ) begin : generate_reginvalid_cnt
+      reginvalidcnt reginvalidcnt( .nex(nex[i]),
+                                   .d(register_invalid[i]),
+                                   .q(register_invalid[i]),
+                                   .* );
    end
    
    always_comb begin
-      for( i = 0; i < 8; i++ ) begin : nex_init
+      for( integer i = 0; i < 8; i++ ) begin : nex_init
          nex[i] <= 0;
       end
       if( regwrite_cur ) begin

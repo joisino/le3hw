@@ -12,6 +12,9 @@ module decode( input logic         clk, reset,
                input logic [15:0]  regwrite_dat,
                input logic         regwrite,
                input logic [15:0]  ALUres_mem,
+               input logic         main_mem_read,
+               input logic         main_mem_write,
+               input logic         main_mem_ac,
                input logic         lock_ac,
                output logic [15:0] rd1_id , rd2_id,
                output logic [3:0]  d_id,
@@ -48,25 +51,25 @@ module decode( input logic         clk, reset,
    logic [2:0] register_invalid[7:0];
    logic regwrite_cur;
    logic flush_decode;
+   logic memory_waiting;
    logic jump;
    logic jump_pred_busy;
    logic use_ra, use_rb;
    logic [2:0] ra, rb;
-
-   
    
    assign regwrite_cur = regwrite_id & (!flush_idex) & en_idex;
-   
+   assign out_dat_id = rd1_id;
+   assign d_id = inst_id[3:0];
+   assign lock_adr = inst_id[9:0];
+
    controller core_controller( .* );
    hazard hazard( .* );
    forwarding forwarding( .* );
-   jumpstate jumpstate( .reset(reset|flush_decode), .* );
+   jumpstate jumpstate( .* );
    jumppred jumppred( .* );
    reginvalid reginvalid( .reset(reset|flush_decode), .* );
    mux #(3) mux_regwrite_adr( inst_id[10:8], inst_id[13:11], regwrite_adr_controll, regwrite_adr_id );
    regfile register_file( clk, reset, regwrite, inst_id[13:11], inst_id[10:8], regwrite_adr, regwrite_dat, register_invalid, rd1_id, rd2_id );
-   assign out_dat_id = rd1_id;
    extend extend( inst_id[7:0], extended_d_id );
-   assign d_id = inst_id[3:0];
-   assign lock_adr = inst_id[9:0];
+   
 endmodule

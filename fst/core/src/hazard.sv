@@ -6,6 +6,13 @@ module hazard( input logic       use_ra, use_rb,
                input logic       jump_pred_adr_miss,
                input logic       jump_pred_busy,
                input logic [2:0] jump_inst,
+
+               input logic       main_mem_read,
+               input logic       main_mem_write,
+               input logic       main_mem_ac,
+               
+               input logic       lock_en, unlock_en,
+               input logic       lock_ac,
                
                output logic      flush_decode,
                    
@@ -13,9 +20,17 @@ module hazard( input logic       use_ra, use_rb,
                output logic      en_idex, flush_idex,
                output logic      en_exmem, flush_exmem,
                output logic      en_memwb, flush_memwb,
-               output logic      en_pc );
+               output logic      en_pc,
+               
+               output logic      memory_waiting );
 
    logic data_hazard;
+   
+   logic jump_waiting, lock_waiting;
+
+   assign jump_waiting = jump_pred_busy & jump_inst != 0;
+   assign lock_waiting = ( lock_en | unlock_en ) & (!lock_ac);
+   assign memory_waiting = ( main_mem_read | main_mem_write ) & (!main_mem_ac);
    
    always_comb begin
       data_hazard <= 0;
@@ -39,9 +54,14 @@ module hazard( input logic       use_ra, use_rb,
          flush_ifid <= 1;
          flush_idex <= 1;
          flush_exmem <= 1;
-         // flush_memwb <= 1; // when jump, mem phase dealing with jump inst
          flush_decode <= 1;
-      end else if( data_hazard | ( jump_pred_busy & jump_inst != 0 ) ) begin
+      end else if( memory_waiting ) begin
+         en_pc <= 0;
+         en_ifid <= 0;
+         en_idex <= 0;
+         en_exmem <= 0;
+         flush_memwb <= 1;
+      end else if( data_hazard | jump_waiting | lock_waiting ) begin
          en_pc <= 0;
          en_ifid <= 0;
          flush_idex <= 1;
