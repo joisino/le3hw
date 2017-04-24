@@ -40,7 +40,6 @@ module core( input logic         clk,
    logic [15:0] regwrite_dat_mem, regwrite_dat_wb, regwrite_dat;
    logic        is_halt_id, is_halt_ex;
    logic        out_en_id, out_en_ex;
-   logic [15:0] out_dat_id, out_dat_ex;   
    logic [1:0]  ALUsrcA_controll_id, ALUsrcA_controll;
    logic [1:0]  ALUsrcB_controll_id, ALUsrcB_controll;
    logic [1:0]  forwardingA_controll_id, forwardingA_controll;

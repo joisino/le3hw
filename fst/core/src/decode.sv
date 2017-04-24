@@ -20,7 +20,6 @@ module decode( input logic         clk, reset,
                output logic [1:0]  forwardingA_controll_id, forwardingB_controll_id,
                output logic [1:0]  forwarding_ra_controll_id,
                output logic [3:0]  ALUop_id,
-               output logic [15:0] out_dat_id,
                output logic        out_en_id,
                output logic        is_halt_id,
                output logic        main_mem_write_id,
@@ -49,10 +48,8 @@ module decode( input logic         clk, reset,
    logic use_ra, use_rb;
    logic [2:0] ra, rb;
 
-   
-   
    assign regwrite_cur = regwrite_id & (!flush_idex) & en_idex;
-   
+
    controller core_controller( .* );
    hazard hazard( .* );
    forwarding forwarding( .* );
