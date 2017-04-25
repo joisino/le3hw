@@ -10,7 +10,9 @@ module controller( input logic        flushed,
                    output logic       is_halt_id, 
                    output logic       main_mem_write_id,
                    output logic       main_mem_read_id,
-                   output logic       lock_en, unlock_en,
+                   output logic       main_mem_write_request,
+                   output logic       main_mem_read_request,
+                   output logic       lock_en_id, unlock_en_id,
 
                    output logic       regwrite_id, regwrite_adr_controll,
                    output logic       out_en_id,
@@ -24,6 +26,9 @@ module controller( input logic        flushed,
    logic [1:0] op;
 
    logic [3:0] ty;
+
+   assign main_mem_write_request = main_mem_write_id;
+   assign main_mem_read_request = main_mem_read_id;
 
    always_comb begin
       op <= inst_id[15:14];
@@ -47,8 +52,8 @@ module controller( input logic        flushed,
       from_main_mem_id <= 0;
       use_ra <= 0;
       use_rb <= 0;
-      lock_en <= 0;
-      unlock_en <= 0;
+      lock_en_id <= 0;
+      unlock_en_id <= 0;
       
       if( !flushed ) begin      
          case( op )
@@ -84,10 +89,10 @@ module controller( input logic        flushed,
                    ALUsrcB_controll_id <= 2;
                 end
                 3: begin // LOCK, UNLOCK
-                   if( inst_id[10] ) begin // UNLOCK
-                      unlock_en <= 1;
+                   if( inst_id[0] ) begin // UNLOCK
+                      unlock_en_id <= 1;
                    end else begin // LOCK
-                      lock_en <= 1;
+                      lock_en_id <= 1;
                    end
                 end
                 4: begin // B

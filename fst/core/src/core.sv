@@ -10,7 +10,7 @@
 
 module core( input logic         clk,
              input logic         reset,
-
+             
              input logic [15:0]  in_dat,
              output logic        out_en,
              output logic [15:0] out_dat,
@@ -23,7 +23,9 @@ module core( input logic         clk,
              output logic [15:0] main_mem_write_adr,
              output logic [15:0] main_mem_write_dat,
              output logic        main_mem_write,
-             output logic        main_mem_read, 
+             output logic        main_mem_read,
+             output logic        main_mem_write_request,
+             output logic        main_mem_read_request, 
              input logic [15:0]  main_mem_dat,
              input logic         main_mem_ac,
              output logic [9:0]  lock_adr,

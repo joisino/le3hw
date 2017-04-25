@@ -1,5 +1,4 @@
 module jumppred( input logic         clk, reset,
-                 input logic         memory_waiting, 
                  input logic         jump,
                  input logic [15:0]  pcinc_id,
                  input logic [15:0]  ALUres_mem,
@@ -58,11 +57,7 @@ module jumppred( input logic         clk, reset,
               3: jump_table_valid[ predicted_pcinc ] <= 2;
             endcase
          end else begin
-            if( memory_waiting ) begin
-               pred_shift_register <= pred_shift_register;
-            end else begin
-               pred_shift_register <= { pred_shift_register[0], jump_pred };
-            end
+            pred_shift_register <= { pred_shift_register[0], jump_pred };
          end
          pcinc_history <= { pcinc_history[7:0], pcinc_id[7:0] };
       end

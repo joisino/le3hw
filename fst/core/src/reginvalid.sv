@@ -1,6 +1,5 @@
 module reginvalid( input logic        clk, reset,
                    input logic        flush_decode,
-                   input logic        memory_waiting, 
                    input logic        regwrite_cur,
                    input logic        from_main_mem_id, 
                    input logic [2:0]  regwrite_adr_id, 

@@ -6,6 +6,8 @@ module main_mem
      input logic [15:0]   main_mem_write_dat [C-1:0],
      input logic [C-1:0]  main_mem_write,
      input logic [C-1:0]  main_mem_read,
+     input logic [C-1:0]  main_mem_write_request,
+     input logic [C-1:0]  main_mem_read_request,
      input logic [9:0]    lock_adr [C-1:0],
      input logic [C-1:0]  lock_en,
      input logic [C-1:0]  unlock_en,
@@ -19,28 +21,35 @@ module main_mem
    logic [1023:0] mutex;
 
    always_comb begin
-      adr <= 0;
-      iswrite <= 0;
-      main_mem_ac <= 0;      
-      if( main_mem_write[0] ) begin
-         adr <= main_mem_write_adr[0];
-         write_dat <= main_mem_write_dat[0];
-         iswrite <= 1;
+      main_mem_ac <= 2'b00;
+      if( main_mem_write_request[0] ) begin
          main_mem_ac <= 2'b01;
-      end else if( main_mem_write[1] ) begin
-         adr <= main_mem_write_adr[1];
-         write_dat <= main_mem_write_dat[1];
-         iswrite <= 1;
+      end else if( main_mem_write_request[1] ) begin
          main_mem_ac <= 2'b10;
-      end else if( main_mem_read[0] ) begin
-         adr <= main_mem_write_adr[0];
+      end else if( main_mem_read_request[0] ) begin
          main_mem_ac <= 2'b01;
-      end else if( main_mem_read[1] ) begin
-         adr <= main_mem_write_adr[1];
+      end else if( main_mem_read_request[1] ) begin
          main_mem_ac <= 2'b10;
       end
    end
 
+   always_comb begin
+      adr <= 0;
+      iswrite <= 0;
+      if( main_mem_write[0] ) begin
+         adr <= main_mem_write_adr[0];
+         write_dat <= main_mem_write_dat[0];
+         iswrite <= 1;
+      end else if( main_mem_write[1] ) begin
+         adr <= main_mem_write_adr[1];
+         write_dat <= main_mem_write_dat[1];
+         iswrite <= 1;
+      end else if( main_mem_read[0] ) begin
+         adr <= main_mem_write_adr[0];
+      end else if( main_mem_read[1] ) begin
+         adr <= main_mem_write_adr[1];
+      end
+   end
 
    always_comb begin
       lock_ac <= 0;      

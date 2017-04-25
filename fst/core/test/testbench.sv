@@ -12,6 +12,8 @@ module testbench
    logic [15:0]  main_mem_write_dat [C-1:0];
    logic [C-1:0] main_mem_write;
    logic [C-1:0] main_mem_read;
+   logic [C-1:0] main_mem_write_request;
+   logic [C-1:0] main_mem_read_request;
    logic [9:0]   lock_adr [C-1:0];
    logic [C-1:0] lock_en;
    logic [C-1:0] unlock_en;
@@ -30,6 +32,8 @@ module testbench
                  .main_mem_write_dat(main_mem_write_dat[i]),
                  .main_mem_write(main_mem_write[i]),
                  .main_mem_read(main_mem_read[i]),
+                 .main_mem_write_request(main_mem_write_request[i]),
+                 .main_mem_read_request(main_mem_read_request[i]),
                  .main_mem_dat(main_mem_dat),
                  .main_mem_ac(main_mem_ac[i]),
                  .lock_adr(lock_adr[i]),

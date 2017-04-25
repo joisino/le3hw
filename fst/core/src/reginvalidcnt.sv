@@ -1,6 +1,5 @@
 module reginvalidcnt( input logic        clk, reset,
                       input logic        flush_decode,
-                      input logic        memory_waiting,
                       input logic [1:0]  nex,
                       input logic [2:0]  d,
                       output logic [2:0] q );
@@ -10,21 +9,12 @@ module reginvalidcnt( input logic        clk, reset,
         q <= 0;
       else begin
          if( nex == 0 ) begin
-            if( memory_waiting ) begin
-               case( d )
-                 1: q <= 1;
-                 2: q <= 2;
-                 3: q <= 3;
-                 default: q <= 0;
-               endcase
-            end else begin
-               case( d )
-                 1: q <= 3;
-                 2: q <= 3;
-                 3: q <= 4;
-                 default: q <= 0;
-               endcase
-            end
+            case( d )
+              1: q <= 3;
+              2: q <= 3;
+              3: q <= 4;
+              default: q <= 0;
+            endcase
          end else begin
            q <= nex;
          end
