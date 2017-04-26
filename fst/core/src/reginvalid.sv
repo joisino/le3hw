@@ -7,15 +7,19 @@ module reginvalid( input logic        clk, reset,
    
    logic [1:0] nex[7:0];
 
-   for( genvar i = 0; i < 8; i++ ) begin : generate_reginvalid_cnt
-      reginvalidcnt reginvalidcnt( .nex(nex[i]),
-                                   .d(register_invalid[i]),
-                                   .q(register_invalid[i]),
-                                   .* );
-   end
+   genvar i;
+   generate
+      for( i = 0; i < 8; i++ ) begin : generate_reginvalid_cnt
+         reginvalidcnt reginvalidcnt( .nex(nex[i]),
+                                      .d(register_invalid[i]),
+                                      .q(register_invalid[i]),
+                                      .* );
+      end
+   endgenerate
    
    always_comb begin
-      for( integer i = 0; i < 8; i++ ) begin : nex_init
+      integer i;
+      for( i = 0; i < 8; i++ ) begin : nex_init
          nex[i] <= 0;
       end
       if( regwrite_cur ) begin

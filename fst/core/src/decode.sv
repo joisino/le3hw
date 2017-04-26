@@ -2,6 +2,7 @@
 `include "reginvalid.sv"
 `include "jumppred.sv"
 `include "hazard.sv"
+`include "forwarding.sv"
 
 module decode( input logic         clk, reset,
                input logic         flushed,

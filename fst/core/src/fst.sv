@@ -4,7 +4,7 @@
 `include "ledcounter.sv"
 
 module fst
-  #( parameter C = 2 )
+  #( parameter C = 8 )
    ( input logic clk_in, reset_n_in,
      input logic [15:0]  in_dat,
      output logic [7:0]  seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
@@ -40,29 +40,38 @@ module fst
 
    pll( clk_in, clk );
 
-   for( genvar i = 0; i < C; i++ ) begin : generate_core
-      core core( .main_mem_read_adr(main_mem_read_adr[i]),
-                 .main_mem_write_adr(main_mem_write_adr[i]),
-                 .main_mem_write_dat(main_mem_write_dat[i]),
-                 .main_mem_write(main_mem_write[i]),
-                 .main_mem_read(main_mem_read[i]),
-                 .main_mem_write_request(main_mem_write_request[i]),
-                 .main_mem_read_request(main_mem_read_request[i]),
-                 .main_mem_dat(main_mem_dat),
-                 .main_mem_ac(main_mem_ac[i]),
-                 .lock_adr(lock_adr[i]),
-                 .lock_en(lock_en[i]),
-                 .unlock_en(unlock_en[i]),
-                 .lock_ac(lock_ac[i]),
-                 .pc(pc[i]),
-                 .inst(inst[i]),
-                 .* );
-   end
+   genvar i;
+   generate
+      for( i = 0; i < C; i++ ) begin : generate_core
+         core core( .main_mem_read_adr(main_mem_read_adr[i]),
+                    .main_mem_write_adr(main_mem_write_adr[i]),
+                    .main_mem_write_dat(main_mem_write_dat[i]),
+                    .main_mem_write(main_mem_write[i]),
+                    .main_mem_read(main_mem_read[i]),
+                    .main_mem_write_request(main_mem_write_request[i]),
+                    .main_mem_read_request(main_mem_read_request[i]),
+                    .main_mem_dat(main_mem_dat),
+                    .main_mem_ac(main_mem_ac[i]),
+                    .lock_adr(lock_adr[i]),
+                    .lock_en(lock_en[i]),
+                    .unlock_en(unlock_en[i]),
+                    .lock_ac(lock_ac[i]),
+                    .pc(pc[i]),
+                    .inst(inst[i]),
+                    .* );
+      end
+   endgenerate
+      
+   imemA inst_memA( .clk(clk_n), .pc(pc[0]), .inst(inst[0]) );
+   imemB inst_memB( .clk(clk_n), .pc(pc[1]), .inst(inst[1]) );
+   imemC inst_memC( .clk(clk_n), .pc(pc[2]), .inst(inst[2]) );
+   imemD inst_memD( .clk(clk_n), .pc(pc[3]), .inst(inst[3]) );
+   imemE inst_memE( .clk(clk_n), .pc(pc[4]), .inst(inst[4]) );
+   imemF inst_memF( .clk(clk_n), .pc(pc[5]), .inst(inst[5]) );
+   imemG inst_memG( .clk(clk_n), .pc(pc[6]), .inst(inst[6]) );
+   imemH inst_memH( .clk(clk_n), .pc(pc[7]), .inst(inst[7]) );
 
-   inst_memA inst_memA( .clk(clk_n), .pc(pc[0]), .inst(inst[0]) );
-   inst_memB inst_memB( .clk(clk_n), .pc(pc[1]), .inst(inst[1]) );
-
-   main_mem main_mem( .clk(clk_n), .* );
+   dmem main_mem( .clk(clk_n), .* );
    
    ledcounter cnter( .clk(clk), .reset_n(reset_n), .stp(halting), .* );
    

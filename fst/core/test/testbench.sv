@@ -1,6 +1,6 @@
 `timescale 1 ns/ 100 ps
 module testbench
-  #( parameter C = 2 )
+  #( parameter C = 8 )
    ();
 
    logic clk, reset;
@@ -50,6 +50,13 @@ module testbench
 
    imemA imemA( .clk(clk), .pc(pc[0]), .inst(inst[0]) );
    imemB imemB( .clk(clk), .pc(pc[1]), .inst(inst[1]) );
+   imemC imemC( .clk(clk), .pc(pc[2]), .inst(inst[2]) );
+   imemD imemD( .clk(clk), .pc(pc[3]), .inst(inst[3]) );
+   imemE imemE( .clk(clk), .pc(pc[4]), .inst(inst[4]) );
+   imemF imemF( .clk(clk), .pc(pc[5]), .inst(inst[5]) );
+   imemG imemG( .clk(clk), .pc(pc[6]), .inst(inst[6]) );
+   imemH imemH( .clk(clk), .pc(pc[7]), .inst(inst[7]) );
+   
    dmem dmem( .* );
    
    always
