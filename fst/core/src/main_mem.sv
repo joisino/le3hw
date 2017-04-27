@@ -20,12 +20,6 @@ module main_mem
    logic iswrite;
    logic [1023:0] mutex;
 
-
-   logic [15:0] adr;
-   logic [15:0] write_dat;
-   logic iswrite;
-   logic [1023:0] mutex;
-
    always_comb begin
       main_mem_ac <= 0;
       if( main_mem_write_request[0] ) begin
@@ -65,6 +59,7 @@ module main_mem
 
    always_comb begin
       adr <= 0;
+      write_dat <= 0;
       iswrite <= 0;
       if( main_mem_write[0] ) begin
          adr <= main_mem_write_adr[0];
