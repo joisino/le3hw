@@ -1,4 +1,11 @@
-`include "inst_mem.sv"
+`include "inst_memA.sv"
+`include "inst_memB.sv"
+`include "inst_memC.sv"
+`include "inst_memD.sv"
+`include "inst_memE.sv"
+`include "inst_memF.sv"
+`include "inst_memG.sv"
+`include "inst_memH.sv"
 `include "main_mem.sv"
 `include "core.sv"
 `include "ledcounter.sv"
@@ -15,7 +22,7 @@ module fst
    logic 	 reset;
    logic         out_en;
    logic [15:0]  out_dat;
-   logic         is_halt;
+   logic [C-1:0] is_halt;
    logic [15:0]  pc [C-1:0];
    logic [15:0]  inst [C-1:0];
    logic [15:0]  main_mem_read_adr [C-1:0];
@@ -58,25 +65,26 @@ module fst
                     .lock_ac(lock_ac[i]),
                     .pc(pc[i]),
                     .inst(inst[i]),
+		    .is_halt(is_halt[i]),
                     .* );
       end
    endgenerate
       
-   imemA inst_memA( .clk(clk_n), .pc(pc[0]), .inst(inst[0]) );
-   imemB inst_memB( .clk(clk_n), .pc(pc[1]), .inst(inst[1]) );
-   imemC inst_memC( .clk(clk_n), .pc(pc[2]), .inst(inst[2]) );
-   imemD inst_memD( .clk(clk_n), .pc(pc[3]), .inst(inst[3]) );
-   imemE inst_memE( .clk(clk_n), .pc(pc[4]), .inst(inst[4]) );
-   imemF inst_memF( .clk(clk_n), .pc(pc[5]), .inst(inst[5]) );
-   imemG inst_memG( .clk(clk_n), .pc(pc[6]), .inst(inst[6]) );
-   imemH inst_memH( .clk(clk_n), .pc(pc[7]), .inst(inst[7]) );
+   inst_memA inst_memA( .clk(clk_n), .pc(pc[0]), .inst(inst[0]) );
+   inst_memB inst_memB( .clk(clk_n), .pc(pc[1]), .inst(inst[1]) );
+   inst_memC inst_memC( .clk(clk_n), .pc(pc[2]), .inst(inst[2]) );
+   inst_memD inst_memD( .clk(clk_n), .pc(pc[3]), .inst(inst[3]) );
+   inst_memE inst_memE( .clk(clk_n), .pc(pc[4]), .inst(inst[4]) );
+   inst_memF inst_memF( .clk(clk_n), .pc(pc[5]), .inst(inst[5]) );
+   inst_memG inst_memG( .clk(clk_n), .pc(pc[6]), .inst(inst[6]) );
+   inst_memH inst_memH( .clk(clk_n), .pc(pc[7]), .inst(inst[7]) );
 
-   dmem main_mem( .clk(clk_n), .* );
+   main_mem main_mem( .clk(clk_n), .* );
    
    ledcounter cnter( .clk(clk), .reset_n(reset_n), .stp(halting), .* );
    
    always_ff @( posedge clk ) begin
-      halting <= halting | is_halt;
+      halting <= halting | ( is_halt != 0 );
       if( !reset_n ) begin
 	 halting <= 0;
       end

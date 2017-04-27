@@ -11,26 +11,26 @@ module jumppred( input logic         clk, reset,
                  output logic [15:0] pcinc_evac,
                  output logic        jump_pred_busy);
 
-   logic [15:0] jump_table [255:0];
-   logic [1:0] jump_table_valid [255:0];
+   logic [15:0] jump_table [63:0];
+   logic [1:0] jump_table_valid [63:0];
    logic [1:0] pred_shift_register;
-   logic [15:0] pcinc_history;
-   logic [15:0] predicted_pcinc;
+   logic [11:0] pcinc_history;
+   logic [5:0] predicted_pcinc;
 
    assign jump_cannot_predict = jump & (!pred_shift_register[1]);
    assign jump_pred_adr_miss = ( jump & pred_shift_register[1] & ( jump_table[predicted_pcinc] != ALUres_mem ) ) | jump_cannot_predict;
    assign jump_pred_miss = (!jump) & pred_shift_register[1];
-   assign jump_pred = (!jump_pred_busy) & (jump_inst != 0) & ( jump_table_valid[ pcinc_id[7:0] ] >= 2 );
-   assign jump_pred_adr = jump_table[ pcinc_id[7:0] ];
+   assign jump_pred = (!jump_pred_busy) & (jump_inst != 0) & ( jump_table_valid[ pcinc_id[5:0] ] >= 2 );
+   assign jump_pred_adr = jump_table[ pcinc_id[5:0] ];
    assign jump_pred_busy = pred_shift_register[0]; // | pred_shift_register[1];
-   assign predicted_pcinc = pcinc_history[15:8];
+   assign predicted_pcinc = pcinc_history[11:6];
    
    integer i;
    always_ff @(posedge clk) begin
       if( reset ) begin
          pcinc_evac <= 0;
          pcinc_history <= 0;
-         for( i = 0; i < 256; i++ ) begin
+         for( i = 0; i < 64; i++ ) begin
             jump_table_valid[i] <= 0;
          end
          pred_shift_register <= 0;
@@ -59,7 +59,7 @@ module jumppred( input logic         clk, reset,
          end else begin
             pred_shift_register <= { pred_shift_register[0], jump_pred };
          end
-         pcinc_history <= { pcinc_history[7:0], pcinc_id[7:0] };
+         pcinc_history <= { pcinc_history[5:0], pcinc_id[5:0] };
       end
    end
    
