@@ -84,10 +84,9 @@ module main_mem
    always_comb begin
       integer i;
       for( i = 0; i < 8; i++ ) begin
-         lock_en_can[i] <= lock_en[i] & (!mutex[lock_adr[i]]);
+	 lock_en_can[i] <= lock_en[i] & (!mutex[lock_adr[i]]);
       end
    end
-
    
    always_comb begin
       enlock_ac <= 0;
@@ -103,10 +102,11 @@ module main_mem
       end
    end
 
-   // assign lock_ac = enlock_ac | unlock_ac;
-   assign lock_ac = 8'b1111_1111;
-
-   always_ff @( posedge clk ) begin
+   assign lock_ac = enlock_ac | unlock_ac;
+   // assign lock_ac = 8'b1111_1111;
+   // assign lock_ac = lock_en_can;
+   
+   always_ff @( negedge clk ) begin
       if( reset ) begin
          mutex <= 0;
       end else begin
@@ -119,7 +119,7 @@ module main_mem
       end
    end
    
-   always_ff @(negedge clk) begin
+   always_ff @( negedge clk ) begin
       if( reset ) begin
          cnt <= 0;
       end else if( cnt == 7 ) begin
