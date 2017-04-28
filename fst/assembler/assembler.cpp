@@ -184,6 +184,19 @@ std::string decode( std::string inst ){
     res += d_to_b( rb.substr( 1 ) , 3 );
 
     res += extend( d );
+  } else if( op == "LOCK" || op == "UNLOCK" ){
+    res += "10011";
+    std::string rb;
+    stin >> rb;
+
+    assert( rb[0] == 'r' );
+    res += d_to_b( rb.substr( 1 ) , 3 );
+
+    if( op == "LOCK" ){
+      res += "00000000";
+    } else if( op == "UNLOCK" ){
+      res += "00000001";
+    }
   } else if( op == "B" || op == "BAL" || op == "BE" || op == "BLT" || op == "BLE" || op == "BNE" ){
     if( op == "B" ){
       res += "10100000";
