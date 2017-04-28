@@ -8,7 +8,7 @@ module main_mem
      input logic [C-1:0]  main_mem_read,
      input logic [C-1:0]  main_mem_write_request,
      input logic [C-1:0]  main_mem_read_request,
-     input logic [9:0]    lock_adr [C-1:0],
+     input logic [3:0]    lock_adr [C-1:0],
      input logic [C-1:0]  lock_en,
      input logic [C-1:0]  unlock_en,
      output logic [15:0]  main_mem_dat,
@@ -18,8 +18,8 @@ module main_mem
    logic [15:0] read_adr, write_adr;
    logic [15:0] write_dat;
    logic iswrite;
-   logic [1023:0] mutex;
-   // logic [31:0] mutex;
+   // logic [1023:0] mutex;
+   logic [15:0] mutex;
 
    logic [2:0] main_mem_write_request_q;
    logic main_mem_write_request_en;

@@ -28,7 +28,7 @@ module core( input logic         clk,
              output logic        main_mem_read_request, 
              input logic [15:0]  main_mem_dat,
              input logic         main_mem_ac,
-             output logic [9:0]  lock_adr,
+             output logic [3:0]  lock_adr,
              output logic        lock_en,
              output logic        unlock_en,
              input logic         lock_ac );

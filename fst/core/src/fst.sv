@@ -32,7 +32,7 @@ module fst
    logic [C-1:0] main_mem_read;
    logic [C-1:0] main_mem_write_request;
    logic [C-1:0] main_mem_read_request;
-   logic [9:0]   lock_adr [C-1:0];
+   logic [3:0] 	 lock_adr [C-1:0];
    logic [C-1:0] lock_en;
    logic [C-1:0] unlock_en;
    logic [15:0]  main_mem_dat;
