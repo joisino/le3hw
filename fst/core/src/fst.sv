@@ -49,7 +49,7 @@ module fst
 
    genvar i;
    generate
-      for( i = 0; i < C; i++ ) begin : generate_core
+      for( i = 0; i < 2; i++ ) begin : generate_core
          core core( .main_mem_read_adr(main_mem_read_adr[i]),
                     .main_mem_write_adr(main_mem_write_adr[i]),
                     .main_mem_write_dat(main_mem_write_dat[i]),
