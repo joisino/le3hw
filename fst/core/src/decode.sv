@@ -31,7 +31,7 @@ module decode( input logic         clk, reset,
                output logic        main_mem_read_id,
                output logic        main_mem_write_request,
                output logic        main_mem_read_request,
-               output logic [9:0]  lock_adr,
+               output logic [3:0]  lock_adr,
                output logic        lock_en, unlock_en,
                output logic [1:0]  regwrite_dat_controll_id,
                output logic        from_main_mem_id, 
@@ -75,6 +75,6 @@ module decode( input logic         clk, reset,
    mux #(3) mux_regwrite_adr( inst_id[10:8], inst_id[13:11], regwrite_adr_controll, regwrite_adr_id );
    regfile register_file( clk, reset, regwrite, inst_id[13:11], inst_id[10:8], regwrite_adr, regwrite_dat, register_invalid, rd1_id, rd2_id );
    extend extend( inst_id[7:0], extended_d_id );
-   mux #(10) mux_lock_adr( rd2_id[9:0], ALUres_mem[9:0], forwarding_lock_controll, lock_adr );
+   mux #(4) mux_lock_adr( rd2_id[3:0], ALUres_mem[3:0], forwarding_lock_controll, lock_adr );
    
 endmodule
