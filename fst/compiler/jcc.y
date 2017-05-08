@@ -84,6 +84,9 @@ PTERM : PRI {
 PRI : NTERM {
   $$ = make_pri( $1, CST );
  }
+| IDENTIFIER {
+  $$ = make_pri( $1, VAR );
+  }
 | LPAR OTERM RPAR {
   $$ = make_pri( $2, OTM );
  }

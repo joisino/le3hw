@@ -28,6 +28,7 @@ struct node{
   node( int type, vector<int> ch ) :type(type), ch(ch), val(-1), str("") {}
   node( int type, vector<int> ch, int val ) :type(type), ch(ch), val(val), str("") {}
   node( int type, vector<int> ch, string str ) :type(type), ch(ch), val(-1), str(str) {}
+  node( int type, vector<int> ch, int val ,string str ) :type(type), ch(ch), val(val), str(str) {}
 };
 
 node nodes[1000000];
@@ -136,6 +137,12 @@ int make_pterm( int ch ){
 int make_pri( int ch, int type ){
   fprintf( stderr, "PRI %d\n", ch );
   nodes[it] = node( PRINODE, vector<int>({ch}), type );
+  return it++;
+}
+
+int make_pri( char *str, int type ){
+  fprintf( stderr, "PRI %s\n", str );
+  nodes[it] = node( PRINODE, vector<int>({}), type, string(str) );
   return it++;
 }
 
@@ -269,6 +276,13 @@ void write_pri( int x ){
   assert( nodes[x].type == PRINODE );
   if( nodes[x].val == CST ){
     write_num( nodes[x].ch.at( 0 ) );
+  } else if( nodes[x].val == VAR ){
+    assert( stackvars.find( nodes[x].str ) != stackvars.end() );
+    load_num( 1, stackvars[ nodes[x].str ] );
+    printf( "ADD r1 r6\n" );
+    printf( "LD r2 r1 0\n" );
+    printf( "ST r2 r7 0\n" );
+    printf( "ADDI r7 1\n" );
   } else if( nodes[x].val == OTM ){
     write_oterm( nodes[x].ch.at( 0 ) );
   }

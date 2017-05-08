@@ -11,6 +11,8 @@
 #define EXP 7
 #define VDEF 8
 
+#define VAR 9
+
 void yyerror( const char *s );
 
 int make_statements( int chl, int chr );
@@ -30,6 +32,7 @@ int make_sterm( int ch );
 int make_pterm( int chl, int chr, int type );
 int make_pterm( int ch );
 int make_pri( int ch, int type );
+int make_pri( char *str, int type );
 int make_num( int num );
 
 void write_statements( int x );
