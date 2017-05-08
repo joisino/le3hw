@@ -10,8 +10,15 @@
  }
 %token <val> NUM
 %token SEMI PLUS MINUS AND XOR OR LPAR RPAR LSHIFT RSHIFT
-%type <val> NTERM PRI PTERM STERM ATERM XTERM OTERM STATEMENT
+%type <val> NTERM PRI PTERM STERM ATERM XTERM OTERM STATEMENT STATEMENTS
 %%
+
+STATEMENTS : STATEMENT {
+  $$ = make_statements( $1 );
+ }
+| STATEMENTS STATEMENT {
+  $$ = make_statements( $1, $2 );
+ }
 
 STATEMENT : OTERM SEMI {
   $$ = make_statement( $1 );
@@ -34,7 +41,7 @@ XTERM : ATERM {
 ATERM : STERM {
   $$ = make_aterm( $1 );
  }
-| ATERM AND PTERM {
+| ATERM AND STERM {
   $$ = make_aterm( $1, $3 );
  }
 

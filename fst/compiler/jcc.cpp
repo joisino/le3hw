@@ -13,7 +13,7 @@ extern "C"{
 }
 
 enum{
-  NNODE, PRINODE, SNODE, PNODE, ANODE, XNODE, ONODE
+  NNODE, PRINODE, SHNODE, PNODE, ANODE, XNODE, ONODE, SNODE, SSNODE
 };
 
 struct node{
@@ -28,8 +28,20 @@ struct node{
 node nodes[100000];
 int it;
 
+int make_statements( int chl, int chr ){
+  fprintf( stderr, "SS %d %d\n", chl, chr ); 
+  nodes[it] = node( SSNODE, vector<int>({chl,chr}) );
+  return it++;
+}
+
+int make_statements( int ch ){
+  fprintf( stderr, "SS %d\n", ch ); 
+  nodes[it] = node( SSNODE, vector<int>({ch}) );
+  return it++;
+}
+
 int make_statement( int ch ){
-  fprintf( stderr, "S %d\n" , ch ); 
+  fprintf( stderr, "SS %d\n", ch ); 
   nodes[it] = node( SNODE, vector<int>({ch}) );
   return it++;
 }
@@ -73,13 +85,13 @@ int make_aterm( int ch ){
 int make_sterm( int chl, int chr, int type ){
   assert( 0 < chr && chr < 16 );
   fprintf( stderr, "S %d %d %d\n", chl, chr, type );
-  nodes[it] = node( SNODE, vector<int>({chl,chr}), type );
+  nodes[it] = node( SHNODE, vector<int>({chl,chr}), type );
   return it++;
 }
 
 int make_sterm( int ch ){
   fprintf( stderr, "S %d\n", ch );
-  nodes[it] = node( SNODE, vector<int>({ch}) );
+  nodes[it] = node( SHNODE, vector<int>({ch}) );
   return it++;
 }
 
@@ -107,9 +119,20 @@ int make_num( int num ){
   return it++;
 }
 
+void write_statements( int x ){
+  assert( nodes[x].type == SSNODE );
+  if( nodes[x].ch.size() == 1 ){
+    write_statement( nodes[x].ch.at( 0 ) );
+  } else {
+    write_statements( nodes[x].ch.at( 0 ) );
+    write_statement( nodes[x].ch.at( 1 ) );
+  }
+}
+
 void write_statement( int x ){
   assert( nodes[x].type == SNODE );
   write_oterm( nodes[x].ch.at( 0 ) );
+  printf( "ADDI r7 -1\n" );
 }
 
 void write_oterm( int x ){
@@ -158,7 +181,7 @@ void write_aterm( int x ){
 }
 
 void write_sterm( int x ){
-  assert( nodes[x].type == SNODE );
+  assert( nodes[x].type == SHNODE );
   if( nodes[x].ch.size() == 1 ){
     write_pterm( nodes[x].ch.at( 0 ) );
   } else {
@@ -233,7 +256,7 @@ int main(){
   extern FILE *yyin;
   yyin = stdin;
   yyparse();
-  write_statement( it - 1 );
+  write_statements( it - 1 );
   printf( "HLT\n" );
   return 0;
 }

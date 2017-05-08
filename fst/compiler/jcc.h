@@ -10,6 +10,8 @@
 
 void yyerror( const char *s );
 
+int make_statements( int chl, int chr );
+int make_statements( int ch );
 int make_statement( int ch );
 int make_oterm( int chl, int chr );
 int make_oterm( int ch );
@@ -24,6 +26,7 @@ int make_pterm( int ch );
 int make_pri( int ch, int type );
 int make_num( int num );
 
+void write_statements( int x );
 void write_statement( int x );
 void write_oterm( int x );
 void write_xterm( int x );
