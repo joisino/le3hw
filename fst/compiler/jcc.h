@@ -1,3 +1,4 @@
+#include <string>
 
 #define PLS 1
 #define MNS 2
@@ -24,6 +25,9 @@
 #define TGT 15
 #define TGE 16
 
+#define TEQEQ 17
+#define TNEQ 18
+
 void yyerror( const char *s );
 
 int make_statements( int chl, int chr );
@@ -41,6 +45,8 @@ int make_xterm( int chl, int chr );
 int make_xterm( int ch );
 int make_aterm( int chl, int chr );
 int make_aterm( int ch );
+int make_eqeqterm( int chl, int num, int type );
+int make_eqeqterm( int ch );
 int make_lgterm( int chl, int num, int type );
 int make_lgterm( int ch );
 int make_sterm( int chl, int num, int type );
@@ -60,6 +66,7 @@ void write_expr( int x );
 void write_oterm( int x );
 void write_xterm( int x );
 void write_aterm( int x );
+void write_eqeqterm( int x );
 void write_lgterm( int x );
 void write_sterm( int x );
 void write_pterm( int x );
@@ -67,3 +74,4 @@ void write_pri( int x );
 void write_num( int x );
 
 void load_num( int r , int a );
+void load_label( int r , std::string label );

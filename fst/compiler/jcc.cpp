@@ -16,7 +16,7 @@ extern "C"{
 }
 
 enum{
-  NNODE, PRINODE, SHNODE, PNODE, LGNODE, ANODE, XNODE, ONODE, ENODE, VNODE, WNODE, INODE, SNODE, SSNODE
+  NNODE, PRINODE, SHNODE, PNODE, LGNODE, EQEQNODE, ANODE, XNODE, ONODE, ENODE, VNODE, WNODE, INODE, SNODE, SSNODE
 };
 
 struct node{
@@ -129,6 +129,18 @@ int make_aterm( int ch ){
   return it++;
 }
 
+int make_eqeqterm( int chl, int chr, int type ){
+  fprintf( stderr, "EQEQ %d %d %d\n", chl, chr, type );
+  nodes[it] = node( EQEQNODE, vector<int>({chl,chr}), type );
+  return it++;
+}
+
+int make_eqeqterm( int ch ){
+  fprintf( stderr, "EQEQ %d\n", ch );
+  nodes[it] = node( EQEQNODE, vector<int>({ch}) );
+  return it++;
+}
+
 int make_lgterm( int chl, int chr, int type ){
   fprintf( stderr, "LG %d %d %d\n", chl, chr, type );
   nodes[it] = node( LGNODE, vector<int>({chl,chr}), type );
@@ -221,19 +233,11 @@ void write_while( int x ){
   printf( "ADDI r7 -1\n" );
   printf( "CMPI r1 0\n" );
   printf( "BNE L%d\n" , lb );
-  printf( "LI r1 L%d 0\n", lc );
-  printf( "SLL r1 6\n" );
-  printf( "ADDI r1 L%d 1\n", lc );
-  printf( "SLL r1 6\n" );
-  printf( "ADDI r1 L%d 2\n", lc );
+  load_label( 1 , "L" + to_string( lc ) );
   printf( "BR r1\n" );
   printf( "L%d:\n", lb );
   write_statement( nodes[x].ch.at( 1 ) );
-  printf( "LI r1 L%d 0\n", la );
-  printf( "SLL r1 6\n" );
-  printf( "ADDI r1 L%d 1\n", la );
-  printf( "SLL r1 6\n" );
-  printf( "ADDI r1 L%d 2\n", la );
+  load_label( 1 , "L" + to_string( la ) );
   printf( "BR r1\n" );
   printf( "L%d:\n", lc );
 }
@@ -248,36 +252,24 @@ void write_if( int x ){
     printf( "ADDI r7 -1\n" );    
     printf( "CMPI r1 0\n" );
     printf( "BNE L%d\n" , la );
-    printf( "LI r1 L%d 0\n", lb );
-    printf( "SLL r1 6\n" );
-    printf( "ADDI r1 L%d 1\n", lb );
-    printf( "SLL r1 6\n" );
-    printf( "ADDI r1 L%d 2\n", lb );
+    load_label( 1 , "L" + to_string( lb ) );
     printf( "BR r1\n" );
     printf( "L%d:\n", la );
     write_statement( nodes[x].ch.at( 1 ) );
     printf( "L%d:\n", lb );
   } else if( nodes[x].ch.size() == 3 ){
     write_expr( nodes[x].ch.at( 0 ) );
-    printf( "LD r1 r7 -1\n" );
-    printf( "CMPI r1 0\n" );
     int la = labelcnt++;
     int lb = labelcnt++;
     int lc = labelcnt++;
+    printf( "LD r1 r7 -1\n" );
+    printf( "CMPI r1 0\n" );
     printf( "BNE L%d\n" , la );
-    printf( "LI r1 L%d 0\n", lb );
-    printf( "SLL r1 6\n" );
-    printf( "ADDI r1 L%d 1\n", lb );
-    printf( "SLL r1 6\n" );
-    printf( "ADDI r1 L%d 2\n", lb );
+    load_label( 1 , "L" + to_string( lb ) );
     printf( "BR r1\n" );
     printf( "L%d:\n", la );
     write_statement( nodes[x].ch.at( 1 ) );
-    printf( "LI r1 L%d 0\n", lc );
-    printf( "SLL r1 6\n" );
-    printf( "ADDI r1 L%d 1\n", lc );
-    printf( "SLL r1 6\n" );
-    printf( "ADDI r1 L%d 2\n", lc );
+    load_label( 1 , "L" + to_string( lc ) );
     printf( "BR r1\n" );
     printf( "L%d:\n", lb );
     write_statement( nodes[x].ch.at( 2 ) );
@@ -338,15 +330,48 @@ void write_xterm( int x ){
 void write_aterm( int x ){
   assert( nodes[x].type == ANODE );
   if( nodes[x].ch.size() == 1 ){
-    write_lgterm( nodes[x].ch.at( 0 ) );
+    write_eqeqterm( nodes[x].ch.at( 0 ) );
   } else {
     write_aterm( nodes[x].ch.at( 0 ) );
-    write_lgterm( nodes[x].ch.at( 1 ) );
+    write_eqeqterm( nodes[x].ch.at( 1 ) );
     printf( "LD r1 r7 -1\n" );
     printf( "LD r2 r7 -2\n" );
     printf( "AND r1 r2\n" );
     printf( "ST r1 r7 -2\n" );
     printf( "ADDI r7 -1\n" );
+  }
+}
+
+void write_eqeqterm( int x ){
+  assert( nodes[x].type == EQEQNODE );
+  if( nodes[x].ch.size() == 1 ){
+    write_lgterm( nodes[x].ch.at( 0 ) );
+  } else {
+    write_eqeqterm( nodes[x].ch.at( 0 ) );
+    write_lgterm( nodes[x].ch.at( 1 ) );
+    printf( "LD r1 r7 -2\n" );
+    printf( "LD r2 r7 -1\n" );
+    int la = labelcnt++;
+    int lb = labelcnt++;
+    if( nodes[x].val == TEQEQ ){
+      printf( "CMP r1 r2\n" );
+      printf( "BE L%d\n", la );
+      printf( "LI r1 0\n" );
+      printf( "B L%d\n", lb );
+      printf( "L%d:\n", la );
+      printf( "LI r1 1\n" );
+      printf( "L%d:\n", lb );
+    } else if( nodes[x].val == TNEQ ){
+      printf( "CMP r1 r2\n" );
+      printf( "BNE L%d\n", la );
+      printf( "LI r1 0\n" );
+      printf( "B L%d\n", lb );
+      printf( "L%d:\n", la );
+      printf( "LI r1 1\n" );
+      printf( "L%d:\n", lb );
+    }
+    printf( "ADDI r7 -1\n" );
+    printf( "ST r1 r7 -1\n" );
   }
 }
 
@@ -482,6 +507,14 @@ void load_num( int r, int a ){
       printf( "ADDI r%d %d\n", r, b );
     }
   }
+}
+
+void load_label( int r , string label ){
+  printf( "LI r%d %s 0\n", r, label.c_str() );
+  printf( "SLL r%d 6\n", r );
+  printf( "ADDI r%d %s 1\n", r, label.c_str() );
+  printf( "SLL r%d 6\n", r );
+  printf( "ADDI r%d %s 2\n", r, label.c_str() );
 }
 
 int main(){

@@ -53,6 +53,12 @@
 ">=" {
   return GE;
 }
+"==" {
+  return EQEQ;
+}
+"!=" {
+  return NEQ;
+}
 "int" {
   return INT;
 }
