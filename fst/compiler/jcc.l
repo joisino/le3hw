@@ -41,6 +41,18 @@
 "<<" {
   return LSHIFT;
 }
+"<" {
+  return LT;
+}
+"<=" {
+  return LE;
+}
+">" {
+  return GT;
+}
+">=" {
+  return GE;
+}
 "int" {
   return INT;
 }

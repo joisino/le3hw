@@ -11,8 +11,8 @@
  }
 %token <val> NUM
 %token <str> IDENTIFIER
-%token SEMI PLUS MINUS AND XOR OR LPAR RPAR LBRACE RBRACE LSHIFT RSHIFT INT EQ IF ELSE WHILE
-%type <val> NTERM PRI PTERM STERM ATERM XTERM OTERM EXPR SVAR WHILEB IFB STATEMENT STATEMENTS
+%token SEMI PLUS MINUS AND XOR OR LPAR RPAR LBRACE RBRACE LSHIFT RSHIFT LT LE GT GE INT EQ IF ELSE WHILE
+%type <val> NTERM PRI PTERM STERM LGTERM ATERM XTERM OTERM EXPR SVAR WHILEB IFB STATEMENT STATEMENTS
 %%
 
 STATEMENTS : STATEMENT {
@@ -74,11 +74,27 @@ XTERM : ATERM {
   $$ = make_xterm( $1, $3 );
  }
 
-ATERM : STERM {
+ATERM : LGTERM {
   $$ = make_aterm( $1 );
  }
-| ATERM AND STERM {
+| ATERM AND LGTERM {
   $$ = make_aterm( $1, $3 );
+ }
+
+LGTERM : STERM {
+  $$ = make_lgterm( $1 );
+ }
+| LGTERM LT STERM {
+  $$ = make_lgterm( $1, $3, TLT );
+ }
+| LGTERM LE STERM {
+  $$ = make_lgterm( $1, $3, TLE );
+ }
+| LGTERM GT STERM {
+  $$ = make_lgterm( $1, $3, TGT );
+ }
+| LGTERM GE STERM {
+  $$ = make_lgterm( $1, $3, TGE );
  }
 
 STERM : PTERM {

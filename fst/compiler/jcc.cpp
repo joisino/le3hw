@@ -16,7 +16,7 @@ extern "C"{
 }
 
 enum{
-  NNODE, PRINODE, SHNODE, PNODE, ANODE, XNODE, ONODE, ENODE, VNODE, WNODE, INODE, SNODE, SSNODE
+  NNODE, PRINODE, SHNODE, PNODE, LGNODE, ANODE, XNODE, ONODE, ENODE, VNODE, WNODE, INODE, SNODE, SSNODE
 };
 
 struct node{
@@ -126,6 +126,18 @@ int make_aterm( int chl, int chr ){
 int make_aterm( int ch ){
   fprintf( stderr, "A %d\n", ch );
   nodes[it] = node( ANODE, vector<int>({ch}) );
+  return it++;
+}
+
+int make_lgterm( int chl, int chr, int type ){
+  fprintf( stderr, "LG %d %d %d\n", chl, chr, type );
+  nodes[it] = node( LGNODE, vector<int>({chl,chr}), type );
+  return it++;
+}
+
+int make_lgterm( int ch ){
+  fprintf( stderr, "LG %d\n", ch );
+  nodes[it] = node( LGNODE, vector<int>({ch}) );
   return it++;
 }
 
@@ -326,15 +338,64 @@ void write_xterm( int x ){
 void write_aterm( int x ){
   assert( nodes[x].type == ANODE );
   if( nodes[x].ch.size() == 1 ){
-    write_sterm( nodes[x].ch.at( 0 ) );
+    write_lgterm( nodes[x].ch.at( 0 ) );
   } else {
     write_aterm( nodes[x].ch.at( 0 ) );
-    write_sterm( nodes[x].ch.at( 1 ) );
+    write_lgterm( nodes[x].ch.at( 1 ) );
     printf( "LD r1 r7 -1\n" );
     printf( "LD r2 r7 -2\n" );
     printf( "AND r1 r2\n" );
     printf( "ST r1 r7 -2\n" );
     printf( "ADDI r7 -1\n" );
+  }
+}
+
+void write_lgterm( int x ){
+  assert( nodes[x].type == LGNODE );
+  if( nodes[x].ch.size() == 1 ){
+    write_sterm( nodes[x].ch.at( 0 ) );
+  } else {
+    write_lgterm( nodes[x].ch.at( 0 ) );
+    write_sterm( nodes[x].ch.at( 1 ) );
+    printf( "LD r1 r7 -2\n" );
+    printf( "LD r2 r7 -1\n" );
+    int la = labelcnt++;
+    int lb = labelcnt++;
+    if( nodes[x].val == TLT ){
+      printf( "CMP r1 r2\n" );
+      printf( "BLT L%d\n", la );
+      printf( "LI r1 0\n" );
+      printf( "B L%d\n", lb );
+      printf( "L%d:\n", la );
+      printf( "LI r1 1\n" );
+      printf( "L%d:\n", lb );
+    } else if( nodes[x].val == TLE ){
+      printf( "CMP r1 r2\n" );
+      printf( "BLE L%d\n", la );
+      printf( "LI r1 0\n" );
+      printf( "B L%d\n", lb );
+      printf( "L%d:\n", la );
+      printf( "LI r1 1\n" );
+      printf( "L%d:\n", lb );
+    } else if( nodes[x].val == TGT ){
+      printf( "CMP r1 r2\n" );
+      printf( "BLE L%d\n", la );
+      printf( "LI r1 1\n" );
+      printf( "B L%d\n", lb );
+      printf( "L%d:\n", la );
+      printf( "LI r1 0\n" );
+      printf( "L%d:\n", lb );
+    } else if( nodes[x].val == TGE ){
+      printf( "CMP r1 r2\n" );
+      printf( "BLT L%d\n", la );
+      printf( "LI r1 1\n" );
+      printf( "B L%d\n", lb );
+      printf( "L%d:\n", la );
+      printf( "LI r1 0\n" );
+      printf( "L%d:\n", lb );
+    }
+    printf( "ADDI r7 -1\n" );
+    printf( "ST r1 r7 -1\n" );
   }
 }
 

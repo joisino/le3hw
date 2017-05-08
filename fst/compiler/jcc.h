@@ -19,6 +19,11 @@
 
 #define WHILEBL 12
 
+#define TLT 13
+#define TLE 14
+#define TGT 15
+#define TGE 16
+
 void yyerror( const char *s );
 
 int make_statements( int chl, int chr );
@@ -36,6 +41,8 @@ int make_xterm( int chl, int chr );
 int make_xterm( int ch );
 int make_aterm( int chl, int chr );
 int make_aterm( int ch );
+int make_lgterm( int chl, int num, int type );
+int make_lgterm( int ch );
 int make_sterm( int chl, int num, int type );
 int make_sterm( int ch );
 int make_pterm( int chl, int chr, int type );
@@ -53,6 +60,7 @@ void write_expr( int x );
 void write_oterm( int x );
 void write_xterm( int x );
 void write_aterm( int x );
+void write_lgterm( int x );
 void write_sterm( int x );
 void write_pterm( int x );
 void write_pri( int x );
