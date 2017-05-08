@@ -7,10 +7,12 @@
 %}
 %union {
   int val;
+  char str[256];
  }
 %token <val> NUM
-%token SEMI PLUS MINUS AND XOR OR LPAR RPAR LSHIFT RSHIFT
-%type <val> NTERM PRI PTERM STERM ATERM XTERM OTERM STATEMENT STATEMENTS
+%token <str> IDENTIFIER
+%token SEMI PLUS MINUS AND XOR OR LPAR RPAR LSHIFT RSHIFT INT EQ
+%type <val> NTERM PRI PTERM STERM ATERM XTERM OTERM EXPR SVAR STATEMENT STATEMENTS
 %%
 
 STATEMENTS : STATEMENT {
@@ -20,8 +22,22 @@ STATEMENTS : STATEMENT {
   $$ = make_statements( $1, $2 );
  }
 
-STATEMENT : OTERM SEMI {
-  $$ = make_statement( $1 );
+STATEMENT : EXPR SEMI {
+  $$ = make_statement( $1, EXP );
+ }
+| SVAR {
+  $$ = make_statement( $1, VDEF );
+  }
+
+SVAR : INT IDENTIFIER SEMI {
+  $$ = make_stackvar( $2 );
+ }
+
+EXPR : OTERM {
+  $$ = make_expr( $1 );
+ }
+| IDENTIFIER EQ EXPR {
+  $$ = make_expr( $1, $3 );
  }
 
 OTERM : XTERM {

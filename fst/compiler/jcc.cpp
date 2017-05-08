@@ -4,6 +4,9 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <string>
+#include <stack>
+#include <map>
 #include "jcc.h"
 
 using namespace std;
@@ -13,20 +16,25 @@ extern "C"{
 }
 
 enum{
-  NNODE, PRINODE, SHNODE, PNODE, ANODE, XNODE, ONODE, SNODE, SSNODE
+  NNODE, PRINODE, SHNODE, PNODE, ANODE, XNODE, ONODE, ENODE, VNODE, SNODE, SSNODE
 };
 
 struct node{
   int type;
   int val;
+  string str;
   vector<int> ch;
   node(){}
-  node( int type, vector<int> ch ) :type(type), ch(ch), val(-1) {}
-  node( int type, vector<int> ch, int val ) :type(type), ch(ch), val(val) {}
+  node( int type, vector<int> ch ) :type(type), ch(ch), val(-1), str("") {}
+  node( int type, vector<int> ch, int val ) :type(type), ch(ch), val(val), str("") {}
+  node( int type, vector<int> ch, string str ) :type(type), ch(ch), val(-1), str(str) {}
 };
 
-node nodes[100000];
+node nodes[1000000];
 int it;
+
+int svcnt = 0;
+map<string,int> stackvars;
 
 int make_statements( int chl, int chr ){
   fprintf( stderr, "SS %d %d\n", chl, chr ); 
@@ -40,9 +48,27 @@ int make_statements( int ch ){
   return it++;
 }
 
-int make_statement( int ch ){
-  fprintf( stderr, "SS %d\n", ch ); 
-  nodes[it] = node( SNODE, vector<int>({ch}) );
+int make_statement( int ch, int type ){
+  fprintf( stderr, "S %d\n", ch ); 
+  nodes[it] = node( SNODE, vector<int>({ch}), type );
+  return it++;
+}
+
+int make_stackvar( char *str ){
+  fprintf( stderr, "V %s\n", str ); 
+  nodes[it] = node( VNODE, vector<int>({}), string(str) );
+  return it++;
+}
+
+int make_expr( char *str, int ch ){
+  fprintf( stderr, "E %s %d\n", str, ch );
+  nodes[it] = node( ENODE, vector<int>({ch}), string(str) );
+  return it++;
+}
+
+int make_expr( int ch ){
+  fprintf( stderr, "E %d\n", ch );
+  nodes[it] = node( ENODE, vector<int>({ch}) );
   return it++;
 }
 
@@ -131,8 +157,32 @@ void write_statements( int x ){
 
 void write_statement( int x ){
   assert( nodes[x].type == SNODE );
-  write_oterm( nodes[x].ch.at( 0 ) );
-  printf( "ADDI r7 -1\n" );
+  if( nodes[x].val == EXP ){
+    write_expr( nodes[x].ch.at( 0 ) );
+    printf( "ADDI r7 -1\n" );
+  } else {
+    write_stackvar( nodes[x].ch.at( 0 ) );
+  }
+}
+
+void write_stackvar( int x ){
+  assert( nodes[x].type == VNODE );
+  stackvars[ nodes[x].str ] = svcnt++;
+  printf( "ADDI r7 1\n" );
+}
+
+void write_expr( int x ){
+  assert( nodes[x].type == ENODE );
+  if( nodes[x].str.size() == 0 ){
+    write_oterm( nodes[x].ch.at( 0 ) );
+  } else {
+    assert( stackvars.find( nodes[x].str ) != stackvars.end() );
+    write_expr( nodes[x].ch.at( 0 ) );
+    load_num( 1, stackvars[ nodes[x].str ] );
+    printf( "ADD r1 r6\n" );
+    printf( "LD r2 r7 -1\n" );
+    printf( "ST r2 r1 0\n" );
+  }
 }
 
 void write_oterm( int x ){
@@ -226,11 +276,20 @@ void write_pri( int x ){
 
 void write_num( int x ){
   assert( nodes[x].type == NNODE );
-  int a = nodes[x].val;
+  load_num( 1, nodes[x].val );
+  printf( "ST r1 r7 0\n" );
+  printf( "ADDI r7 1\n" );
+}
+
+void load_num( int r, int a ){
   if( a < 0 ){
     a = ( 1 << 16 ) + a;
   }
   assert( a >= 0 );
+  if( a == 0 ){
+    printf( "LI r%d 0\n", r );
+    return;
+  }
   vector<int> v(0);
   while( a > 0 ){
     v.push_back( a % 16 );
@@ -241,16 +300,13 @@ void write_num( int x ){
   for( int b : v ){
     if( !f ){
       f = true;
-      printf( "LI r1 %d\n" , b );
+      printf( "LI r%d %d\n", r , b );
     } else {
-      printf( "SLL r1 4\n" );
-      printf( "ADDI r1 %d\n" , b );
+      printf( "SLL r%d 4\n", r );
+      printf( "ADDI r%d %d\n", r, b );
     }
   }
-  printf( "ST r1 r7 0\n" );
-  printf( "ADDI r7 1\n" );
 }
-
 
 int main(){
   extern FILE *yyin;
