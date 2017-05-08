@@ -183,7 +183,14 @@ std::string decode( std::string inst ){
     assert( rb[0] == 'r' );
     res += d_to_b( rb.substr( 1 ) , 3 );
 
-    res += extend( d );
+    if( ( '0' <= d[0] && d[0] <= '9' ) || d[0] == '+' || d[0] == '-' ){
+      res += extend( d );
+    } else {
+      res += d;
+      std::string par;
+      stin >> par;
+      res += par;
+    }
   } else if( op == "B" || op == "BAL" || op == "BE" || op == "BLT" || op == "BLE" || op == "BNE" ){
     if( op == "B" ){
       res += "10100000";
@@ -264,13 +271,36 @@ int main( int argc, char **argv ){
   for( int i = 0; i < (int)insts.size(); i++ ){
     std::string w = insts[i];
     std::string op2 = w.substr( 2 , 3 );
-    if( w.substr( 0 , 2 ) == "10" && ( op2 == "100" || op2 == "101" || op2 == "111" ) ){
-      std::string label = w.substr( 8 );
-      if( label_to_address.find( label ) == label_to_address.end() ){
-        std::cout << "LAVEL " << label << " NOT FOUND" << std::endl;
-        assert( false );
+    if( w.substr( 0 , 2 ) == "10" ){
+      if( op2 == "100" || op2 == "101" || op2 == "111" ){
+        std::string label = w.substr( 8 );
+        if( label_to_address.find( label ) == label_to_address.end() ){
+          std::cout << "LAVEL " << label << " NOT FOUND" << std::endl;
+          assert( false );
+        }
+        insts[i] = w.substr( 0 , 8 ) + extend( std::to_string( label_to_address[label] - ( i + 1 ) ) );
+      } else if( op2 == "000" || op2 == "001" || op2 == "010" ){
+        std::string label = w.substr( 8 );
+        std::string par = label.substr( (int)(label.size()) - 1 );
+        label = label.substr( 0 , (int)(label.size()) - 1 );
+        if( '0' <= label[0] && label[0] <= '9' ){
+          continue;
+        }
+        if( label_to_address.find( label ) == label_to_address.end() ){
+          std::cout << "LAVEL " << label << " NOT FOUND" << std::endl;
+          assert( false );
+        }
+        int adr = label_to_address[label];
+        int imm = -1;
+        if( par == "0" ){
+          imm = adr >> 12;
+        } else if( par == "1" ){
+          imm = ( adr >> 6 ) % ( 1 << 6 );
+        } else if( par == "2" ){
+          imm = adr % ( 1 << 6 );
+        }
+        insts[i] = w.substr( 0 , 8 ) + extend( std::to_string( imm ) );
       }
-      insts[i] = w.substr( 0 , 8 ) + extend( std::to_string( label_to_address[label] - ( i + 1 ) ) );
     }
   }
 

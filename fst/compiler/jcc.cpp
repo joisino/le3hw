@@ -16,7 +16,7 @@ extern "C"{
 }
 
 enum{
-  NNODE, PRINODE, SHNODE, PNODE, ANODE, XNODE, ONODE, ENODE, VNODE, SNODE, SSNODE
+  NNODE, PRINODE, SHNODE, PNODE, ANODE, XNODE, ONODE, ENODE, VNODE, INODE, SNODE, SSNODE
 };
 
 struct node{
@@ -33,6 +33,8 @@ struct node{
 
 node nodes[1000000];
 int it;
+
+int labelcnt;
 
 int svcnt = 0;
 map<string,int> stackvars;
@@ -52,6 +54,12 @@ int make_statements( int ch ){
 int make_statement( int ch, int type ){
   fprintf( stderr, "S %d\n", ch ); 
   nodes[it] = node( SNODE, vector<int>({ch}), type );
+  return it++;
+}
+
+int make_if( int chl, int chr ){
+  fprintf( stderr, "I %d %d\n", chl, chr ); 
+  nodes[it] = node( INODE, vector<int>({chl,chr}) );
   return it++;
 }
 
@@ -167,9 +175,30 @@ void write_statement( int x ){
   if( nodes[x].val == EXP ){
     write_expr( nodes[x].ch.at( 0 ) );
     printf( "ADDI r7 -1\n" );
-  } else {
+  } else if( nodes[x].val == IFBL ){
+    write_if( nodes[x].ch.at( 0 ) );
+  } else if( nodes[x].val == VDEF ){
     write_stackvar( nodes[x].ch.at( 0 ) );
   }
+}
+
+void write_if( int x ){
+  assert( nodes[x].type == INODE );
+  write_expr( nodes[x].ch.at( 0 ) );
+  printf( "LD r1 r7 -1\n" );
+  printf( "CMPI r1 0\n" );
+  int la = labelcnt++;
+  int lb = labelcnt++;
+  printf( "BNE L%d\n" , la );
+  printf( "LI r1 L%d 0\n", lb );
+  printf( "SLL r1 6\n" );
+  printf( "ADDI r1 L%d 1\n", lb );
+  printf( "SLL r1 6\n" );
+  printf( "ADDI r1 L%d 2\n", lb );
+  printf( "BR r1\n" );
+  printf( "L%d:\n", la );
+  write_statement( nodes[x].ch.at( 1 ) );
+  printf( "L%d:\n", lb );
 }
 
 void write_stackvar( int x ){
@@ -306,8 +335,8 @@ void load_num( int r, int a ){
   }
   vector<int> v(0);
   while( a > 0 ){
-    v.push_back( a % 16 );
-    a /= 16;
+    v.push_back( a % 64 );
+    a /= 64;
   }
   reverse( v.begin(), v.end() );
   bool f = false;
@@ -316,7 +345,7 @@ void load_num( int r, int a ){
       f = true;
       printf( "LI r%d %d\n", r , b );
     } else {
-      printf( "SLL r%d 4\n", r );
+      printf( "SLL r%d 6\n", r );
       printf( "ADDI r%d %d\n", r, b );
     }
   }

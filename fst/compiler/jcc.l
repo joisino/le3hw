@@ -41,6 +41,9 @@
 "=" {
   return EQ;
 }
+"if" {
+  return IF;
+}
 [[:alpha:]][[:alnum:]]* {
   sscanf( yytext, "%s", yylval.str );
   return IDENTIFIER;
