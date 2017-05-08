@@ -53,11 +53,14 @@
 "else" {
   return ELSE;
 }
+"while" {
+  return WHILE;
+}
 [[:alpha:]][[:alnum:]]* {
   sscanf( yytext, "%s", yylval.str );
   return IDENTIFIER;
 }
-[+-]?[1-9][0-9]* {
+[+-]?[0-9]+ {
   int temp;
   sscanf( yytext, "%d", &temp );
   yylval.val = (int16_t)temp;

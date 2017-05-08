@@ -16,7 +16,7 @@ extern "C"{
 }
 
 enum{
-  NNODE, PRINODE, SHNODE, PNODE, ANODE, XNODE, ONODE, ENODE, VNODE, INODE, SNODE, SSNODE
+  NNODE, PRINODE, SHNODE, PNODE, ANODE, XNODE, ONODE, ENODE, VNODE, WNODE, INODE, SNODE, SSNODE
 };
 
 struct node{
@@ -66,6 +66,12 @@ int make_if( int chexp, int cha, int chb ){
 int make_if( int chl, int chr ){
   fprintf( stderr, "I %d %d\n", chl, chr ); 
   nodes[it] = node( INODE, vector<int>({chl,chr}) );
+  return it++;
+}
+
+int make_while( int chl, int chr ){
+  fprintf( stderr, "W %d %d\n", chl, chr ); 
+  nodes[it] = node( WNODE, vector<int>({chl,chr}) );
   return it++;
 }
 
@@ -183,11 +189,41 @@ void write_statement( int x ){
     printf( "ADDI r7 -1\n" );
   } else if( nodes[x].val == IFBL ){
     write_if( nodes[x].ch.at( 0 ) );
+  } else if( nodes[x].val == WHILEBL ){
+    write_while( nodes[x].ch.at( 0 ) );
   } else if( nodes[x].val == VDEF ){
     write_stackvar( nodes[x].ch.at( 0 ) );
   } else if( nodes[x].val == BRACE ){
     write_statements( nodes[x].ch.at( 0 ) );
   }
+}
+
+void write_while( int x ){
+  assert( nodes[x].type == WNODE );
+  int la = labelcnt++;
+  int lb = labelcnt++;
+  int lc = labelcnt++;
+  printf( "L%d:\n", la );  
+  write_expr( nodes[x].ch.at( 0 ) );
+  printf( "LD r1 r7 -1\n" );
+  printf( "ADDI r7 -1\n" );
+  printf( "CMPI r1 0\n" );
+  printf( "BNE L%d\n" , lb );
+  printf( "LI r1 L%d 0\n", lc );
+  printf( "SLL r1 6\n" );
+  printf( "ADDI r1 L%d 1\n", lc );
+  printf( "SLL r1 6\n" );
+  printf( "ADDI r1 L%d 2\n", lc );
+  printf( "BR r1\n" );
+  printf( "L%d:\n", lb );
+  write_statement( nodes[x].ch.at( 1 ) );
+  printf( "LI r1 L%d 0\n", la );
+  printf( "SLL r1 6\n" );
+  printf( "ADDI r1 L%d 1\n", la );
+  printf( "SLL r1 6\n" );
+  printf( "ADDI r1 L%d 2\n", la );
+  printf( "BR r1\n" );
+  printf( "L%d:\n", lc );
 }
 
 void write_if( int x ){
@@ -197,6 +233,7 @@ void write_if( int x ){
     int la = labelcnt++;
     int lb = labelcnt++;
     printf( "LD r1 r7 -1\n" );
+    printf( "ADDI r7 -1\n" );    
     printf( "CMPI r1 0\n" );
     printf( "BNE L%d\n" , la );
     printf( "LI r1 L%d 0\n", lb );
@@ -324,8 +361,8 @@ void write_pterm( int x ){
   } else {
     write_pterm( nodes[x].ch.at( 0 ) );
     write_pri( nodes[x].ch.at( 1 ) );
-    printf( "LD r1 r7 -1\n" );
-    printf( "LD r2 r7 -2\n" );
+    printf( "LD r1 r7 -2\n" );
+    printf( "LD r2 r7 -1\n" );
     if( nodes[x].val == PLS ){
       printf( "ADD r1 r2\n" );
     } else if( nodes[x].val == MNS ){

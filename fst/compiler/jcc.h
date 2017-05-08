@@ -17,6 +17,8 @@
 
 #define BRACE 11
 
+#define WHILEBL 12
+
 void yyerror( const char *s );
 
 int make_statements( int chl, int chr );
@@ -24,6 +26,7 @@ int make_statements( int ch );
 int make_statement( int ch, int type );
 int make_if( int chl, int chr );
 int make_if( int chexp, int cha, int chb );
+int make_while( int chl, int chr );
 int make_stackvar( char *str );
 int make_expr( char *str, int ch );
 int make_expr( int ch );
@@ -44,6 +47,7 @@ int make_num( int num );
 void write_statements( int x );
 void write_statement( int x );
 void write_if( int x );
+void write_while( int x );
 void write_stackvar( int x );
 void write_expr( int x );
 void write_oterm( int x );
