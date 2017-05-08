@@ -57,6 +57,12 @@ int make_statement( int ch, int type ){
   return it++;
 }
 
+int make_if( int chexp, int cha, int chb ){
+  fprintf( stderr, "I %d %d %d\n", chexp, cha, chb ); 
+  nodes[it] = node( INODE, vector<int>({chexp,cha,chb}) );
+  return it++;
+}
+
 int make_if( int chl, int chr ){
   fprintf( stderr, "I %d %d\n", chl, chr ); 
   nodes[it] = node( INODE, vector<int>({chl,chr}) );
@@ -179,26 +185,55 @@ void write_statement( int x ){
     write_if( nodes[x].ch.at( 0 ) );
   } else if( nodes[x].val == VDEF ){
     write_stackvar( nodes[x].ch.at( 0 ) );
+  } else if( nodes[x].val == BRACE ){
+    write_statements( nodes[x].ch.at( 0 ) );
   }
 }
 
 void write_if( int x ){
   assert( nodes[x].type == INODE );
-  write_expr( nodes[x].ch.at( 0 ) );
-  printf( "LD r1 r7 -1\n" );
-  printf( "CMPI r1 0\n" );
-  int la = labelcnt++;
-  int lb = labelcnt++;
-  printf( "BNE L%d\n" , la );
-  printf( "LI r1 L%d 0\n", lb );
-  printf( "SLL r1 6\n" );
-  printf( "ADDI r1 L%d 1\n", lb );
-  printf( "SLL r1 6\n" );
-  printf( "ADDI r1 L%d 2\n", lb );
-  printf( "BR r1\n" );
-  printf( "L%d:\n", la );
-  write_statement( nodes[x].ch.at( 1 ) );
-  printf( "L%d:\n", lb );
+  if( nodes[x].ch.size() == 2 ){
+    write_expr( nodes[x].ch.at( 0 ) );
+    int la = labelcnt++;
+    int lb = labelcnt++;
+    printf( "LD r1 r7 -1\n" );
+    printf( "CMPI r1 0\n" );
+    printf( "BNE L%d\n" , la );
+    printf( "LI r1 L%d 0\n", lb );
+    printf( "SLL r1 6\n" );
+    printf( "ADDI r1 L%d 1\n", lb );
+    printf( "SLL r1 6\n" );
+    printf( "ADDI r1 L%d 2\n", lb );
+    printf( "BR r1\n" );
+    printf( "L%d:\n", la );
+    write_statement( nodes[x].ch.at( 1 ) );
+    printf( "L%d:\n", lb );
+  } else if( nodes[x].ch.size() == 3 ){
+    write_expr( nodes[x].ch.at( 0 ) );
+    printf( "LD r1 r7 -1\n" );
+    printf( "CMPI r1 0\n" );
+    int la = labelcnt++;
+    int lb = labelcnt++;
+    int lc = labelcnt++;
+    printf( "BNE L%d\n" , la );
+    printf( "LI r1 L%d 0\n", lb );
+    printf( "SLL r1 6\n" );
+    printf( "ADDI r1 L%d 1\n", lb );
+    printf( "SLL r1 6\n" );
+    printf( "ADDI r1 L%d 2\n", lb );
+    printf( "BR r1\n" );
+    printf( "L%d:\n", la );
+    write_statement( nodes[x].ch.at( 1 ) );
+    printf( "LI r1 L%d 0\n", lc );
+    printf( "SLL r1 6\n" );
+    printf( "ADDI r1 L%d 1\n", lc );
+    printf( "SLL r1 6\n" );
+    printf( "ADDI r1 L%d 2\n", lc );
+    printf( "BR r1\n" );
+    printf( "L%d:\n", lb );
+    write_statement( nodes[x].ch.at( 2 ) );
+    printf( "L%d:\n", lc );
+  }
 }
 
 void write_stackvar( int x ){

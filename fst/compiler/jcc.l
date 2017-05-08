@@ -29,6 +29,12 @@
 ")" {
   return RPAR;
 }
+"{" {
+  return LBRACE;
+}
+"}" {
+  return RBRACE;
+}
 ">>" {
   return RSHIFT;
 }
@@ -43,6 +49,9 @@
 }
 "if" {
   return IF;
+}
+"else" {
+  return ELSE;
 }
 [[:alpha:]][[:alnum:]]* {
   sscanf( yytext, "%s", yylval.str );
