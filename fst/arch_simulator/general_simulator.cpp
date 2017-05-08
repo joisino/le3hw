@@ -431,7 +431,7 @@ struct Imme_goto : Operation {
 
     case BR:
       use_counter[OP_BR]++;
-      mem.pc = mem.reg[0]-1;
+      mem.pc = mem.reg[rb]-1;
       break;
 
     default:
