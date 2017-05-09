@@ -30,6 +30,7 @@
 
 void yyerror( const char *s );
 
+int make_function( char *str, int ch );
 int make_statements( int chl, int chr );
 int make_statements( int ch );
 int make_statement( int ch, int type );
@@ -57,6 +58,7 @@ int make_pri( int ch, int type );
 int make_pri( char *str, int type );
 int make_num( int num );
 
+void write_function( int x );
 void write_statements( int x );
 void write_statement( int x );
 void write_if( int x );
@@ -75,3 +77,9 @@ void write_num( int x );
 
 void load_num( int r , int a );
 void load_label( int r , std::string label );
+
+void check_name( std::string &s );
+
+void vstack_add( std::string &s );
+void vstack_push();
+void vstack_pop( int r );

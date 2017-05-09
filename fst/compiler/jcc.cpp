@@ -7,6 +7,7 @@
 #include <string>
 #include <stack>
 #include <map>
+#include <set>
 #include "jcc.h"
 
 using namespace std;
@@ -16,7 +17,7 @@ extern "C"{
 }
 
 enum{
-  NNODE, PRINODE, SHNODE, PNODE, LGNODE, EQEQNODE, ANODE, XNODE, ONODE, ENODE, VNODE, WNODE, INODE, SNODE, SSNODE
+  NNODE, PRINODE, SHNODE, PNODE, LGNODE, EQEQNODE, ANODE, XNODE, ONODE, ENODE, VNODE, WNODE, INODE, SNODE, SSNODE, FNODE
 };
 
 struct node{
@@ -37,7 +38,16 @@ int it;
 int labelcnt;
 
 int svcnt = 0;
+stack<vector<string> > vstack;
 map<string,int> stackvars;
+
+set<string> funcs;
+
+int make_function( char *str, int ch ){
+  fprintf( stderr, "F %s %d\n", str, ch ); 
+  nodes[it] = node( FNODE, vector<int>({ch}), string(str) );
+  return it++;
+}
 
 int make_statements( int chl, int chr ){
   fprintf( stderr, "SS %d %d\n", chl, chr ); 
@@ -196,6 +206,28 @@ int make_num( int num ){
   return it++;
 }
 
+void write_function( int x ){
+  assert( nodes[x].type == FNODE );
+  vstack_push();
+  check_name( nodes[x].str );
+  funcs.insert( nodes[x].str );
+  printf( "%s:\n", nodes[x].str.c_str() );
+  for( int i = 0; i < 7; i++ ){
+    printf( "ST r%d r7 %d\n", i , i );
+  }
+  printf( "MOV r6 r7\n" );
+  printf( "ADDI r7 7\n" );
+  svcnt = 7;
+  write_statements( nodes[x].ch.at( 0 ) );
+  printf( "ADDI r7 -7\n" );
+  svcnt -= 7;
+  for( int i = 0; i < 7; i++ ){
+    printf( "LD r%d r7 %d\n", i , i );
+  }
+  vstack_pop( 1 );
+  assert( svcnt == 0 );
+}
+
 void write_statements( int x ){
   assert( nodes[x].type == SSNODE );
   if( nodes[x].ch.size() == 1 ){
@@ -236,7 +268,9 @@ void write_while( int x ){
   load_label( 1 , "L" + to_string( lc ) );
   printf( "BR r1\n" );
   printf( "L%d:\n", lb );
+  vstack_push();
   write_statement( nodes[x].ch.at( 1 ) );
+  vstack_pop( 1 );
   load_label( 1 , "L" + to_string( la ) );
   printf( "BR r1\n" );
   printf( "L%d:\n", lc );
@@ -279,8 +313,8 @@ void write_if( int x ){
 
 void write_stackvar( int x ){
   assert( nodes[x].type == VNODE );
-  stackvars[ nodes[x].str ] = svcnt++;
-  printf( "ADDI r7 1\n" );
+  check_name( nodes[x].str );
+  vstack_add( nodes[x].str );
 }
 
 void write_expr( int x ){
@@ -517,11 +551,41 @@ void load_label( int r , string label ){
   printf( "ADDI r%d %s 2\n", r, label.c_str() );
 }
 
+void check_name( string &s ){
+  if( funcs.find( s ) != funcs.end() || stackvars.find( s ) != stackvars.end() ){
+    printf( "%s is already decleared\n", s.c_str() );
+    exit( 1 );
+  }
+}
+
+void vstack_add( string &s ){
+  cerr << "ADD " << s << endl;
+  stackvars[s] = svcnt++;
+  vstack.top().push_back( s );
+  printf( "ADDI r7 1\n" );
+}
+
+void vstack_push(){
+  vstack.push( vector<string>(0) );
+}
+
+void vstack_pop( int r ){
+  load_num( r, vstack.top().size() );
+  printf( "SUB r7 r%d\n",r );
+  while( !vstack.top().empty() ){
+    cerr << "DEL " << vstack.top().back() << endl;
+    stackvars.erase( stackvars.find( vstack.top().back() ) );
+    vstack.top().pop_back();
+    svcnt--;
+  }
+  vstack.pop();
+}
+
 int main(){
   extern FILE *yyin;
   yyin = stdin;
   yyparse();
-  write_statements( it - 1 );
+  write_function( it - 1 );
   printf( "HLT\n" );
   return 0;
 }
