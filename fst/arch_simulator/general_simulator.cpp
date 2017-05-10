@@ -620,6 +620,7 @@ int main(int argc, char **argv) {
     }
     data.main_mem = m;
   }
+  int nex_query = 0;
   while (1) {
     data.flags.c = false;
     assert(pc < static_cast<int>(ops.size()));
@@ -630,8 +631,13 @@ int main(int argc, char **argv) {
 
     if( STEP ){
       print_state( nowclock, data );
-      std::string buf;
-      std::getline( std::cin, buf );
+      if( nowclock >= nex_query ){
+        std::string buf;
+        std::getline( std::cin, buf );
+        if( !buf.empty() ){
+          nex_query = nowclock + atoi( buf.c_str() );
+        }
+      }
     }
     
     if (data.finish_flag) {
