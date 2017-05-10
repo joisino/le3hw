@@ -301,9 +301,11 @@ void write_program( int x ){
   printf( "HLT\n" );
   if( nodes[x].ch.size() == 1 ){
     write_function( nodes[x].ch.at( 0 ) );
-  } else {
+  } else if( nodes[x].ch.size() == 2 ){
     write_program( nodes[x].ch.at( 0 ) );
     write_function( nodes[x].ch.at( 1 ) );
+  } else {
+    assert( false );
   }
 }
 

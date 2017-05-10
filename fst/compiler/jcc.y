@@ -85,7 +85,7 @@ RET  : RETURN EXPR SEMI {
 SVAR : INT IDENTIFIER SEMI {
   $$ = make_stackvar( $2 );
  }
-| INT IDENTIFIER LPAR NUM RPAR {
+| INT IDENTIFIER LBRACK NUM RBRACK SEMI {
   $$ = make_stackvar( $2, $4 );
  }
 
