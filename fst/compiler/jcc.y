@@ -110,7 +110,7 @@ XTERM : ATERM {
 ATERM : EQEQTERM {
   $$ = make_aterm( $1 );
  }
-| ATERM AND LGTERM {
+| ATERM AND EQEQTERM {
   $$ = make_aterm( $1, $3 );
  }
 
