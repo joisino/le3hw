@@ -589,9 +589,9 @@ void write_sterm( int x ){
   } else {
     write_sterm( nodes[x].ch.at( 0 ) );
     printf( "LD r1 r7 -1\n" );
-    if( nodes[x].type == LSFT ){
+    if( nodes[x].val == LSFT ){
       printf( "SLL r1 %d\n", nodes[x].ch.at(1) );
-    } else if( nodes[x].type == RSFT ){
+    } else if( nodes[x].val == RSFT ){
       printf( "SRA r1 %d\n", nodes[x].ch.at(1) );
     }
     printf( "ST r1 r7 -1\n" );
