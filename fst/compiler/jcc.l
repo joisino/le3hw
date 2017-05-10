@@ -8,6 +8,9 @@
 ";" {
   return SEMI;
 }
+"," {
+  return COMMA;
+}
 "+" {
   return PLUS;
 }

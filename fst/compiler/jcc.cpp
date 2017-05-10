@@ -17,7 +17,7 @@ extern "C"{
 }
 
 enum{
-  NNODE, PRINODE, SHNODE, PNODE, LGNODE, EQEQNODE, ANODE, XNODE, ONODE, ENODE, VNODE, RNODE, WNODE, INODE, SNODE, SSNODE, FNODE, PROGNODE
+  NNODE, FCNODE, ARGNODE, PRINODE, SHNODE, PNODE, LGNODE, EQEQNODE, ANODE, XNODE, ONODE, ENODE, VNODE, RNODE, WNODE, INODE, SNODE, SSNODE, FNODE, PARAMNODE, PARAMSNODE, PROGNODE
 };
 
 struct node{
@@ -37,11 +37,14 @@ int it;
 
 int labelcnt;
 
+int paramcnt, argcnt;
+
 int svcnt = 0;
 stack<vector<string> > vstack;
 map<string,int> stackvars;
 
 set<string> funcs;
+map<string,int> arity;
 
 int make_program( int chl, int chr ){
   fprintf( stderr, "PROG %d %d\n", chl, chr ); 
@@ -55,10 +58,33 @@ int make_program( int ch ){
   return it++;
 }
 
+int make_params( int chl, int chr ){
+  fprintf( stderr, "PARAMS %d %d\n", chl, chr ); 
+  nodes[it] = node( PARAMSNODE, vector<int>({chl,chr}) );
+  return it++;
+}
+
+int make_params( int ch ){
+  fprintf( stderr, "PARAMS %d\n", ch ); 
+  nodes[it] = node( PARAMSNODE, vector<int>({ch}) );
+  return it++;
+}
+
+int make_param( char *str ){
+  fprintf( stderr, "PARAM %s\n", str ); 
+  nodes[it] = node( PARAMNODE, vector<int>({}), string(str) );
+  return it++;
+}
 
 int make_function( char *str, int ch ){
   fprintf( stderr, "F %s %d\n", str, ch ); 
   nodes[it] = node( FNODE, vector<int>({ch}), string(str) );
+  return it++;
+}
+
+int make_function( char *str, int chl, int chr ){
+  fprintf( stderr, "F %s %d %d\n", str, chl, chr ); 
+  nodes[it] = node( FNODE, vector<int>({chl,chr}), string(str) );
   return it++;
 }
 
@@ -219,6 +245,30 @@ int make_pri( char *str, int type ){
   return it++;
 }
 
+int make_args( int chl, int chr ){
+  fprintf( stderr, "ARG %d %d\n", chl, chr );
+  nodes[it] = node( ARGNODE, vector<int>({chl,chr}) );
+  return it++;
+}
+
+int make_args( int ch ){
+  fprintf( stderr, "ARG %d\n", ch );
+  nodes[it] = node( ARGNODE, vector<int>({ch}) );
+  return it++;
+}
+
+int make_funcall( char *str ){
+  fprintf( stderr, "FC %s\n", str );
+  nodes[it] = node( FCNODE, vector<int>({}), string(str) );
+  return it++;
+}
+
+int make_funcall( char *str, int ch ){
+  fprintf( stderr, "FC %s %d\n", str, ch );
+  nodes[it] = node( FCNODE, vector<int>({ch}), string(str) );
+  return it++;
+}
+
 int make_num( int num ){
   fprintf( stderr, "N %d\n" , num );
   nodes[it] = node( NNODE, vector<int>({}), num );
@@ -237,6 +287,23 @@ void write_program( int x ){
   }
 }
 
+void write_params( int x ){
+  assert( nodes[x].type == PARAMSNODE );
+  paramcnt++;
+  if( nodes[x].ch.size() == 1 ){
+    write_param( nodes[x].ch.at( 0 ) );
+  } else {
+    write_params( nodes[x].ch.at( 0 ) );
+    write_param( nodes[x].ch.at( 1 ) );
+  }
+}
+
+void write_param( int x ){
+  assert( nodes[x].type == PARAMNODE );
+  check_name( nodes[x].str );
+  vstack_add( nodes[x].str );
+}
+
 void write_function( int x ){
   assert( nodes[x].type == FNODE );
   check_name( nodes[x].str );
@@ -250,7 +317,15 @@ void write_function( int x ){
   assert( svcnt == 0 );
   svcnt = 7;
   vstack_push();
-  write_statements( nodes[x].ch.at( 0 ) );
+  if( nodes[x].ch.size() == 1 ){
+    arity[ nodes[x].str ] = 0;
+    write_statements( nodes[x].ch.at( 0 ) );
+  } else if( nodes[x].ch.size() == 2 ){
+    paramcnt = 0;
+    write_params( nodes[x].ch.at( 0 ) );
+    arity[ nodes[x].str ] = paramcnt;
+    write_statements( nodes[x].ch.at( 1 ) );
+  }
   vstack_pop( 1 );
   svcnt -= 7;
   assert( svcnt == 0 );  
@@ -546,9 +621,8 @@ void write_pri( int x ){
   assert( nodes[x].type == PRINODE );
   if( nodes[x].val == CST ){
     write_num( nodes[x].ch.at( 0 ) );
-  } else if( nodes[x].val == TFUN ){
-    assert( funcs.find( nodes[x].str ) != funcs.end() );
-    call_func( nodes[x].str, 1, 2 );
+  } else if( nodes[x].val == TFC ){
+    write_funcall( nodes[x].ch.at( 0 ) );
   } else if( nodes[x].val == VAR ){
     assert( stackvars.find( nodes[x].str ) != stackvars.end() );
     load_num( 1, stackvars[ nodes[x].str ] );
@@ -558,6 +632,35 @@ void write_pri( int x ){
     printf( "ADDI r7 1\n" );
   } else if( nodes[x].val == OTM ){
     write_oterm( nodes[x].ch.at( 0 ) );
+  }
+}
+
+void write_args( int x ){
+  assert( nodes[x].type == ARGNODE );
+  argcnt++;
+  if( nodes[x].ch.size() == 1 ){
+    write_expr( nodes[x].ch.at( 0 ) );
+  } else if( nodes[x].ch.size() == 2 ){
+    write_args( nodes[x].ch.at( 0 ) );
+    write_expr( nodes[x].ch.at( 1 ) );
+  }
+}
+
+void write_funcall( int x ){
+  assert( nodes[x].type == FCNODE );
+  if( nodes[x].ch.size() == 0 ){
+    assert( funcs.find( nodes[x].str ) != funcs.end() );
+    assert( arity[ nodes[x].str ] == 0 );
+    call_func( nodes[x].str, 1, 2 );
+  } else if( nodes[x].ch.size() == 1 ){
+    assert( funcs.find( nodes[x].str ) != funcs.end() );
+    printf( "ADDI r7 7\n" );
+    argcnt = 0;
+    write_args( nodes[x].ch.at( 0 ) );
+    assert( arity[ nodes[x].str ] == argcnt );
+    load_num( 1 , 7 + argcnt );
+    printf( "SUB r7 r1\n" );
+    call_func( nodes[x].str, 1, 2 );
   }
 }
 

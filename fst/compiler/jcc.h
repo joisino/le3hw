@@ -30,13 +30,17 @@
 
 #define TRET 19
 
-#define TFUN 20
+#define TFC 20
 
 void yyerror( const char *s );
 
 int make_program( int chl, int chr );
 int make_program( int ch );
+int make_params( int chl, int chr );
+int make_params( int ch );
+int make_param( char *str );
 int make_function( char *str, int ch );
+int make_function( char *str, int chl, int chr );
 int make_statements( int chl, int chr );
 int make_statements( int ch );
 int make_statement( int ch, int type );
@@ -63,9 +67,15 @@ int make_pterm( int chl, int chr, int type );
 int make_pterm( int ch );
 int make_pri( int ch, int type );
 int make_pri( char *str, int type );
+int make_args( int ch );
+int make_args( int chl, int chr );
+int make_funcall( char *str );
+int make_funcall( char *str, int ch );
 int make_num( int num );
 
 void write_program( int x );
+void write_params( int x );
+void write_param( int x );
 void write_function( int x );
 void write_statements( int x );
 void write_statement( int x );
@@ -82,6 +92,8 @@ void write_lgterm( int x );
 void write_sterm( int x );
 void write_pterm( int x );
 void write_pri( int x );
+void write_args( int x );
+void write_funcall( int x );
 void write_num( int x );
 
 void load_num( int r , int a );

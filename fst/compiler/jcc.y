@@ -11,8 +11,8 @@
  }
 %token <val> NUM
 %token <str> IDENTIFIER
-%token SEMI PLUS MINUS AND XOR OR LPAR RPAR LBRACE RBRACE LSHIFT RSHIFT LT LE GT GE EQEQ NEQ INT EQ IF ELSE WHILE RETURN
-%type <val> NTERM PRI PTERM STERM LGTERM EQEQTERM ATERM XTERM OTERM EXPR SVAR RET WHILEB IFB STATEMENT STATEMENTS FUNC PROGRAM
+%token SEMI COMMA PLUS MINUS AND XOR OR LPAR RPAR LBRACE RBRACE LSHIFT RSHIFT LT LE GT GE EQEQ NEQ INT EQ IF ELSE WHILE RETURN
+%type <val> NTERM FUNCALL ARGS PRI PTERM STERM LGTERM EQEQTERM ATERM XTERM OTERM EXPR SVAR RET WHILEB IFB STATEMENT STATEMENTS FUNC PARAM PARAMS PROGRAM
 %%
 
 PROGRAM: FUNC {
@@ -22,9 +22,24 @@ PROGRAM: FUNC {
   $$ = make_program( $1, $2 );
  }
 
+PARAMS: PARAM {
+  $$ = make_params( $1 );
+ }
+| PARAMS COMMA PARAM {
+  $$ = make_params( $1, $3 );
+ }
+
+PARAM: INT IDENTIFIER {
+  $$ = make_param( $2 );
+ }
+
 FUNC: INT IDENTIFIER LPAR RPAR LBRACE STATEMENTS RBRACE {
   $$ = make_function( $2, $6 );
  }
+| INT IDENTIFIER LPAR PARAMS RPAR LBRACE STATEMENTS RBRACE {
+  $$ = make_function( $2, $4, $7 );
+ }
+
 
 STATEMENTS : STATEMENT {
   $$ = make_statements( $1 );
@@ -148,15 +163,30 @@ PTERM : PRI {
 PRI : NTERM {
   $$ = make_pri( $1, CST );
  }
-| IDENTIFIER LPAR RPAR {
-  $$ = make_pri( $1, TFUN );
- }
+| FUNCALL {
+  $$ = make_pri( $1, TFC );
+  }
 | IDENTIFIER {
   $$ = make_pri( $1, VAR );
   }
 | LPAR OTERM RPAR {
   $$ = make_pri( $2, OTM );
  }
+
+ARGS : EXPR {
+  $$ = make_args( $1 );
+}
+| ARGS COMMA EXPR {
+  $$ = make_args( $1, $3 );
+ }
+
+FUNCALL : IDENTIFIER LPAR ARGS RPAR {
+  $$ = make_funcall( $1, $3 );
+ }
+| IDENTIFIER LPAR RPAR {
+  $$ = make_funcall( $1 );
+ }
+
 
 NTERM : NUM {
   $$ = make_num( $1 );
