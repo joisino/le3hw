@@ -146,8 +146,6 @@ struct Operation {
     if (result == 0)flags.z = true;
   }
 
-
-
   int f_add(const int l, const int r, Data::Flags&flags) {
     int result = l + r;
     f_check(result, flags);
@@ -403,6 +401,10 @@ struct Imme_goto : Operation {
     rb = rb_; d = d_;
   }
   virtual void play(Data&mem, std::map<All_op, int>&use_counter) {
+    mem.flags.z = false;
+    mem.flags.s = false;
+    mem.flags.v = false;
+    mem.flags.c = false;
     switch (op2) {
     case LI:
       use_counter[OP_LI]++;
@@ -505,6 +507,7 @@ struct If : Operation {
 void print_state( int nowclock, Data &data ){
   std::cout << "CLOCK: " << nowclock << std::endl;
   std::cout << "PC: " << data.pc << std::endl;
+  std::cout << "Z: " << data.flags.z << ",S: " << data.flags.s << ",C: " << data.flags.c << ",V: " << data.flags.v << std::endl;
   std::cout << "REG:";
   for( int i = 0; i < REGISTER_SIZE; i++ ){
     std::cout << " " << data.reg[i];
