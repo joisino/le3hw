@@ -32,6 +32,8 @@
 
 #define TFC 20
 
+#define TARRAY 21
+
 void yyerror( const char *s );
 
 int make_program( int chl, int chr );
@@ -49,6 +51,8 @@ int make_if( int chexp, int cha, int chb );
 int make_while( int chl, int chr );
 int make_ret( int ch );
 int make_stackvar( char *str );
+int make_stackvar( char *str, int num );
+int make_expr( char *str, int chl, int chr );
 int make_expr( char *str, int ch );
 int make_expr( int ch );
 int make_oterm( int chl, int chr );
@@ -67,6 +71,7 @@ int make_pterm( int chl, int chr, int type );
 int make_pterm( int ch );
 int make_pri( int ch, int type );
 int make_pri( char *str, int type );
+int make_pri( char *str, int ch, int type );
 int make_args( int ch );
 int make_args( int chl, int chr );
 int make_funcall( char *str );

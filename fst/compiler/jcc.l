@@ -38,6 +38,12 @@
 "}" {
   return RBRACE;
 }
+"[" {
+  return LBRACK;
+}
+"]" {
+  return RBRACK;
+}
 ">>" {
   return RSHIFT;
 }

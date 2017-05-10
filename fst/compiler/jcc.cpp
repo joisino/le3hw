@@ -41,6 +41,7 @@ int paramcnt, argcnt;
 
 int svcnt = 0;
 stack<vector<string> > vstack;
+stack<int> svcntstack;
 map<string,int> stackvars;
 
 set<string> funcs;
@@ -133,6 +134,19 @@ int make_ret( int ch ){
 int make_stackvar( char *str ){
   fprintf( stderr, "V %s\n", str ); 
   nodes[it] = node( VNODE, vector<int>({}), string(str) );
+  return it++;
+}
+
+int make_stackvar( char *str, int num ){
+  assert( num > 0 );
+  fprintf( stderr, "V %s %d\n", str, num ); 
+  nodes[it] = node( VNODE, vector<int>({}), num, string(str) );
+  return it++;
+}
+
+int make_expr( char *str, int chl, int chr ){
+  fprintf( stderr, "E %s %d %d\n", str, chl, chr );
+  nodes[it] = node( ENODE, vector<int>({chl,chr}), string(str) );
   return it++;
 }
 
@@ -242,6 +256,12 @@ int make_pri( int ch, int type ){
 int make_pri( char *str, int type ){
   fprintf( stderr, "PRI %s\n", str );
   nodes[it] = node( PRINODE, vector<int>({}), type, string(str) );
+  return it++;
+}
+
+int make_pri( char *str, int ch, int type ){
+  fprintf( stderr, "PRI %s %d\n", str, ch );
+  nodes[it] = node( PRINODE, vector<int>({ch}), type, string(str) );
   return it++;
 }
 
@@ -437,21 +457,46 @@ void write_ret( int x ){
 
 void write_stackvar( int x ){
   assert( nodes[x].type == VNODE );
-  check_name( nodes[x].str );
-  vstack_add( nodes[x].str );
+  if( nodes[x].val == -1 ){
+    check_name( nodes[x].str );
+    vstack_add( nodes[x].str );
+  } else {
+    check_name( nodes[x].str );
+    vstack_add( nodes[x].str );
+    load_num( 1 , svcnt );
+    printf( "ADD r1 r6\n" );
+    printf( "ST r1 r7 -1\n" );
+    load_num( 1 , nodes[x].val );
+    printf( "ADD r7 r1\n" );
+    svcnt += nodes[x].val;
+  }
 }
 
 void write_expr( int x ){
   assert( nodes[x].type == ENODE );
   if( nodes[x].str.size() == 0 ){
     write_oterm( nodes[x].ch.at( 0 ) );
-  } else {
+  } else if( nodes[x].ch.size() == 1 ){
     assert( stackvars.find( nodes[x].str ) != stackvars.end() );
     write_expr( nodes[x].ch.at( 0 ) );
     load_num( 1, stackvars[ nodes[x].str ] );
     printf( "ADD r1 r6\n" );
     printf( "LD r2 r7 -1\n" );
     printf( "ST r2 r1 0\n" );
+  } else if( nodes[x].ch.size() == 2 ){
+    assert( stackvars.find( nodes[x].str ) != stackvars.end() );
+    write_expr( nodes[x].ch.at( 1 ) );
+    write_expr( nodes[x].ch.at( 0 ) );
+    printf( "ADDI r7 -1\n" );
+    printf( "LD r2 r7 0\n" );
+    load_num( 1, stackvars[ nodes[x].str ] );
+    printf( "ADD r1 r6\n" );
+    printf( "LD r1 r1 0\n" );
+    printf( "ADD r1 r2\n" );
+    printf( "LD r2 r7 -1\n" );
+    printf( "ST r2 r1 0\n" );
+  } else {
+    assert( false );
   }
 }
 
@@ -623,6 +668,16 @@ void write_pri( int x ){
     write_num( nodes[x].ch.at( 0 ) );
   } else if( nodes[x].val == TFC ){
     write_funcall( nodes[x].ch.at( 0 ) );
+  } else if( nodes[x].val == TARRAY ){
+    assert( stackvars.find( nodes[x].str ) != stackvars.end() );
+    write_expr( nodes[x].ch.at( 0 ) );
+    printf( "LD r2 r7 -1\n" );
+    load_num( 1, stackvars[ nodes[x].str ] );
+    printf( "ADD r1 r6\n" );
+    printf( "LD r1 r1 0\n" );
+    printf( "ADD r1 r2\n" );
+    printf( "LD r1 r1 0\n" );
+    printf( "ST r1 r7 -1\n" );
   } else if( nodes[x].val == VAR ){
     assert( stackvars.find( nodes[x].str ) != stackvars.end() );
     load_num( 1, stackvars[ nodes[x].str ] );
@@ -632,6 +687,8 @@ void write_pri( int x ){
     printf( "ADDI r7 1\n" );
   } else if( nodes[x].val == OTM ){
     write_oterm( nodes[x].ch.at( 0 ) );
+  } else {
+    assert( false );
   }
 }
 
@@ -722,6 +779,7 @@ void vstack_add( string &s ){
 
 void vstack_push(){
   vstack.push( vector<string>(0) );
+  svcntstack.push( svcnt );
 }
 
 void vstack_pop( int r ){
@@ -731,8 +789,9 @@ void vstack_pop( int r ){
     cerr << "DEL " << vstack.top().back() << endl;
     stackvars.erase( stackvars.find( vstack.top().back() ) );
     vstack.top().pop_back();
-    svcnt--;
   }
+  svcnt = svcntstack.top();
+  svcntstack.pop();
   vstack.pop();
 }
 
