@@ -28,8 +28,14 @@
 #define TEQEQ 17
 #define TNEQ 18
 
+#define TRET 19
+
+#define TFUN 20
+
 void yyerror( const char *s );
 
+int make_program( int chl, int chr );
+int make_program( int ch );
 int make_function( char *str, int ch );
 int make_statements( int chl, int chr );
 int make_statements( int ch );
@@ -37,6 +43,7 @@ int make_statement( int ch, int type );
 int make_if( int chl, int chr );
 int make_if( int chexp, int cha, int chb );
 int make_while( int chl, int chr );
+int make_ret( int ch );
 int make_stackvar( char *str );
 int make_expr( char *str, int ch );
 int make_expr( int ch );
@@ -58,11 +65,13 @@ int make_pri( int ch, int type );
 int make_pri( char *str, int type );
 int make_num( int num );
 
+void write_program( int x );
 void write_function( int x );
 void write_statements( int x );
 void write_statement( int x );
 void write_if( int x );
 void write_while( int x );
+void write_ret( int x );
 void write_stackvar( int x );
 void write_expr( int x );
 void write_oterm( int x );
@@ -83,3 +92,6 @@ void check_name( std::string &s );
 void vstack_add( std::string &s );
 void vstack_push();
 void vstack_pop( int r );
+
+void call_func( std::string s, int ra, int rb );
+ 

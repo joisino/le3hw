@@ -74,6 +74,9 @@
 "while" {
   return WHILE;
 }
+"return" {
+  return RETURN;
+}
 [[:alpha:]][[:alnum:]]* {
   sscanf( yytext, "%s", yylval.str );
   return IDENTIFIER;

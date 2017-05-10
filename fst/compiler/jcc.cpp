@@ -17,7 +17,7 @@ extern "C"{
 }
 
 enum{
-  NNODE, PRINODE, SHNODE, PNODE, LGNODE, EQEQNODE, ANODE, XNODE, ONODE, ENODE, VNODE, WNODE, INODE, SNODE, SSNODE, FNODE
+  NNODE, PRINODE, SHNODE, PNODE, LGNODE, EQEQNODE, ANODE, XNODE, ONODE, ENODE, VNODE, RNODE, WNODE, INODE, SNODE, SSNODE, FNODE, PROGNODE
 };
 
 struct node{
@@ -42,6 +42,19 @@ stack<vector<string> > vstack;
 map<string,int> stackvars;
 
 set<string> funcs;
+
+int make_program( int chl, int chr ){
+  fprintf( stderr, "PROG %d %d\n", chl, chr ); 
+  nodes[it] = node( PROGNODE, vector<int>({chl,chr}) );
+  return it++;
+}
+
+int make_program( int ch ){
+  fprintf( stderr, "PROG %d\n", ch ); 
+  nodes[it] = node( PROGNODE, vector<int>({ch}) );
+  return it++;
+}
+
 
 int make_function( char *str, int ch ){
   fprintf( stderr, "F %s %d\n", str, ch ); 
@@ -82,6 +95,12 @@ int make_if( int chl, int chr ){
 int make_while( int chl, int chr ){
   fprintf( stderr, "W %d %d\n", chl, chr ); 
   nodes[it] = node( WNODE, vector<int>({chl,chr}) );
+  return it++;
+}
+
+int make_ret( int ch ){
+  fprintf( stderr, "R %d\n", ch ); 
+  nodes[it] = node( RNODE, vector<int>({ch}) );
   return it++;
 }
 
@@ -206,9 +225,20 @@ int make_num( int num ){
   return it++;
 }
 
+void write_program( int x ){
+  assert( nodes[x].type == PROGNODE );
+  call_func( "main", 1, 2 );
+  printf( "HLT\n" );
+  if( nodes[x].ch.size() == 1 ){
+    write_function( nodes[x].ch.at( 0 ) );
+  } else {
+    write_program( nodes[x].ch.at( 0 ) );
+    write_function( nodes[x].ch.at( 1 ) );
+  }
+}
+
 void write_function( int x ){
   assert( nodes[x].type == FNODE );
-  vstack_push();
   check_name( nodes[x].str );
   funcs.insert( nodes[x].str );
   printf( "%s:\n", nodes[x].str.c_str() );
@@ -217,15 +247,18 @@ void write_function( int x ){
   }
   printf( "MOV r6 r7\n" );
   printf( "ADDI r7 7\n" );
+  assert( svcnt == 0 );
   svcnt = 7;
+  vstack_push();
   write_statements( nodes[x].ch.at( 0 ) );
-  printf( "ADDI r7 -7\n" );
+  vstack_pop( 1 );
   svcnt -= 7;
+  assert( svcnt == 0 );  
+  printf( "ADDI r7 -7\n" );
   for( int i = 0; i < 7; i++ ){
     printf( "LD r%d r7 %d\n", i , i );
   }
-  vstack_pop( 1 );
-  assert( svcnt == 0 );
+  printf( "BR r0\n" );
 }
 
 void write_statements( int x ){
@@ -251,6 +284,8 @@ void write_statement( int x ){
     write_stackvar( nodes[x].ch.at( 0 ) );
   } else if( nodes[x].val == BRACE ){
     write_statements( nodes[x].ch.at( 0 ) );
+  } else if( nodes[x].val == TRET ){
+    write_ret( nodes[x].ch.at( 0 ) );
   }
 }
 
@@ -309,6 +344,20 @@ void write_if( int x ){
     write_statement( nodes[x].ch.at( 2 ) );
     printf( "L%d:\n", lc );
   }
+}
+
+void write_ret( int x ){
+  assert( nodes[x].type == RNODE );
+  write_expr( nodes[x].ch.at( 0 ) );
+  printf( "LD r2 r7 -1\n" );
+  load_num( 1, svcnt );
+  printf( "SUB r7 r1\n" );
+  printf( "LD r0 r7 -1\n" );
+  printf( "ST r2 r7 -1\n" );  
+  for( int i = 1; i < 7; i++ ){
+    printf( "LD r%d r7 %d\n", i , i-1 );
+  }
+  printf( "BR r0\n" );  
 }
 
 void write_stackvar( int x ){
@@ -497,6 +546,9 @@ void write_pri( int x ){
   assert( nodes[x].type == PRINODE );
   if( nodes[x].val == CST ){
     write_num( nodes[x].ch.at( 0 ) );
+  } else if( nodes[x].val == TFUN ){
+    assert( funcs.find( nodes[x].str ) != funcs.end() );
+    call_func( nodes[x].str, 1, 2 );
   } else if( nodes[x].val == VAR ){
     assert( stackvars.find( nodes[x].str ) != stackvars.end() );
     load_num( 1, stackvars[ nodes[x].str ] );
@@ -581,11 +633,24 @@ void vstack_pop( int r ){
   vstack.pop();
 }
 
+void call_func( string s, int ra, int rb ){
+  int la = labelcnt++;
+  int lb = labelcnt++;
+  printf( "LI r%d 0\n", ra );
+  printf( "BAL L%d\n", la );
+  printf( "L%d:\n", la );
+  printf( "CMPI r%d 1\n", ra );
+  printf( "BE L%d\n", lb );
+  printf( "LI r%d 1\n", ra );
+  load_label( rb, s );
+  printf( "BR r%d\n", rb );
+  printf( "L%d:\n", lb );
+}
+
 int main(){
   extern FILE *yyin;
   yyin = stdin;
   yyparse();
-  write_function( it - 1 );
-  printf( "HLT\n" );
+  write_program( it - 1 );
   return 0;
 }
