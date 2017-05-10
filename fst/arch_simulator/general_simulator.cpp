@@ -14,7 +14,7 @@
 const bool DEBUG = true;
 
 const int REGISTER_SIZE = 8;
-const int MAIN_MEMORY_SIZE = 2048;
+const int MAIN_MEMORY_SIZE = 8192;
 
 const int REGISTER_BIT = 16;
 const int REGISTER_MAX = (1 << (REGISTER_BIT - 1)) - 1;
@@ -643,13 +643,19 @@ int main(int argc, char **argv) {
     if (data.finish_flag) {
       break;
     }
-    if (nowclock > 1e7) {
+    if (nowclock > 1e8) {
       std::cout << "Infinite loop? over" << nowclock << " clock!" << std::endl;
       return 1;
     }
   }
 
   print_state( nowclock, data );
+
+  std::ofstream ofs( "mem.out" );
+  for( int i = 0; i < MAIN_MEMORY_SIZE; i++ ){
+    ofs << data.main_mem[i] << std::endl;
+  }
+  ofs.close();
   
   return 0;
 }
