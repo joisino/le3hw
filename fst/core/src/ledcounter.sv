@@ -4,8 +4,8 @@
 module ledcounter( input logic        clk,
 		input logic        reset_n,
 		input logic        stp,
-		output logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
-		output logic [7:0] controll );
+		output logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h );
+
  
    logic [3:0] ca, cb, cc, cd, ce, cf, cg, ch;
    logic       carry_a, carry_b, carry_c, carry_d, carry_e, carry_f, carry_g, carry_h;
@@ -27,8 +27,6 @@ module ledcounter( input logic        clk,
    leddecoder df( cf, seg_f );
    leddecoder dg( cg, seg_g );
    leddecoder dh( ch, seg_h );
-
-   assign controll = 8'b0000_0001;
    
 endmodule
    

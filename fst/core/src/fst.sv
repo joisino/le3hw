@@ -9,19 +9,21 @@
 `include "main_mem.sv"
 `include "core.sv"
 `include "ledcounter.sv"
+`include "ledout.sv"
 
 module fst
   #( parameter C = 8 )
    ( input logic clk_in, reset_n_in,
-     input logic [15:0]  in_dat,
-     output logic [7:0]  seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
-     output logic [7:0]  controll,
-     output logic        halting );
+     input logic [15:0] in_dat,
+     output logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
+     output logic [7:0] seg_out_a, seg_out_b, seg_out_c, seg_out_d,
+     output logic [7:0] controll,
+     output logic       halting );
    
    logic         clk_n;
    logic 	 reset;
-   logic         out_en;
-   logic [15:0]  out_dat;
+   logic [C-1:0] out_en;
+   logic [15:0]  out_dat [C-1:0];
    logic [C-1:0] is_halt;
    logic [15:0]  pc [C-1:0];
    logic [15:0]  inst [C-1:0];
@@ -66,6 +68,8 @@ module fst
                     .pc(pc[i]),
                     .inst(inst[i]),
 		    .is_halt(is_halt[i]),
+                    .out_en(out_en[i]),
+                    .out_dat(out_dat[i]),
                     .* );
       end
    endgenerate
@@ -82,6 +86,8 @@ module fst
    main_mem main_mem( .clk(clk_n), .* );
    
    ledcounter cnter( .clk(clk), .reset_n(reset_n), .stp(halting), .* );
+   ledout cnter( .* );
+   assign controll = 8'b0000_0011;
    
    always_ff @( posedge clk ) begin
       halting <= halting | ( is_halt != 0 );
