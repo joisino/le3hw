@@ -504,7 +504,7 @@ struct If : Operation {
 };
 
 
-void print_state( int nowclock, Data &data ){
+void print_state( long long int nowclock, Data &data ){
   std::cout << "CLOCK: " << nowclock << std::endl;
   std::cout << "PC: " << data.pc << std::endl;
   std::cout << "Z: " << data.flags.z << ",S: " << data.flags.s << ",C: " << data.flags.c << ",V: " << data.flags.v << std::endl;
@@ -598,7 +598,7 @@ int main(int argc, char **argv) {
   }
   int pc = 0;
 
-  int nowclock = 0;
+  long long int nowclock = 0;
   Data data;
   std::map<All_op, int>operation_counter;
   std::map<int, int>place_counter;
@@ -620,7 +620,7 @@ int main(int argc, char **argv) {
     }
     data.main_mem = m;
   }
-  int nex_query = 0;
+  long long int nex_query = 0;
   while (1) {
     data.flags.c = false;
     assert(pc < static_cast<int>(ops.size()));
@@ -643,7 +643,7 @@ int main(int argc, char **argv) {
     if (data.finish_flag) {
       break;
     }
-    if (nowclock > 1e8) {
+    if (nowclock > 1e10) {
       std::cout << "Infinite loop? over" << nowclock << " clock!" << std::endl;
       return 1;
     }
