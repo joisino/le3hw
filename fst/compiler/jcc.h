@@ -34,6 +34,8 @@
 
 #define TARRAY 21
 
+#define TPRI 22
+
 void yyerror( const char *s );
 
 int make_program( int chl, int chr );
@@ -50,8 +52,10 @@ int make_if( int chl, int chr );
 int make_if( int chexp, int cha, int chb );
 int make_while( int chl, int chr );
 int make_ret( int ch );
-int make_stackvar( char *str );
-int make_stackvar( char *str, int num );
+int make_stackvar( char *str, int type );
+int make_stackvar( char *str, int ch, int type );
+int make_stackvar( int ch, int type );
+int make_stackarray( char *str, int num );
 int make_expr( char *str, int chl, int chr );
 int make_expr( char *str, int ch );
 int make_expr( int ch );
@@ -69,6 +73,7 @@ int make_sterm( int chl, int num, int type );
 int make_sterm( int ch );
 int make_pterm( int chl, int chr, int type );
 int make_pterm( int ch );
+int make_mterm( int ch, int type );
 int make_pri( int ch, int type );
 int make_pri( char *str, int type );
 int make_pri( char *str, int ch, int type );
@@ -88,6 +93,7 @@ void write_if( int x );
 void write_while( int x );
 void write_ret( int x );
 void write_stackvar( int x );
+void write_stackarray( int x );
 void write_expr( int x );
 void write_oterm( int x );
 void write_xterm( int x );
@@ -96,6 +102,7 @@ void write_eqeqterm( int x );
 void write_lgterm( int x );
 void write_sterm( int x );
 void write_pterm( int x );
+void write_mterm( int x );
 void write_pri( int x );
 void write_args( int x );
 void write_funcall( int x );

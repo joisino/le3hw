@@ -12,7 +12,7 @@
 %token <val> NUM
 %token <str> IDENTIFIER
 %token SEMI COMMA PLUS MINUS AND XOR OR LPAR RPAR LBRACE RBRACE LBRACK RBRACK LSHIFT RSHIFT LT LE GT GE EQEQ NEQ INT EQ IF ELSE WHILE RETURN
-%type <val> NTERM FUNCALL ARGS PRI PTERM STERM LGTERM EQEQTERM ATERM XTERM OTERM EXPR SVAR RET WHILEB IFB STATEMENT STATEMENTS FUNC PARAM PARAMS PROGRAM
+%type <val> NTERM FUNCALL ARGS PRI MTERM PTERM STERM LGTERM EQEQTERM ATERM XTERM OTERM EXPR SARRAY SVAR RET WHILEB IFB STATEMENT STATEMENTS FUNC PARAM PARAMS PROGRAM
 %%
 
 PROGRAM: FUNC {
@@ -83,10 +83,17 @@ RET  : RETURN EXPR SEMI {
 }
 
 SVAR : INT IDENTIFIER SEMI {
-  $$ = make_stackvar( $2 );
+  $$ = make_stackvar( $2, VAR );
  }
-| INT IDENTIFIER LBRACK NUM RBRACK SEMI {
-  $$ = make_stackvar( $2, $4 );
+| INT IDENTIFIER EQ EXPR SEMI {
+  $$ = make_stackvar( $2, $4, VAR );
+ }
+| SARRAY {
+  $$ = make_stackvar( $1, TARRAY );
+  }
+
+SARRAY :  INT IDENTIFIER LBRACK NUM RBRACK SEMI {
+  $$ = make_stackarray( $2, $4 );
  }
 
 EXPR : OTERM {
@@ -156,14 +163,21 @@ STERM : PTERM {
   $$ = make_sterm( $1, $3, RSFT );
  }
 
-PTERM : PRI {
+PTERM : MTERM {
   $$ = make_pterm( $1 );
  }
-| PTERM PLUS PRI {
+| PTERM PLUS MTERM {
   $$ = make_pterm( $1, $3, PLS );
  }
-| PTERM MINUS PRI {
+| PTERM MINUS MTERM {
   $$ = make_pterm( $1, $3, MNS );
+ }
+
+MTERM: PRI {
+  $$ = make_mterm( $1, TPRI );
+ }
+| MINUS MTERM {
+  $$ = make_mterm( $2, MNS );
  }
 
 PRI : NTERM {

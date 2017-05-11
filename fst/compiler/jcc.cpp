@@ -17,7 +17,7 @@ extern "C"{
 }
 
 enum{
-  NNODE, FCNODE, ARGNODE, PRINODE, SHNODE, PNODE, LGNODE, EQEQNODE, ANODE, XNODE, ONODE, ENODE, VNODE, RNODE, WNODE, INODE, SNODE, SSNODE, FNODE, PARAMNODE, PARAMSNODE, PROGNODE
+  NNODE, FCNODE, ARGNODE, PRINODE, MNODE, SHNODE, PNODE, LGNODE, EQEQNODE, ANODE, XNODE, ONODE, ENODE, ARRAYNODE, VNODE, RNODE, WNODE, INODE, SNODE, SSNODE, FNODE, PARAMNODE, PARAMSNODE, PROGNODE
 };
 
 struct node{
@@ -131,16 +131,28 @@ int make_ret( int ch ){
   return it++;
 }
 
-int make_stackvar( char *str ){
-  fprintf( stderr, "V %s\n", str ); 
-  nodes[it] = node( VNODE, vector<int>({}), string(str) );
+int make_stackvar( char *str, int type ){
+  fprintf( stderr, "V %s %d\n", str, type ); 
+  nodes[it] = node( VNODE, vector<int>({}), type, string(str) );
   return it++;
 }
 
-int make_stackvar( char *str, int num ){
+int make_stackvar( char *str, int ch, int type ){
+  fprintf( stderr, "V %s %d %d\n", str, ch, type ); 
+  nodes[it] = node( VNODE, vector<int>({ch}), type, string(str) );
+  return it++;
+}
+
+int make_stackvar( int ch, int type ){
+  fprintf( stderr, "V %d %d\n", ch, type ); 
+  nodes[it] = node( VNODE, vector<int>({ch}), type );
+  return it++;
+}
+
+int make_stackarray( char *str, int num ){
   assert( num > 0 );
-  fprintf( stderr, "V %s %d\n", str, num ); 
-  nodes[it] = node( VNODE, vector<int>({}), num, string(str) );
+  fprintf( stderr, "ARRAY %s %d\n", str, num ); 
+  nodes[it] = node( ARRAYNODE, vector<int>({}), num, string(str) );
   return it++;
 }
 
@@ -244,6 +256,12 @@ int make_pterm( int chl, int chr, int type ){
 int make_pterm( int ch ){
   fprintf( stderr, "P %d\n", ch );
   nodes[it] = node( PNODE, vector<int>({ch}) );
+  return it++;
+}
+
+int make_mterm( int ch, int type ){
+  fprintf( stderr, "M %d %d\n", ch, type );
+  nodes[it] = node( MNODE, vector<int>({ch}), type );
   return it++;
 }
 
@@ -459,20 +477,37 @@ void write_ret( int x ){
 
 void write_stackvar( int x ){
   assert( nodes[x].type == VNODE );
-  if( nodes[x].val == -1 ){
-    check_name( nodes[x].str );
-    vstack_add( nodes[x].str );
+  if( nodes[x].val == VAR ){
+    if( nodes[x].ch.size() == 0 ){
+      check_name( nodes[x].str );
+      vstack_add( nodes[x].str );
+    } else if( nodes[x].ch.size() == 1 ){
+      write_expr( nodes[x].ch.at( 0 ) );
+      check_name( nodes[x].str );
+      stackvars[ nodes[x].str ] = svcnt++;
+      vstack.top().push_back( nodes[x].str );
+    } else {
+      assert( false );
+    }
+  } else if( nodes[x].val == TARRAY ){
+    write_stackarray( nodes[x].ch.at( 0 ) );
   } else {
-    check_name( nodes[x].str );
-    vstack_add( nodes[x].str );
-    load_num( 1 , svcnt );
-    printf( "ADD r1 r6\n" );
-    printf( "ST r1 r7 -1\n" );
-    load_num( 1 , nodes[x].val );
-    printf( "ADD r7 r1\n" );
-    svcnt += nodes[x].val;
+    assert( false );
   }
 }
+
+void write_stackarray( int x ){
+  assert( nodes[x].type == ARRAYNODE );
+  check_name( nodes[x].str );
+  vstack_add( nodes[x].str );
+  load_num( 1 , svcnt );
+  printf( "ADD r1 r6\n" );
+  printf( "ST r1 r7 -1\n" );
+  load_num( 1 , nodes[x].val );
+  printf( "ADD r7 r1\n" );
+  svcnt += nodes[x].val;
+}
+
 
 void write_expr( int x ){
   assert( nodes[x].type == ENODE );
@@ -648,10 +683,10 @@ void write_sterm( int x ){
 void write_pterm( int x ){
   assert( nodes[x].type == PNODE );
   if( nodes[x].ch.size() == 1 ){
-    write_pri( nodes[x].ch.at( 0 ) );
+    write_mterm( nodes[x].ch.at( 0 ) );
   } else {
     write_pterm( nodes[x].ch.at( 0 ) );
-    write_pri( nodes[x].ch.at( 1 ) );
+    write_mterm( nodes[x].ch.at( 1 ) );
     printf( "LD r1 r7 -2\n" );
     printf( "LD r2 r7 -1\n" );
     if( nodes[x].val == PLS ){
@@ -661,6 +696,21 @@ void write_pterm( int x ){
     }
     printf( "ST r1 r7 -2\n" );
     printf( "ADDI r7 -1\n" );
+  }
+}
+
+void write_mterm( int x ){
+  assert( nodes[x].type == MNODE );
+  if( nodes[x].val == TPRI ){
+    write_pri( nodes[x].ch.at( 0 ) );
+  } else if( nodes[x].val == MNS ){
+    write_mterm( nodes[x].ch.at( 0 ) );
+    printf( "LI r1 0\n" );
+    printf( "LD r2 r7 -1\n" );
+    printf( "SUB r1 r2\n" );
+    printf( "ST r1 r7 -1\n" );
+  } else {
+    assert( false );
   }
 }
 
