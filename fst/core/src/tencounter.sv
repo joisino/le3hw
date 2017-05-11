@@ -11,7 +11,7 @@ module tenc( input logic clk,
 	 nex <= 0;
       end else if( ad & (!stp) ) begin
 	 if( cur < 9 ) begin
-	    nex <= cur + 1;
+	    nex <= cur + 4'b1;
 	 end else begin
 	    nex <= 0;
 	 end

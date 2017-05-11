@@ -24,16 +24,16 @@ module testbench();
    always
      begin
         clk = 1;
-        #25;
+        #5;
         assert( (reset == 1) | (!is_halt) ) else $stop;
         clk = 0;
         assert( (reset == 1) | (!is_halt) ) else $stop;
-        #25;
+        #5;
      end
    
    initial begin
       reset = 1;
-      #130;
+      #63;
       reset = 0;
    end
    

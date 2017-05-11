@@ -3,15 +3,15 @@
 `include "core.sv"
 `include "ledcounter.sv"
 
-module fst( input logic clk_in, reset_n,
-	    output logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
-	    output logic [7:0] controll,
-            output logic halting,
-            output logic [7:0] pc_out );
+module fst( input logic clk_in, reset_n_in,
+	    input logic [15:0] 	in_dat,
+	    output logic [7:0] 	seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
+	    output logic [7:0] 	controll,
+            output logic 	halting,
+            output logic [15:0] pc_out );
    
    logic         clk_n;
    logic 	 reset;
-   logic [15:0]  in_dat;
    logic         out_en;
    logic [15:0]  out_dat;
    logic         is_halt;
@@ -24,6 +24,7 @@ module fst( input logic clk_in, reset_n,
    logic [15:0]  main_mem_write_dat;
    logic [31:0]  counter;
    logic 	 clk;
+   logic 	 reset_n;
    
    assign pc_out = pc;
 
@@ -39,10 +40,12 @@ module fst( input logic clk_in, reset_n,
    ledcounter cnter( .clk(clk), .reset_n(reset_n), .stp(halting), .* );
    
    always_ff @( posedge clk ) begin
-      halting = halting | is_halt;
+      halting <= halting | is_halt;
       if( !reset_n ) begin
-	 halting = 0;
+	 halting <= 0;
       end
+
+      reset_n <= reset_n_in;
    end
    
 endmodule
