@@ -136,19 +136,19 @@ std::string decode( std::string inst ){
   } else if( op == "OUT" ){
     res += "11";
 
-    std::string rs;
-    std::string d;
+    std::string rs, rd;
     stin >> rs;
-    stin >> d;
+    stin >> rd;
     
     assert( rs[0] == 'r' );
     res += d_to_b( rs.substr( 1 ) , 3 );
 
-    res += "000";
+    assert( rd[0] == 'r' );
+    res += d_to_b( rd.substr( 1 ) , 3 );
 
     res += "1101";
 
-    res += d_to_b( d , 4 );
+    res += "0000";
   } else if( op == "HLT" ){
     res = "1100000011110000";
   } else if( op == "LD" || op == "ST" ){
