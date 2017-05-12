@@ -137,7 +137,9 @@ std::string decode( std::string inst ){
     res += "11";
 
     std::string rs;
+    std::string d;
     stin >> rs;
+    stin >> d;
     
     assert( rs[0] == 'r' );
     res += d_to_b( rs.substr( 1 ) , 3 );
@@ -146,7 +148,7 @@ std::string decode( std::string inst ){
 
     res += "1101";
 
-    res += "0000";
+    res += d_to_b( d , 4 );
   } else if( op == "HLT" ){
     res = "1100000011110000";
   } else if( op == "LD" || op == "ST" ){
