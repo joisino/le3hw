@@ -14,6 +14,7 @@ module core( input logic         clk,
              input logic [15:0]  in_dat,
              output logic        out_en,
              output logic [15:0] out_dat,
+             output logic [3:0]  out_pos,
              output logic        is_halt,
 
              output logic [15:0] pc,

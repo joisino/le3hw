@@ -17,14 +17,15 @@ module fst
      input logic [15:0] in_dat,
      output logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
      output logic [7:0] controll,
-     output logic [7:0] seg_out,
-     output logic [3:0] controll_out,
+     output logic [7:0] seg_x, seg_y,
+     output logic [3:0] controll_x, controll_y,
      output logic       halting );
    
    logic         clk_n;
    logic 	 reset;
    logic [C-1:0] out_en;
    logic [15:0]  out_dat [C-1:0];
+   logic [3:0]   out_pos [C-1:0];
    logic [C-1:0] is_halt;
    logic [15:0]  pc [C-1:0];
    logic [15:0]  inst [C-1:0];
@@ -71,6 +72,7 @@ module fst
 		    .is_halt(is_halt[i]),
                     .out_en(out_en[i]),
                     .out_dat(out_dat[i]),
+                    .out_pos(out_pos[i]),
                     .* );
       end
    endgenerate
