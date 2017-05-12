@@ -36,6 +36,11 @@
 
 #define TPRI 22
 
+#define TIN 23
+#define TOUT 24
+
+#define TFUNC 25
+
 void yyerror( const char *s );
 
 int make_program( int chl, int chr );
@@ -79,8 +84,10 @@ int make_pri( char *str, int type );
 int make_pri( char *str, int ch, int type );
 int make_args( int ch );
 int make_args( int chl, int chr );
-int make_funcall( char *str );
-int make_funcall( char *str, int ch );
+int make_funcall( char *str, int type );
+int make_funcall( char *str, int ch, int type );
+int make_funcall( int type );
+int make_funcall( int chl, int chr, int type );
 int make_num( int num );
 
 void write_program( int x );
