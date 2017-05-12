@@ -10,7 +10,6 @@
 `include "core.sv"
 `include "ledcounter.sv"
 `include "ledout.sv"
-`include "ledchoose.sv"
 
 module fst
   #( parameter C = 8 )
@@ -18,6 +17,8 @@ module fst
      input logic [15:0] in_dat,
      output logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
      output logic [7:0] controll,
+     output logic [7:0] seg_out,
+     output logic [3:0] controll_out,
      output logic       halting );
    
    logic         clk_n;
@@ -43,9 +44,6 @@ module fst
    logic [31:0]  counter;
    logic 	 clk;
    logic 	 reset_n;
-
-   logic [7:0]   seg_cnt_a, seg_cnt_b, seg_cnt_c, seg_cnt_d, seg_cnt_e, seg_cnt_f, seg_cnt_g, seg_cnt_h;
-   logic [7:0]   seg_out_a, seg_out_b, seg_out_c, seg_out_d;
    
    assign clk_n = ~clk;
    assign reset = ~reset_n | halting;
@@ -90,7 +88,6 @@ module fst
    
    ledcounter cnter( .clk(clk), .reset_n(reset_n), .stp(halting), .* );
    ledout lout( .* );
-   ledchoose lchose( .* );
    
    always_ff @( posedge clk ) begin
       halting <= halting | ( is_halt != 0 );
