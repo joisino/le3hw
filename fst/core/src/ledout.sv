@@ -1,9 +1,7 @@
-`include "tencounter.sv"
-`include "leddecoder.sv"
-
-module ledcounter( input logic [7:0] out_en,
-                   input logic [15:0] out_dat [7:0],
-                   output logic [7:0] seg_out_a, seg_out_b, seg_out_c, seg_out_d );
+module ledout( input logic clk,
+               input logic [7:0]  out_en,
+               input logic [15:0] out_dat [7:0],
+               output logic [7:0] seg_out_a, seg_out_b, seg_out_c, seg_out_d );
 
    logic [15:0] dat;
    
@@ -12,7 +10,7 @@ module ledcounter( input logic [7:0] out_en,
    leddecoder lc( dat[11:8], seg_out_c );
    leddecoder ld( dat[15:12], seg_out_d );
 
-   always_comb begin
+   always_ff @( posedge clk ) begin
       if( out_en[0] ) begin
          dat = out_dat[0];
       end else if( out_en[1] ) begin
@@ -29,10 +27,6 @@ module ledcounter( input logic [7:0] out_en,
          dat = out_dat[6];
       end else if( out_en[7] ) begin
          dat = out_dat[7];
-      end else if( out_en[8] ) begin
-         dat = out_dat[8];
-      end else begin
-         dat = 0;
       end
    end
    
