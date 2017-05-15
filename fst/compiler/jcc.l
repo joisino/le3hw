@@ -83,6 +83,9 @@
 "while" {
   return WHILE;
 }
+"for" {
+  return FOR;
+}
 "return" {
   return RETURN;
 }

@@ -46,6 +46,10 @@
 #define TBREAK 27
 #define TCONTINUE 28
 
+#define FORBL 29
+
+#define TNONE 30
+
 void yyerror( const char *s );
 
 int make_program( int chl, int chr );
@@ -65,6 +69,9 @@ int make_statement( int ch, int type );
 int make_if( int chl, int chr );
 int make_if( int chexp, int cha, int chb );
 int make_while( int chl, int chr );
+int make_for( int cha, int chb, int chc, int chd );
+int make_forinit( int type );
+int make_forinit( int ch, int type );
 int make_ret( int ch );
 int make_break();
 int make_continue();
@@ -112,6 +119,8 @@ void write_statements( int x );
 void write_statement( int x );
 void write_if( int x );
 void write_while( int x );
+void write_for( int x );
+void write_forinit( int x );
 void write_ret( int x );
 void write_break( int x );
 void write_continue( int x );
