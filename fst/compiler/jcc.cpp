@@ -324,15 +324,27 @@ int make_args( int ch ){
   return it++;
 }
 
-int make_funcall( char *str ){
-  fprintf( stderr, "FC %s\n", str );
-  nodes[it] = node( FCNODE, vector<int>({}), string(str) );
+int make_funcall( char *str, int type ){
+  fprintf( stderr, "FC %s %d\n", str, type );
+  nodes[it] = node( FCNODE, vector<int>({}), type, string(str) );
   return it++;
 }
 
-int make_funcall( char *str, int ch ){
-  fprintf( stderr, "FC %s %d\n", str, ch );
-  nodes[it] = node( FCNODE, vector<int>({ch}), string(str) );
+int make_funcall( char *str, int ch, int type ){
+  fprintf( stderr, "FC %s %d %d\n", str, ch, type );
+  nodes[it] = node( FCNODE, vector<int>({ch}), type, string(str) );
+  return it++;
+}
+
+int make_funcall( int type ){
+  fprintf( stderr, "FC %d\n", type );
+  nodes[it] = node( FCNODE, vector<int>({}), type );
+  return it++;
+}
+
+int make_funcall( int chl, int chr, int type ){
+  fprintf( stderr, "FC %d %d %d\n", chl, chr, type );
+  nodes[it] = node( FCNODE, vector<int>({chl,chr}), type );
   return it++;
 }
 
@@ -816,19 +828,34 @@ void write_args( int x ){
 
 void write_funcall( int x ){
   assert( nodes[x].type == FCNODE );
-  if( nodes[x].ch.size() == 0 ){
-    assert( funcs.find( nodes[x].str ) != funcs.end() );
-    assert( arity[ nodes[x].str ] == 0 );
-    call_func( nodes[x].str, 1, 2 );
-  } else if( nodes[x].ch.size() == 1 ){
-    assert( funcs.find( nodes[x].str ) != funcs.end() );
-    printf( "ADDI r7 7\n" );
-    argcnt = 0;
-    write_args( nodes[x].ch.at( 0 ) );
-    assert( arity[ nodes[x].str ] == argcnt );
-    load_num( 1 , 7 + argcnt );
-    printf( "SUB r7 r1\n" );
-    call_func( nodes[x].str, 1, 2 );
+  if( nodes[x].val == TFUNC ){
+    if( nodes[x].ch.size() == 0 ){
+      assert( funcs.find( nodes[x].str ) != funcs.end() );
+      assert( arity[ nodes[x].str ] == 0 );
+      call_func( nodes[x].str, 1, 2 );
+    } else if( nodes[x].ch.size() == 1 ){
+      assert( funcs.find( nodes[x].str ) != funcs.end() );
+      printf( "ADDI r7 7\n" );
+      argcnt = 0;
+      write_args( nodes[x].ch.at( 0 ) );
+      assert( arity[ nodes[x].str ] == argcnt );
+      load_num( 1 , 7 + argcnt );
+      printf( "SUB r7 r1\n" );
+      call_func( nodes[x].str, 1, 2 );
+    } else {
+      assert( false );
+    }
+  } else if( nodes[x].val == TIN ){
+    printf( "IN r1\n" );
+    printf( "ST r1 r7 0\n" );
+    printf( "ADDI r7 1\n" );
+  } else if( nodes[x].val == TOUT ){
+    write_expr( nodes[x].ch.at( 1 ) );
+    write_expr( nodes[x].ch.at( 0 ) );
+    printf( "LD r1 r7 -2\n" );
+    printf( "LD r2 r7 -1\n" );
+    printf( "OUT r1 r2\n" );
+    printf( "ADDI r7 -1\n" );
   }
 }
 

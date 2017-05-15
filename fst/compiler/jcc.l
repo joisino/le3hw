@@ -86,6 +86,12 @@
 "return" {
   return RETURN;
 }
+"out" {
+  return OUT;
+}
+"in" {
+  return IN;
+}
 [[:alpha:]][[:alnum:]]* {
   sscanf( yytext, "%s", yylval.str );
   return IDENTIFIER;

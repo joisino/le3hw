@@ -12,6 +12,7 @@ module exmem( input logic clk, reset, en_exmem, flush_exmem,
               input logic         regwrite_ex,
               input logic         is_halt_ex,
               input logic         out_en_ex,
+              input logic [15:0]   rd2_ex, 
               output logic [15:0] ALUres_mem,
               output logic        S_mem, C_mem, Z_mem, V_mem,
               output logic [15:0] pcinc_mem,
@@ -24,7 +25,8 @@ module exmem( input logic clk, reset, en_exmem, flush_exmem,
               output logic        from_main_mem_mem,
               output logic        regwrite_mem,
               output logic        is_halt,
-              output logic        out_en );
+              output logic        out_en,
+              output logic [3:0]  out_pos );
    
    flopr ALUres_flop( clk, reset | flush_exmem, en_exmem, ALUres_ex, ALUres_mem );
    flopr #(1) S_flop( clk, reset | flush_exmem, en_exmem, S_ex, S_mem );
@@ -42,5 +44,6 @@ module exmem( input logic clk, reset, en_exmem, flush_exmem,
    flopr #(1) regwrite_flop( clk, reset | flush_exmem, en_exmem, regwrite_ex, regwrite_mem );
    flopr #(1) is_halt_flop( clk, reset | flush_exmem, en_exmem, is_halt_ex, is_halt );
    flopr #(1) out_en_flop( clk, reset | flush_exmem, en_exmem, out_en_ex, out_en );
+   flopr #(4) out_pos_flop( clk, reset | flush_exmem, en_exmem, rd2_ex[3:0], out_pos );
 
 endmodule

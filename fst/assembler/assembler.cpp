@@ -136,13 +136,15 @@ std::string decode( std::string inst ){
   } else if( op == "OUT" ){
     res += "11";
 
-    std::string rs;
+    std::string rs, rd;
     stin >> rs;
+    stin >> rd;
     
     assert( rs[0] == 'r' );
     res += d_to_b( rs.substr( 1 ) , 3 );
 
-    res += "000";
+    assert( rd[0] == 'r' );
+    res += d_to_b( rd.substr( 1 ) , 3 );
 
     res += "1101";
 
