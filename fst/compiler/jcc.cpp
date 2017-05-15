@@ -17,7 +17,7 @@ extern "C"{
 }
 
 enum{
-  NNODE, FCNODE, ARGNODE, PRINODE, MNODE, SHNODE, PNODE, LGNODE, EQEQNODE, ANODE, XNODE, ONODE, ENODE, ARRAYNODE, VNODE, RNODE, WNODE, INODE, SNODE, SSNODE, FNODE, PARAMNODE, PARAMSNODE, PROGNODE
+  NNODE, FCNODE, ARGNODE, PRINODE, MNODE, SHNODE, PNODE, LGNODE, EQEQNODE, ANODE, XNODE, ONODE, ENODE, ARRAYNODE, VNODE, RNODE, WNODE, INODE, SNODE, SSNODE, FNODE, PARAMNODE, PARAMSNODE, GARRAYNODE, GVARNODE, TNODE, PROGNODE
 };
 
 struct node{
@@ -44,8 +44,13 @@ stack<vector<string> > vstack;
 stack<int> svcntstack;
 map<string,int> stackvars;
 
+int gvcnt = 0;
+map<string,int> globalvars;
+
 set<string> funcs;
 map<string,int> arity;
+
+vector<string> initial_ops;
 
 int make_program( int chl, int chr ){
   fprintf( stderr, "PROG %d %d\n", chl, chr ); 
@@ -56,6 +61,30 @@ int make_program( int chl, int chr ){
 int make_program( int ch ){
   fprintf( stderr, "PROG %d\n", ch ); 
   nodes[it] = node( PROGNODE, vector<int>({ch}) );
+  return it++;
+}
+
+int make_top( int ch, int type ){
+  fprintf( stderr, "TOP %d %d\n", ch, type ); 
+  nodes[it] = node( TNODE, vector<int>({ch}), type );
+  return it++;
+}
+
+int make_globalvar( char *str, int type ){
+  fprintf( stderr, "GVAR %s %d\n", str , type ); 
+  nodes[it] = node( GVARNODE, vector<int>({}), type, string(str) );
+  return it++;
+}
+
+int make_globalvar( int ch, int type ){
+  fprintf( stderr, "GVAR %d %d\n", ch, type ); 
+  nodes[it] = node( GVARNODE, vector<int>({ch}), type );
+  return it++;
+}
+
+int make_globalarray( char *str, int num ){
+  fprintf( stderr, "GVAR %s %d\n", str , num ); 
+  nodes[it] = node( GARRAYNODE, vector<int>({}), num, string(str) );
   return it++;
 }
 
@@ -315,16 +344,52 @@ int make_num( int num ){
 
 void write_program( int x ){
   assert( nodes[x].type == PROGNODE );
-  call_func( "main", 1, 2 );
-  printf( "HLT\n" );
   if( nodes[x].ch.size() == 1 ){
-    write_function( nodes[x].ch.at( 0 ) );
+    write_top( nodes[x].ch.at( 0 ) );
   } else if( nodes[x].ch.size() == 2 ){
     write_program( nodes[x].ch.at( 0 ) );
-    write_function( nodes[x].ch.at( 1 ) );
+    write_top( nodes[x].ch.at( 1 ) );
   } else {
     assert( false );
   }
+}
+
+void write_top( int x ){
+  assert( nodes[x].type == TNODE );
+  if( nodes[x].val == TFUN ){
+    write_function( nodes[x].ch.at(0) );
+  } else if( nodes[x].val == VAR ){
+    write_globalvar( nodes[x].ch.at(0) );
+  } else {
+    assert( false );
+  }
+}
+void write_globalvar( int x ){
+  assert( nodes[x].type == GVARNODE );
+  if( nodes[x].val == VAR ){
+    if( nodes[x].ch.size() == 0 ){
+      check_name( nodes[x].str );
+      globalvars[ nodes[x].str ] = gvcnt++;
+      printf( "ADDI r7 1\n" );
+    } else {
+      assert( false );
+    }
+  } else if( nodes[x].val == TARRAY ){
+    write_globalarray( nodes[x].ch.at( 0 ) );
+  } else {
+    assert( false );
+  }
+}
+
+void write_globalarray( int x ){
+  assert( nodes[x].type == GARRAYNODE );
+  check_name( nodes[x].str );
+  globalvars[ nodes[x].str ] = gvcnt++;
+  load_num( 1 , gvcnt );
+  printf( "ST r1 r7 0\n" );
+  load_num( 1 , nodes[x].val + 1 );
+  printf( "ADD r7 r1\n" );
+  gvcnt += nodes[x].val;
 }
 
 void write_params( int x ){
@@ -348,6 +413,8 @@ void write_function( int x ){
   assert( nodes[x].type == FNODE );
   check_name( nodes[x].str );
   funcs.insert( nodes[x].str );
+  load_label( 1 , nodes[x].str + "_end" );
+  printf( "BR r1\n" );
   printf( "%s:\n", nodes[x].str.c_str() );
   for( int i = 0; i < 7; i++ ){
     printf( "ST r%d r7 %d\n", i , i );
@@ -374,6 +441,7 @@ void write_function( int x ){
     printf( "LD r%d r7 %d\n", i , i );
   }
   printf( "BR r0\n" );
+  printf( "%s_end:\n", nodes[x].str.c_str() );
 }
 
 void write_statements( int x ){
@@ -508,26 +576,21 @@ void write_stackarray( int x ){
   svcnt += nodes[x].val;
 }
 
-
 void write_expr( int x ){
   assert( nodes[x].type == ENODE );
   if( nodes[x].str.size() == 0 ){
     write_oterm( nodes[x].ch.at( 0 ) );
   } else if( nodes[x].ch.size() == 1 ){
-    assert( stackvars.find( nodes[x].str ) != stackvars.end() );
     write_expr( nodes[x].ch.at( 0 ) );
-    load_num( 1, stackvars[ nodes[x].str ] );
-    printf( "ADD r1 r6\n" );
+    load_adr( 1, nodes[x].str );
     printf( "LD r2 r7 -1\n" );
     printf( "ST r2 r1 0\n" );
   } else if( nodes[x].ch.size() == 2 ){
-    assert( stackvars.find( nodes[x].str ) != stackvars.end() );
     write_expr( nodes[x].ch.at( 1 ) );
     write_expr( nodes[x].ch.at( 0 ) );
     printf( "ADDI r7 -1\n" );
     printf( "LD r2 r7 0\n" );
-    load_num( 1, stackvars[ nodes[x].str ] );
-    printf( "ADD r1 r6\n" );
+    load_adr( 1, nodes[x].str );
     printf( "LD r1 r1 0\n" );
     printf( "ADD r1 r2\n" );
     printf( "LD r2 r7 -1\n" );
@@ -721,19 +784,15 @@ void write_pri( int x ){
   } else if( nodes[x].val == TFC ){
     write_funcall( nodes[x].ch.at( 0 ) );
   } else if( nodes[x].val == TARRAY ){
-    assert( stackvars.find( nodes[x].str ) != stackvars.end() );
     write_expr( nodes[x].ch.at( 0 ) );
     printf( "LD r2 r7 -1\n" );
-    load_num( 1, stackvars[ nodes[x].str ] );
-    printf( "ADD r1 r6\n" );
+    load_adr( 1, nodes[x].str );
     printf( "LD r1 r1 0\n" );
     printf( "ADD r1 r2\n" );
     printf( "LD r1 r1 0\n" );
     printf( "ST r1 r7 -1\n" );
   } else if( nodes[x].val == VAR ){
-    assert( stackvars.find( nodes[x].str ) != stackvars.end() );
-    load_num( 1, stackvars[ nodes[x].str ] );
-    printf( "ADD r1 r6\n" );
+    load_adr( 1 , nodes[x].str );
     printf( "LD r2 r1 0\n" );
     printf( "ST r2 r7 0\n" );
     printf( "ADDI r7 1\n" );
@@ -807,6 +866,17 @@ void load_num( int r, int a ){
   }
 }
 
+void load_adr( int r, string &s ){
+  if( globalvars.find( s ) != globalvars.end() ){
+    load_num( 1, globalvars[s] );
+  } else if( stackvars.find( s ) != stackvars.end() ){
+    load_num( 1, stackvars[s] );
+    printf( "ADD r1 r6\n" );
+  } else {
+    assert( false );
+  }
+}
+
 void load_label( int r , string label ){
   printf( "LI r%d %s 0\n", r, label.c_str() );
   printf( "SLL r%d 6\n", r );
@@ -816,7 +886,7 @@ void load_label( int r , string label ){
 }
 
 void check_name( string &s ){
-  if( funcs.find( s ) != funcs.end() || stackvars.find( s ) != stackvars.end() ){
+  if( funcs.find( s ) != funcs.end() || stackvars.find( s ) != stackvars.end() || globalvars.find( s ) != globalvars.end() ){
     printf( "%s is already decleared\n", s.c_str() );
     exit( 1 );
   }
@@ -866,5 +936,7 @@ int main(){
   yyin = stdin;
   yyparse();
   write_program( it - 1 );
+  call_func( "main", 1, 2 );
+  printf( "HLT\n" );
   return 0;
 }

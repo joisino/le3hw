@@ -36,10 +36,16 @@
 
 #define TPRI 22
 
+#define TFUN 23
+
 void yyerror( const char *s );
 
 int make_program( int chl, int chr );
 int make_program( int ch );
+int make_top( int ch, int type );
+int make_globalvar( char *str, int type );
+int make_globalvar( int ch, int type );
+int make_globalarray( char *str, int num );
 int make_params( int chl, int chr );
 int make_params( int ch );
 int make_param( char *str );
@@ -85,6 +91,9 @@ int make_num( int num );
 
 void write_program( int x );
 void write_params( int x );
+void write_top( int x );
+void write_globalvar( int x );
+void write_globalarray( int x );
 void write_param( int x );
 void write_function( int x );
 void write_statements( int x );
@@ -109,6 +118,7 @@ void write_funcall( int x );
 void write_num( int x );
 
 void load_num( int r , int a );
+void load_adr( int r , std::string &s );
 void load_label( int r , std::string label );
 
 void check_name( std::string &s );
