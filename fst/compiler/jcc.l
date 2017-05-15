@@ -86,6 +86,12 @@
 "return" {
   return RETURN;
 }
+"continue" {
+  return CONTINUE;
+}
+"break" {
+  return BREAK;
+}
 "out" {
   return OUT;
 }

@@ -43,6 +43,8 @@
 
 #define TFUN 26
 
+#define TBREAK 27
+#define TCONTINUE 28
 
 void yyerror( const char *s );
 
@@ -64,6 +66,8 @@ int make_if( int chl, int chr );
 int make_if( int chexp, int cha, int chb );
 int make_while( int chl, int chr );
 int make_ret( int ch );
+int make_break();
+int make_continue();
 int make_stackvar( char *str, int type );
 int make_stackvar( char *str, int ch, int type );
 int make_stackvar( int ch, int type );
@@ -109,6 +113,8 @@ void write_statement( int x );
 void write_if( int x );
 void write_while( int x );
 void write_ret( int x );
+void write_break( int x );
+void write_continue( int x );
 void write_stackvar( int x );
 void write_stackarray( int x );
 void write_expr( int x );

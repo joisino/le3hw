@@ -17,7 +17,7 @@ extern "C"{
 }
 
 enum{
-  NNODE, FCNODE, ARGNODE, PRINODE, MNODE, SHNODE, PNODE, LGNODE, EQEQNODE, ANODE, XNODE, ONODE, ENODE, ARRAYNODE, VNODE, RNODE, WNODE, INODE, SNODE, SSNODE, FNODE, PARAMNODE, PARAMSNODE, GARRAYNODE, GVARNODE, TNODE, PROGNODE
+  NNODE, FCNODE, ARGNODE, PRINODE, MNODE, SHNODE, PNODE, LGNODE, EQEQNODE, ANODE, XNODE, ONODE, ENODE, ARRAYNODE, VNODE, BNODE, CNODE, RNODE, WNODE, INODE, SNODE, SSNODE, FNODE, PARAMNODE, PARAMSNODE, GARRAYNODE, GVARNODE, TNODE, PROGNODE
 };
 
 struct node{
@@ -51,6 +51,9 @@ set<string> funcs;
 map<string,int> arity;
 
 vector<string> initial_ops;
+
+string breaklabel;
+string continuelabel;
 
 int make_program( int chl, int chr ){
   fprintf( stderr, "PROG %d %d\n", chl, chr ); 
@@ -157,6 +160,18 @@ int make_while( int chl, int chr ){
 int make_ret( int ch ){
   fprintf( stderr, "R %d\n", ch ); 
   nodes[it] = node( RNODE, vector<int>({ch}) );
+  return it++;
+}
+
+int make_break(){
+  fprintf( stderr, "B\n" ); 
+  nodes[it] = node( BNODE, vector<int>({}) );
+  return it++;
+}
+
+int make_continue(){
+  fprintf( stderr, "C\n" ); 
+  nodes[it] = node( CNODE, vector<int>({}) );
   return it++;
 }
 
@@ -481,6 +496,10 @@ void write_statement( int x ){
     write_statements( nodes[x].ch.at( 0 ) );
   } else if( nodes[x].val == TRET ){
     write_ret( nodes[x].ch.at( 0 ) );
+  } else if( nodes[x].val == TBREAK ){
+    write_break( nodes[x].ch.at( 0 ) );
+  } else if( nodes[x].val == TCONTINUE ){
+    write_continue( nodes[x].ch.at( 0 ) );
   }
 }
 
@@ -489,6 +508,8 @@ void write_while( int x ){
   int la = labelcnt++;
   int lb = labelcnt++;
   int lc = labelcnt++;
+  continuelabel = "L" + to_string( la );
+  breaklabel = "L" + to_string( lc );
   printf( "L%d:\n", la );  
   write_expr( nodes[x].ch.at( 0 ) );
   printf( "LD r1 r7 -1\n" );
@@ -553,6 +574,18 @@ void write_ret( int x ){
     printf( "LD r%d r7 %d\n", i , i-1 );
   }
   printf( "BR r0\n" );  
+}
+
+void write_break( int x ){
+  assert( nodes[x].type == BNODE );
+  load_label( 1 , breaklabel );
+  printf( "BR r1\n" );  
+}
+
+void write_continue( int x ){
+  assert( nodes[x].type == CNODE );
+  load_label( 1 , continuelabel );
+  printf( "BR r1\n" );  
 }
 
 void write_stackvar( int x ){
