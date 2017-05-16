@@ -6,7 +6,7 @@ module ledout( input logic        clk,
                output logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
                output logic [7:0] controll );
 
-   logic [4:0] cnt;
+   logic [3:0] cnt;
    
    logic [15:0] dat;
    logic [7:0] seg_out_a, seg_out_b, seg_out_c, seg_out_d;
@@ -22,7 +22,7 @@ module ledout( input logic        clk,
       if( reset ) begin
          cnt <= 0;
       end else begin
-         cnt <= cnt + 5'b00001;
+         cnt <= cnt + 4'b0001;
       end
    end
 
