@@ -96,7 +96,7 @@ int make_eqeqterm( int chl, int num, int type );
 int make_eqeqterm( int ch );
 int make_lgterm( int chl, int num, int type );
 int make_lgterm( int ch );
-int make_sterm( int chl, int num, int type );
+int make_sterm( int chl, int chr, int type );
 int make_sterm( int ch );
 int make_pterm( int chl, int chr, int type );
 int make_pterm( int ch );
