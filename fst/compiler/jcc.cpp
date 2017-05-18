@@ -880,6 +880,8 @@ void write_sterm( int x ){
       printf( "SLL r1 r2\n" );
     } else if( nodes[x].val == RSFT ){
       printf( "SRA r1 r2\n" );
+    } else {
+      assert( false );
     }
     printf( "ST r1 r7 -2\n" );
     printf( "ADDI r7 -1\n" );
