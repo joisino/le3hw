@@ -287,22 +287,38 @@ struct Calc_put :Operation {
 
     case SLL:
       use_counter[OP_SLL]++;
-      mem.reg[rd] = f_sll(mem.reg[rd], mem.reg[rs], mem.flags);
+      if( d == 0 ){
+        mem.reg[rd] = f_sll(mem.reg[rd], mem.reg[rs], mem.flags);
+      } else {
+        mem.reg[rd] = f_sll(mem.reg[rd], d, mem.flags);
+      }
       break;
 
     case SLR:
       use_counter[OP_SLR]++;
-      mem.reg[rd] = f_slr(mem.reg[rd], mem.reg[rs], mem.flags);
+      if( d == 0 ){
+        mem.reg[rd] = f_slr(mem.reg[rd], mem.reg[rs], mem.flags);
+      } else {
+        mem.reg[rd] = f_slr(mem.reg[rd], d, mem.flags);
+      }
       break;
 
     case SRL:
       use_counter[OP_SRL]++;
-      mem.reg[rd] = f_srl(mem.reg[rd], mem.reg[rs], mem.flags);
+      if( d == 0 ){
+        mem.reg[rd] = f_slr(mem.reg[rd], mem.reg[rs], mem.flags);
+      } else {
+        mem.reg[rd] = f_srl(mem.reg[rd], d, mem.flags);
+      }
       break;
 
     case SRA:
       use_counter[OP_SRA]++;
-      mem.reg[rd] = f_sra(mem.reg[rd], mem.reg[rs], mem.flags);
+      if( d == 0 ){
+        mem.reg[rd] = f_sra(mem.reg[rd], mem.reg[rs], mem.flags);
+      } else {
+        mem.reg[rd] = f_sra(mem.reg[rd], d, mem.flags);
+      }
       break;
 
     case IN:
