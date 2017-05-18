@@ -872,15 +872,20 @@ void write_sterm( int x ){
   assert( nodes[x].type == SHNODE );
   if( nodes[x].ch.size() == 1 ){
     write_pterm( nodes[x].ch.at( 0 ) );
-  } else {
+  } else if( nodes[x].ch.size() == 2 ){
     write_sterm( nodes[x].ch.at( 0 ) );
-    printf( "LD r1 r7 -1\n" );
+    write_pterm( nodes[x].ch.at( 1 ) );
+    printf( "LD r1 r7 -2\n" );
+    printf( "LD r2 r7 -1\n" );
     if( nodes[x].val == LSFT ){
-      printf( "SLL r1 %d\n", nodes[x].ch.at(1) );
+      printf( "SLL r1 r2\n" );
     } else if( nodes[x].val == RSFT ){
-      printf( "SRA r1 %d\n", nodes[x].ch.at(1) );
+      printf( "SRA r1 r2\n" );
     }
-    printf( "ST r1 r7 -1\n" );
+    printf( "ST r1 r7 -2\n" );
+    printf( "ADDI r7 -1\n" );
+  } else {
+    assert( false );
   }
 }
 
