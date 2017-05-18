@@ -11,15 +11,33 @@
  }
 %token <val> NUM
 %token <str> IDENTIFIER
-%token SEMI COMMA PLUS MINUS AND XOR OR LPAR RPAR LBRACE RBRACE LBRACK RBRACK LSHIFT RSHIFT LT LE GT GE EQEQ NEQ INT EQ IF ELSE WHILE RETURN
-%type <val> NTERM FUNCALL ARGS PRI MTERM PTERM STERM LGTERM EQEQTERM ATERM XTERM OTERM EXPR SARRAY SVAR RET WHILEB IFB STATEMENT STATEMENTS FUNC PARAM PARAMS PROGRAM
+%token SEMI COMMA PLUS MINUS AND XOR OR ASTA LPAR RPAR LBRACE RBRACE LBRACK RBRACK LSHIFT RSHIFT LT LE GT GE EQEQ NEQ INT EQ IF ELSE WHILE FOR IN OUT RETURN CONTINUE BREAK
+%type <val> NTERM FUNCALL ARGS PRI MTERM PTERM STERM LGTERM EQEQTERM ATERM XTERM OTERM EXPR SARRAY SVAR RET CON BRE WHILEB FORB FORINIT IFB STATEMENT STATEMENTS FUNC PARAM PARAMS GARRAY GVAR TOP PROGRAM
 %%
 
-PROGRAM: FUNC {
+PROGRAM: TOP {
   $$ = make_program( $1 );
  }
-| PROGRAM FUNC {
+| PROGRAM TOP {
   $$ = make_program( $1, $2 );
+ }
+
+TOP: FUNC {
+  $$ = make_top( $1, TFUN );
+ }
+| GVAR {
+  $$ = make_top( $1, VAR );
+  }
+
+GVAR: INT IDENTIFIER SEMI {
+  $$ = make_globalvar( $2, VAR );
+ }
+| GARRAY {
+  $$ = make_globalvar( $1, TARRAY );
+  }
+
+GARRAY: INT IDENTIFIER LBRACK NUM RBRACK SEMI {
+  $$ = make_globalarray( $2, $4 );
  }
 
 PARAMS: PARAM {
@@ -60,12 +78,21 @@ STATEMENT : EXPR SEMI {
 | WHILEB {
   $$ = make_statement( $1, WHILEBL );
   }
+| FORB {
+  $$ = make_statement( $1, FORBL );
+  }
 | LBRACE STATEMENTS RBRACE {
   $$ = make_statement( $2, BRACE );
  }
 | RET {
   $$ = make_statement( $1, TRET );
  }
+| CON {
+  $$ = make_statement( $1, TCONTINUE );
+  }
+| BRE {
+  $$ = make_statement( $1, TBREAK );
+  }
 
 IFB : IF LPAR EXPR RPAR STATEMENT ELSE STATEMENT {
   $$ = make_if( $3, $5, $7 );
@@ -78,9 +105,31 @@ WHILEB : WHILE LPAR EXPR RPAR STATEMENT {
   $$ = make_while( $3, $5 );
  }
 
+FORB : FOR LPAR FORINIT EXPR SEMI EXPR RPAR STATEMENT {
+  $$ = make_for( $3, $4, $6, $8 );
+ }
+
+FORINIT : SEMI {
+  $$ = make_forinit( TNONE );
+ }
+| EXPR SEMI {
+  $$ = make_forinit( $1 , EXP );
+ }
+| SVAR {
+  $$ = make_forinit( $1 , VAR );
+  }
+
 RET  : RETURN EXPR SEMI {
   $$ = make_ret( $2 );
 }
+
+BRE : BREAK SEMI {
+  $$ = make_break();
+ }
+
+CON : CONTINUE SEMI {
+  $$ = make_continue();
+ }
 
 SVAR : INT IDENTIFIER SEMI {
   $$ = make_stackvar( $2, VAR );
@@ -104,6 +153,9 @@ EXPR : OTERM {
  }
 | IDENTIFIER LBRACK EXPR RBRACK EQ EXPR {
   $$ = make_expr( $1, $3, $6 );
+ }
+| ASTA MTERM EQ EXPR {
+  $$ = make_expr( $2, $4 );
  }
 
 OTERM : XTERM {
@@ -179,6 +231,12 @@ MTERM: PRI {
 | MINUS MTERM {
   $$ = make_mterm( $2, MNS );
  }
+| AND IDENTIFIER {
+  $$ = make_mterm( $2, TAND );
+ }
+| ASTA MTERM {
+  $$ = make_mterm( $2, TASTA );
+ }
 
 PRI : NTERM {
   $$ = make_pri( $1, CST );
@@ -204,12 +262,17 @@ ARGS : EXPR {
  }
 
 FUNCALL : IDENTIFIER LPAR ARGS RPAR {
-  $$ = make_funcall( $1, $3 );
+  $$ = make_funcall( $1, $3, TFUNC );
  }
 | IDENTIFIER LPAR RPAR {
-  $$ = make_funcall( $1 );
+  $$ = make_funcall( $1, TFUNC );
  }
-
+| IN LPAR RPAR {
+  $$ = make_funcall( TIN );
+ }
+| OUT LPAR EXPR COMMA EXPR RPAR {
+  $$ = make_funcall( $3, $5, TOUT );
+ }
 
 NTERM : NUM {
   $$ = make_num( $1 );

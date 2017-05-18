@@ -9,6 +9,11 @@ module controller( input logic        flushed,
                    
                    output logic       is_halt_id, 
                    output logic       main_mem_write_id,
+                   output logic       main_mem_read_id,
+                   output logic       main_mem_write_request,
+                   output logic       main_mem_read_request,
+                   output logic       lock_en_id, unlock_en_id,
+
                    output logic       regwrite_id, regwrite_adr_controll,
                    output logic       out_en_id,
                    output logic [1:0] ALUsrcA_controll_id, ALUsrcB_controll_id,
@@ -22,6 +27,9 @@ module controller( input logic        flushed,
 
    logic [3:0] ty;
 
+   assign main_mem_write_request = main_mem_write_id;
+   assign main_mem_read_request = main_mem_read_id;
+
    always_comb begin
       op <= inst_id[15:14];
       ra <= inst_id[13:11];
@@ -32,6 +40,7 @@ module controller( input logic        flushed,
    always_comb begin
       jump_inst <= 0;
       is_halt_id <= 0;
+      main_mem_read_id <= 0; 
       main_mem_write_id <= 0;
       regwrite_id <= 0;
       regwrite_adr_controll <= 0;
@@ -43,6 +52,8 @@ module controller( input logic        flushed,
       from_main_mem_id <= 0;
       use_ra <= 0;
       use_rb <= 0;
+      lock_en_id <= 0;
+      unlock_en_id <= 0;
       
       if( !flushed ) begin      
          case( op )
@@ -52,6 +63,7 @@ module controller( input logic        flushed,
               ALUsrcB_controll_id <= 2;
               regwrite_adr_controll <= 1;
               from_main_mem_id <= 1;
+              main_mem_read_id <= 1;
            end
            1: begin // ST
               use_ra <= 1;
@@ -75,6 +87,13 @@ module controller( input logic        flushed,
                    use_rb <= 1;
                    ALUop_id <= 5;
                    ALUsrcB_controll_id <= 2;
+                end
+                3: begin // LOCK, UNLOCK
+                   if( inst_id[0] ) begin // UNLOCK
+                      unlock_en_id <= 1;
+                   end else begin // LOCK
+                      lock_en_id <= 1;
+                   end
                 end
                 4: begin // B
                    jump_inst <= 1;
@@ -138,8 +157,9 @@ module controller( input logic        flushed,
                    ALUsrcA_controll_id <= 2;
                    ALUsrcB_controll_id <= 3;
                 end
-                13: begin
+                13: begin // OUT
                    use_ra <= 1;
+                   use_rb <= 1;
                    out_en_id <= 1;
                 end
                 15: begin

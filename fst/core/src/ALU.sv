@@ -23,7 +23,7 @@ module ALU( input logic [3:0] op,
         8:
           { C, res } <= a << b;
         9:
-          res <= { a, a } >> b;
+          res <= { a, a } >> (16-b[3:0]);
         10:
            { res, C } <= { a , 1'b0 } >> b;
         11:

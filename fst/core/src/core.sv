@@ -10,20 +10,29 @@
 
 module core( input logic         clk,
              input logic         reset,
-
+             
              input logic [15:0]  in_dat,
              output logic        out_en,
              output logic [15:0] out_dat,
+             output logic [3:0]  out_pos,
              output logic        is_halt,
 
              output logic [15:0] pc,
              input logic [15:0]  inst,
 
              output logic [15:0] main_mem_read_adr,
-             input logic [15:0]  main_mem_dat,
-             output logic        main_mem_write,
              output logic [15:0] main_mem_write_adr,
-             output logic [15:0] main_mem_write_dat );
+             output logic [15:0] main_mem_write_dat,
+             output logic        main_mem_write,
+             output logic        main_mem_read,
+             output logic        main_mem_write_request,
+             output logic        main_mem_read_request, 
+             input logic [15:0]  main_mem_dat,
+             input logic         main_mem_ac,
+             output logic [3:0]  lock_adr,
+             output logic        lock_en,
+             output logic        unlock_en,
+             input logic         lock_ac );
 
    logic [15:0] pcinc, pcinc_id, pcinc_ex, pcinc_mem;
    logic        jump_pred;
@@ -33,7 +42,7 @@ module core( input logic         clk,
    logic [15:0] pcinc_evac;
    logic [15:0] inst_id;
    logic [15:0] rd1_id, rd1_ex, rd1_ex2, rd1_mem, rd1_wb;
-   logic [15:0] rd2_id, rd2_ex;
+   logic [15:0] rd2_id, rd2_ex, rd2_ex2;
    logic [3:0]  d_id, d_ex;
    logic [15:0] extended_d_id, extended_d_ex, extended_d_mem, extended_d_wb;
    logic [2:0]  regwrite_adr_id, regwrite_adr_ex, regwrite_adr_mem, regwrite_adr;
@@ -45,8 +54,10 @@ module core( input logic         clk,
    logic [1:0]  forwardingA_controll_id, forwardingA_controll;
    logic [1:0]  forwardingB_controll_id, forwardingB_controll;
    logic [1:0]  forwarding_ra_controll_id, forwarding_ra_controll;
+   logic [1:0]  forwarding_rb_controll_id, forwarding_rb_controll;
    logic [3:0]  ALUop_id, ALUop;
    logic        main_mem_write_id, main_mem_write_ex;
+   logic        main_mem_read_id, main_mem_read_ex;
    logic [15:0] main_mem_dat_wb;
    logic        regwrite_id, regwrite_ex, regwrite_mem, regwrite;
    logic [1:0]  regwrite_dat_controll_id, regwrite_dat_controll_ex, regwrite_dat_controll;

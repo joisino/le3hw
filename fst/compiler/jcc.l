@@ -26,6 +26,9 @@
 "|" {
   return OR;
 }
+"*" {
+  return ASTA;
+}
 "(" {
   return LPAR;
 }
@@ -83,8 +86,23 @@
 "while" {
   return WHILE;
 }
+"for" {
+  return FOR;
+}
 "return" {
   return RETURN;
+}
+"continue" {
+  return CONTINUE;
+}
+"break" {
+  return BREAK;
+}
+"out" {
+  return OUT;
+}
+"in" {
+  return IN;
 }
 [[:alpha:]][[:alnum:]]* {
   sscanf( yytext, "%s", yylval.str );

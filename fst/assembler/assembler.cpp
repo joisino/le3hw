@@ -136,13 +136,15 @@ std::string decode( std::string inst ){
   } else if( op == "OUT" ){
     res += "11";
 
-    std::string rs;
+    std::string rs, rd;
     stin >> rs;
+    stin >> rd;
     
     assert( rs[0] == 'r' );
     res += d_to_b( rs.substr( 1 ) , 3 );
 
-    res += "000";
+    assert( rd[0] == 'r' );
+    res += d_to_b( rd.substr( 1 ) , 3 );
 
     res += "1101";
 
@@ -190,6 +192,19 @@ std::string decode( std::string inst ){
       std::string par;
       stin >> par;
       res += par;
+    }
+  } else if( op == "LOCK" || op == "UNLOCK" ){
+    res += "10011";
+    std::string rb;
+    stin >> rb;
+
+    assert( rb[0] == 'r' );
+    res += d_to_b( rb.substr( 1 ) , 3 );
+
+    if( op == "LOCK" ){
+      res += "00000000";
+    } else if( op == "UNLOCK" ){
+      res += "00000001";
     }
   } else if( op == "B" || op == "BAL" || op == "BE" || op == "BLT" || op == "BLE" || op == "BNE" ){
     if( op == "B" ){

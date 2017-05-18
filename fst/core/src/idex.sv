@@ -7,8 +7,10 @@ module idex( input logic clk, reset, en_idex, flush_idex,
              input logic [1:0]   ALUsrcA_controll_id, ALUsrcB_controll_id,
              input logic [1:0]   forwardingA_controll_id, forwardingB_controll_id,
              input logic [1:0]   forwarding_ra_controll_id,
+             input logic [1:0]   forwarding_rb_controll_id,
              input logic [3:0]   ALUop_id,
              input logic         main_mem_write_id,
+             input logic         main_mem_read_id,
              input logic [1:0]   regwrite_dat_controll_id,
              input logic         from_main_mem_id,
              input logic         regwrite_id,
@@ -22,8 +24,10 @@ module idex( input logic clk, reset, en_idex, flush_idex,
              output logic [1:0]  ALUsrcA_controll, ALUsrcB_controll,
              output logic [1:0]  forwardingA_controll, forwardingB_controll,
              output logic [1:0]  forwarding_ra_controll,
+             output logic [1:0]  forwarding_rb_controll,
              output logic [3:0]  ALUop,
              output logic        main_mem_write_ex,
+             output logic        main_mem_read_ex,
              output logic [1:0]  regwrite_dat_controll_ex,
              output logic        from_main_mem_ex,
              output logic        regwrite_ex,
@@ -42,8 +46,10 @@ module idex( input logic clk, reset, en_idex, flush_idex,
    flopr #(2) forwardingA_controll_flop( clk, reset | flush_idex, en_idex, forwardingA_controll_id, forwardingA_controll );
    flopr #(2) forwardingB_controll_flop( clk, reset | flush_idex, en_idex, forwardingB_controll_id, forwardingB_controll );
    flopr #(2) forwarding_ra_controll_flop( clk, reset | flush_idex, en_idex, forwarding_ra_controll_id, forwarding_ra_controll );
+   flopr #(2) forwarding_rb_controll_flop( clk, reset | flush_idex, en_idex, forwarding_rb_controll_id, forwarding_rb_controll );
    flopr #(4) ALUop_flop( clk, reset | flush_idex, en_idex, ALUop_id, ALUop );
    flopr #(1) main_mem_write_flop( clk, reset | flush_idex, en_idex, main_mem_write_id, main_mem_write_ex );
+   flopr #(1) main_mem_read_flop( clk, reset | flush_idex, en_idex, main_mem_read_id, main_mem_read_ex );
    flopr #(2) regwrite_dat_controll_flop( clk, reset | flush_idex, en_idex, regwrite_dat_controll_id, regwrite_dat_controll_ex );
    flopr #(1) from_main_mem_flop( clk, reset | flush_idex, en_idex, from_main_mem_id, from_main_mem_ex );
    flopr #(1) regwrite_flop( clk, reset | flush_idex, en_idex, regwrite_id, regwrite_ex );
