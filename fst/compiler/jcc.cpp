@@ -303,7 +303,6 @@ int make_lgterm( int ch ){
 }
 
 int make_sterm( int chl, int chr, int type ){
-  assert( 0 < chr && chr < 16 );
   fprintf( stderr, "S %d %d %d\n", chl, chr, type );
   nodes[it] = node( SHNODE, vector<int>({chl,chr}), type );
   return it++;
