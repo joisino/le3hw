@@ -1040,6 +1040,7 @@ void load_adr( int r, string &s ){
     load_num( 1, stackvars[s] );
     printf( "ADD r1 r6\n" );
   } else {
+    printf( "identifier %s NOT FOUND\n", s.c_str() );
     assert( false );
   }
 }
