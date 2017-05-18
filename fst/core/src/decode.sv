@@ -63,7 +63,6 @@ module decode( input logic         clk, reset,
    logic lock_hazard;
    
    assign regwrite_cur = regwrite_id & (!flush_idex) & en_idex;
-   assign d_id = inst_id[3:0];
    assign lock_en = lock_en_id & (!lock_hazard);
    assign unlock_en = unlock_en_id & (!lock_hazard);
 
