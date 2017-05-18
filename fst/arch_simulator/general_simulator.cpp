@@ -176,30 +176,30 @@ struct Operation {
     f_check(result, flags);
     return result;
   }
-  int f_sll(const int l, Data::Flags&flags) {
-    int result = l << d;
-    flags.c = static_cast<bool>(l&(1 << (REGISTER_BIT - d)));
+  int f_sll(const int l, const int r, Data::Flags&flags) {
+    int result = l << r;
+    flags.c = static_cast<bool>(l&(1 << (REGISTER_BIT - r)));
     if (result < 0)flags.s = true;
     if (result == 0)flags.z = true;
     return result;
   }
-  int f_slr(const int l, Data::Flags&flags) {
+  int f_slr(const int l, const int r, Data::Flags&flags) {
     assert(REGISTER_BIT == 16);
-    int result = (short(l << d) | short(l >> (REGISTER_BIT - d)));
+    int result = (short(l << r) | short(l >> (REGISTER_BIT - r)));
     if (result < 0)flags.s = true;
     if (result == 0)flags.z = true;
     return result;
   }
-  int f_srl(const int l, Data::Flags&flags) {
-    int result = static_cast<unsigned int>(l) >> d;
-    flags.c = d>0 ? static_cast<bool>(l&(1 << (d - 1))) : false;
+  int f_srl(const int l, const int r, Data::Flags&flags) {
+    int result = static_cast<unsigned int>(l) >> r;
+    flags.c = r>0 ? static_cast<bool>(l&(1 << (r - 1))) : false;
     if (result < 0)flags.s = true;
     if (result == 0)flags.z = true;
     return result;
   }
-  int f_sra(const int l, Data::Flags&flags) {
-    int result = l >> d;
-    flags.c = d>0 ? static_cast<bool>(l&(1 << (d - 1))) : false;
+  int f_sra(const int l, const int r, Data::Flags&flags) {
+    int result = l >> r;
+    flags.c = r>0 ? static_cast<bool>(l&(1 << (r - 1))) : false;
     if (result < 0)flags.s = true;
     if (result == 0)flags.z = true;
     return result;
@@ -287,22 +287,22 @@ struct Calc_put :Operation {
 
     case SLL:
       use_counter[OP_SLL]++;
-      mem.reg[rd] = f_sll(mem.reg[rd], mem.flags);
+      mem.reg[rd] = f_sll(mem.reg[rd], mem.reg[rs], mem.flags);
       break;
 
     case SLR:
       use_counter[OP_SLR]++;
-      mem.reg[rd] = f_slr(mem.reg[rd], mem.flags);
+      mem.reg[rd] = f_slr(mem.reg[rd], mem.reg[rs], mem.flags);
       break;
 
     case SRL:
       use_counter[OP_SRL]++;
-      mem.reg[rd] = f_srl(mem.reg[rd], mem.flags);
+      mem.reg[rd] = f_srl(mem.reg[rd], mem.reg[rs], mem.flags);
       break;
 
     case SRA:
       use_counter[OP_SRA]++;
-      mem.reg[rd] = f_sra(mem.reg[rd], mem.flags);
+      mem.reg[rd] = f_sra(mem.reg[rd], mem.reg[rs], mem.flags);
       break;
 
     case IN:
