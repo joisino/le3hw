@@ -157,8 +157,9 @@ module controller( input logic        flushed,
                    ALUsrcA_controll_id <= 2;
                    ALUsrcB_controll_id <= 3;
                 end
-                13: begin
+                13: begin // OUT
                    use_ra <= 1;
+                   use_rb <= 1;
                    out_en_id <= 1;
                 end
                 15: begin

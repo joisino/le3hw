@@ -42,7 +42,7 @@ module core( input logic         clk,
    logic [15:0] pcinc_evac;
    logic [15:0] inst_id;
    logic [15:0] rd1_id, rd1_ex, rd1_ex2, rd1_mem, rd1_wb;
-   logic [15:0] rd2_id, rd2_ex;
+   logic [15:0] rd2_id, rd2_ex, rd2_ex2;
    logic [3:0]  d_id, d_ex;
    logic [15:0] extended_d_id, extended_d_ex, extended_d_mem, extended_d_wb;
    logic [2:0]  regwrite_adr_id, regwrite_adr_ex, regwrite_adr_mem, regwrite_adr;
@@ -54,6 +54,7 @@ module core( input logic         clk,
    logic [1:0]  forwardingA_controll_id, forwardingA_controll;
    logic [1:0]  forwardingB_controll_id, forwardingB_controll;
    logic [1:0]  forwarding_ra_controll_id, forwarding_ra_controll;
+   logic [1:0]  forwarding_rb_controll_id, forwarding_rb_controll;
    logic [3:0]  ALUop_id, ALUop;
    logic        main_mem_write_id, main_mem_write_ex;
    logic        main_mem_read_id, main_mem_read_ex;

@@ -994,6 +994,8 @@ void write_funcall( int x ){
     printf( "LD r2 r7 -1\n" );
     printf( "OUT r1 r2\n" );
     printf( "ADDI r7 -1\n" );
+  } else {
+    return false;
   }
 }
 
