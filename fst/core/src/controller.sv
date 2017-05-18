@@ -20,6 +20,8 @@ module controller( input logic        flushed,
                    output logic [3:0] ALUop_id,
                    output logic [1:0] regwrite_dat_controll_id,
 
+                   output logic [3:0] d_id,
+
                    output logic       use_ra, use_rb,
                    output logic [2:0] ra, rb );
 
@@ -35,6 +37,7 @@ module controller( input logic        flushed,
       ra <= inst_id[13:11];
       rb <= inst_id[10:8];
       ty <= inst_id[7:4];
+      d_id <= inst_id[3:0];
    end
 
    always_comb begin
@@ -147,10 +150,14 @@ module controller( input logic        flushed,
                    regwrite_id <= 1;
                    regwrite_dat_controll_id <= 0;
                 end
-                8, 9, 10, 11: begin
+                8, 9, 10, 11: begin // SHIFT
                    use_rb <= 1;
                    regwrite_id <= 1;
-                   ALUsrcB_controll_id <= 1;
+                   if( d_id == 0 ) begin
+                      use_ra <= 1;
+                   end else begin
+                      ALUsrcB_controll_id <= 1;
+                   end
                 end
                 12: begin
                    regwrite_id <= 1;

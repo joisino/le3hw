@@ -208,10 +208,10 @@ LGTERM : STERM {
 STERM : PTERM {
   $$ = make_sterm( $1 );
  }
-| STERM LSHIFT NUM {
+| STERM LSHIFT PTERM {
   $$ = make_sterm( $1, $3, LSFT );
  }
-| STERM RSHIFT NUM {
+| STERM RSHIFT PTERM {
   $$ = make_sterm( $1, $3, RSFT );
  }
 

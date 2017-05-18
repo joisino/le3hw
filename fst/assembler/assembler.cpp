@@ -99,12 +99,18 @@ std::string decode( std::string inst ){
     }
     res += "0000";
   } else if( find( shifts.begin(), shifts.end(), op ) != shifts.end() ){
-    res += "11000";
+    res += "11";
 
     std::string rd;
     stin >> rd;
-    std::string d;
-    stin >> d;
+    std::string rs;
+    stin >> rs;
+
+    if( rs[0] == 'r' ){
+      res += d_to_b( rs.substr( 1 ) , 3 );
+    } else {
+      res += "000";
+    }
 
     assert( rd[0] == 'r' );
     res += d_to_b( rd.substr( 1 ) , 3 );
@@ -118,7 +124,12 @@ std::string decode( std::string inst ){
     } else if( op == "SRA" ){
       res += "1011";
     }
-    res += d_to_b( d , 4 );
+
+    if( rs[0] == 'r' ){
+      res += "0000";
+    } else {
+      res += d_to_b( rs , 4 );
+    }
   } else if( op == "IN" ){
     res += "11";
 
