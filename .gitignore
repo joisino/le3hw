@@ -25,3 +25,5 @@ fst/etc/topng/topng
 fst/etc/hextopng/tmp
 *.png
 *.mif
+*.bin
+*.o
