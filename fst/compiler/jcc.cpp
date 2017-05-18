@@ -995,7 +995,7 @@ void write_funcall( int x ){
     printf( "OUT r1 r2\n" );
     printf( "ADDI r7 -1\n" );
   } else {
-    return false;
+    assert( false );
   }
 }
 
@@ -1040,6 +1040,7 @@ void load_adr( int r, string &s ){
     load_num( 1, stackvars[s] );
     printf( "ADD r1 r6\n" );
   } else {
+    printf( "identifier %s NOT FOUND\n", s.c_str() );
     assert( false );
   }
 }
