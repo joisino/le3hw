@@ -26,6 +26,9 @@
 "|" {
   return OR;
 }
+"*" {
+  return ASTA;
+}
 "(" {
   return LPAR;
 }

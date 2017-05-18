@@ -50,6 +50,9 @@
 
 #define TNONE 30
 
+#define TAND 31
+#define TASTA 32
+
 void yyerror( const char *s );
 
 int make_program( int chl, int chr );
@@ -81,6 +84,7 @@ int make_stackvar( int ch, int type );
 int make_stackarray( char *str, int num );
 int make_expr( char *str, int chl, int chr );
 int make_expr( char *str, int ch );
+int make_expr( int chl, int chr );
 int make_expr( int ch );
 int make_oterm( int chl, int chr );
 int make_oterm( int ch );
@@ -97,6 +101,7 @@ int make_sterm( int ch );
 int make_pterm( int chl, int chr, int type );
 int make_pterm( int ch );
 int make_mterm( int ch, int type );
+int make_mterm( char *str, int type );
 int make_pri( int ch, int type );
 int make_pri( char *str, int type );
 int make_pri( char *str, int ch, int type );

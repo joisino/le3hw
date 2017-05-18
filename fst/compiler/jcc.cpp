@@ -230,6 +230,12 @@ int make_expr( char *str, int ch ){
   return it++;
 }
 
+int make_expr( int chl, int chr ){
+  fprintf( stderr, "E %d %d\n", chl, chr );
+  nodes[it] = node( ENODE, vector<int>({chl,chr}) );
+  return it++;
+}
+
 int make_expr( int ch ){
   fprintf( stderr, "E %d\n", ch );
   nodes[it] = node( ENODE, vector<int>({ch}) );
@@ -324,6 +330,12 @@ int make_pterm( int ch ){
 int make_mterm( int ch, int type ){
   fprintf( stderr, "M %d %d\n", ch, type );
   nodes[it] = node( MNODE, vector<int>({ch}), type );
+  return it++;
+}
+
+int make_mterm( char *str, int type ){
+  fprintf( stderr, "M %s %d\n", str, type );
+  nodes[it] = node( MNODE, vector<int>({}), type, string(str) );
   return it++;
 }
 
@@ -697,7 +709,18 @@ void write_stackarray( int x ){
 void write_expr( int x ){
   assert( nodes[x].type == ENODE );
   if( nodes[x].str.size() == 0 ){
-    write_oterm( nodes[x].ch.at( 0 ) );
+    if( nodes[x].ch.size() == 1 ){
+      write_oterm( nodes[x].ch.at( 0 ) );
+    } else if( nodes[x].ch.size() == 2 ){
+      write_expr( nodes[x].ch.at( 1 ) );
+      write_mterm( nodes[x].ch.at( 0 ) );
+      printf( "LD r1 r7 -2\n" );
+      printf( "LD r2 r7 -1\n" );
+      printf( "ST r1 r2 0\n" );
+      printf( "ADDI r7 -1\n" );
+    } else {
+      assert( false );
+    }
   } else if( nodes[x].ch.size() == 1 ){
     write_expr( nodes[x].ch.at( 0 ) );
     load_adr( 1, nodes[x].str );
@@ -890,6 +913,15 @@ void write_mterm( int x ){
     printf( "LD r2 r7 -1\n" );
     printf( "SUB r1 r2\n" );
     printf( "ST r1 r7 -1\n" );
+  } else if( nodes[x].val == TAND ){
+    load_adr( 1 , nodes[x].str );
+    printf( "ST r1 r7 0\n" );
+    printf( "ADDI r7 1\n" );
+  } else if( nodes[x].val == TASTA ){
+    write_mterm( nodes[x].ch.at( 0 ) );
+    printf( "LD r1 r7 -1\n" );
+    printf( "LD r2 r1 0\n" );
+    printf( "ST r2 r7 -1\n" );
   } else {
     assert( false );
   }
