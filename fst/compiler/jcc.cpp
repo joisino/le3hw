@@ -995,7 +995,7 @@ void write_funcall( int x ){
     printf( "OUT r1 r2\n" );
     printf( "ADDI r7 -1\n" );
   } else {
-    return false;
+    assert( false );
   }
 }
 
