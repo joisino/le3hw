@@ -580,7 +580,9 @@ void write_for( int x ){
   load_label( 1 , "L" + to_string( lc ) );
   printf( "BR r1\n" );
   printf( "L%d:\n", lb );
+  vstack_push();
   write_statement( nodes[x].ch.at( 3 ) );
+  vstack_pop( 1 );
   write_expr( nodes[x].ch.at( 2 ) );
   printf( "ADDI r7 -1\n" );
   load_label( 1 , "L" + to_string( la ) );
