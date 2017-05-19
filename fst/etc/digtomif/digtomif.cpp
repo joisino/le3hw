@@ -81,7 +81,7 @@ int main( int argc, char *argv[] ){
     cnt++;
   }
   FOR( i , cnt , depth ){
-    cout << i << " : " << string( width , '0' ) << ";" << endl;
+    cout << i << " : 0;" << endl;
   }
   cout << "END;" << endl;
   
