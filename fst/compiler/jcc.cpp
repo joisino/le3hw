@@ -622,7 +622,9 @@ void write_if( int x ){
     load_label( 1 , "L" + to_string( lb ) );
     printf( "BR r1\n" );
     printf( "L%d:\n", la );
+    vstack_push();
     write_statement( nodes[x].ch.at( 1 ) );
+    vstack_pop( 1 );
     printf( "L%d:\n", lb );
   } else if( nodes[x].ch.size() == 3 ){
     write_expr( nodes[x].ch.at( 0 ) );
@@ -636,12 +638,18 @@ void write_if( int x ){
     load_label( 1 , "L" + to_string( lb ) );
     printf( "BR r1\n" );
     printf( "L%d:\n", la );
+    vstack_push();
     write_statement( nodes[x].ch.at( 1 ) );
+    vstack_pop( 1 );
     load_label( 1 , "L" + to_string( lc ) );
     printf( "BR r1\n" );
     printf( "L%d:\n", lb );
+    vstack_push();
     write_statement( nodes[x].ch.at( 2 ) );
+    vstack_pop( 1 );
     printf( "L%d:\n", lc );
+  } else {
+    assert( false );
   }
 }
 
