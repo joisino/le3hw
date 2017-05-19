@@ -14,6 +14,7 @@ fst/compiler/jcc.tab.hpp
 fst/compiler/lex.yy.c
 fst/compiler/lex.yy.o
 fst/etc/bintomif/bintomif
+fst/etc/digtomif/digtomif
 fst/etc/miftobin/miftobin
 fst/etc/unfolddig/unfolddig
 fst/etc/unfolddig/out
