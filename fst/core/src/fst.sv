@@ -10,11 +10,15 @@
 `include "core.sv"
 `include "ledcounter.sv"
 `include "ledout.sv"
+`include "music.sv"
 
 module fst
   #( parameter C = 8 )
-   ( input logic clk_in, reset_n_in,
+   ( input logic        clk_in, reset_n_in,
+     input logic        mflug,
+     input logic [3:0]  mperiod,  
      input logic [15:0] in_dat,
+     output logic       mout,
      output logic [7:0] seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_h,
      output logic [7:0] controll,
      output logic [7:0] seg_x, seg_y,
@@ -76,7 +80,7 @@ module fst
                     .* );
       end
    endgenerate
-      
+
    inst_memA inst_memA( .clk(clk_n), .pc(pc[0]), .inst(inst[0]) );
    inst_memB inst_memB( .clk(clk_n), .pc(pc[1]), .inst(inst[1]) );
    inst_memC inst_memC( .clk(clk_n), .pc(pc[2]), .inst(inst[2]) );
@@ -90,6 +94,8 @@ module fst
    
    ledcounter cnter( .clk(clk), .reset_n(reset_n), .stp(halting), .* );
    ledout lout( .* );
+
+   music music( .* );
    
    always_ff @( posedge clk ) begin
       halting <= halting | ( is_halt != 0 );
