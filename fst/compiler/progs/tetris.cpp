@@ -227,19 +227,17 @@ int main() {
 	dy[1] = 1;
         dy[2] = 0;
 	dy[3] = -1;
-	int T[25];
-	int S[25];
-	int I[25];
+        int B[75];
 	int Dummy[25];
 	for (int i = 0; i < 25; i = i + 1) {
-		I[i] = 0;
-		T[i] = 0;
-		S[i] = 0;
 		Dummy[i] = 0;
 	}
-	T[6] = 1; T[7] = 1; T[8] = 1; T[12] = 1;
-	S[11] = 1; S[7] = 1; S[8] = 1; S[12] = 1;
-	I[2] = 1; I[7] = 1; I[12] = 1; I[17] = 1;
+        for( int i = 0; i < 75; i = i + 1 ){
+          B[i] = 0;
+        }
+	B[6] = 1; B[7] = 1; B[8] = 1; B[12] = 1;
+	B[25 + 11] = 1; B[25 + 7] = 1; B[25 + 8] = 1; B[25 + 12] = 1;
+	B[50 + 2] = 1; B[50 + 7] = 1; B[50 + 12] = 1; B[50 + 17] = 1;
 
 	int stage[84];
 	for (int i = 0; i < 80; i = i + 1) {
@@ -275,21 +273,9 @@ int main() {
 				nh = 1;
 				nw = 1;
 				status = 1;
-				if (k == 0) {
-					for (int i = 0; i < 25; i = i + 1) {
-						mino[i] = T[i];
-					}
-				}
-				else if (k == 1) {
-					for (int i = 0; i < 25; i = i + 1) {
-						mino[i] = S[i];
-					}
-				}
-				else if (k == 2) {
-					for (int i = 0; i < 25; i = i + 1) {
-						mino[i] = I[i];
-					}
-				}
+                                for( int i = 0; i < 25; i = i + 1 ) {
+                                  mino[i] = B[multi(25,k)+i];
+                                }
 				k = k + 1;
 				if (k >= 3) {
 					k = k - 3;
