@@ -1,12 +1,13 @@
-module music( input logic  clk,
-              input logic  reset,
-              input logic  mflug,
-              output logic mout );
+module music( input logic       clk,
+              input logic       reset,
+              input logic       mflug,
+              input logic [3:0] mperiod,
+              output logic      mout );
 
    logic [15:0] adr;
    logic [15:0] cnta;
    logic [15:0] cntb;
-   logic [15:0] cntc;
+   logic [31:0] cntc;
    logic [15:0] period;
    logic [15:0] perioda;
    logic [15:0] periodb;
@@ -32,7 +33,7 @@ module music( input logic  clk,
          if( periodb[14] ) begin
             adr <= 0;
          end
-         if( cntc[14] ) begin
+         if( cntc == ( mperiod << 11 ) ) begin
             adr <= adr + 1;
             cntb <= 0;
             cntc <= 0;
