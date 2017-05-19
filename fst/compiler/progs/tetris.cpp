@@ -224,8 +224,12 @@ int main() {
 	STAGEWIDE = 4;
 	int tetonum = 3;
 	dx[0] = -1;
+        dx[1] = 0;
 	dx[2] = 1;
+        dx[3] = 0;
+        dy[0] = 0;
 	dy[1] = 1;
+        dy[2] = 0;
 	dy[3] = -1;
 	int T[25];
 	int S[25];
@@ -251,6 +255,7 @@ int main() {
 	int nh = 1;
 	int nw = 1;
 	int mino[25];
+        int nextmino[25];
 	for (int i = 0; i < 25; i = i + 1) {
 		mino[i] = 0;
 	}
@@ -295,19 +300,18 @@ int main() {
 				}
 
 			}
-			if (input(0)) {
+			if (input(4)) {
 				if (canmove(stage, nh, nw, mino, 0)) {
 					nw = nw - 1;
 				}
 			}
-			else if (input(4)) {
+			else if (input(0)) {
 				if (canmove(stage, nh, nw, mino, 2)) {
 					nw = nw + 1;
 				}
 			}
 			else if (input(12)) {
 				if (canrotate(stage, nh, nw, mino, 1)) {
-					int nextmino[25];
 					for (int y = 0; y < MINOSIZE; y = y + 1) {
 						for (int x = 0; x < MINOSIZE; x = x + 1) {
 							nextmino[multi(MINOCENTERH + (x - MINOCENTERW), MINOSIZE) + MINOCENTERW + (MINOCENTERH - y)] = mino[multi(y, MINOSIZE) + x];
@@ -341,6 +345,13 @@ int main() {
 		}
 
 		show(stage, nh, nw, mino);
+                
+                for( int i = 0; i < 30000; i = i + 1 ){
+                  for( int j = 0; j < 10; j = j + 1 ){
+                    1;
+                  }
+                }
+                
 	}
 	return 0;
 }
