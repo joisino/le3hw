@@ -25,7 +25,7 @@ int multi(int a, int b) {
 int output(int led) {
 	for (int x = 3; x >= 0; x = x - 1) {
 		for (int y = 0; y < 4; y = y + 1) {
-			int index = multi(y, 4) + x;
+			int index = multi(x, 4) + y;
 			out(index,led[index]);
 		}
 	}
@@ -42,7 +42,7 @@ int showled(int digital) {
 				int index = multi((y << 2) + h, 4) + x;
 				num = num + digital[index];
 			}
-			led[multi(y, 4) + x] = num;
+			led[multi(x, 4) + y] = num;
 		}
 	}
 	output(led);
@@ -59,16 +59,16 @@ int showdigital(int ans) {
 			int fieldindex = multi(h, STAGEWIDE) + w;
 			int digindex = multi(h - 4, STAGEWIDE) + w;
 			if (ans[fieldindex] == 1) {
-				digital[digindex] = 5;
+				digital[digindex] = 8;
 			}
 			else if (ans[fieldindex] == 2) {
-				digital[digindex] = 8;
+				digital[digindex] = 5;
 			}
 			else if (ans[fieldindex] == 42) {
 				digital[digindex] = 2;
 			}
 			else {
-				digital[digindex] = 0;
+				digital[digindex] = 1;
 			}
 		}
 	}
@@ -99,8 +99,7 @@ int show(int mp, int nh, int nw, int mino) {
 }
 
 int input(int k) {
-        
-	return 0;
+  return ( in() & ( 1 << k ) ) == 0;
 }
 int canmove(int mp, int nh, int nw, int mino, int way) {
 	for (int y = 0; y < MINOSIZE; y = y + 1) {
@@ -301,12 +300,12 @@ int main() {
 					nw = nw - 1;
 				}
 			}
-			else if (input(1)) {
+			else if (input(4)) {
 				if (canmove(stage, nh, nw, mino, 2)) {
 					nw = nw + 1;
 				}
 			}
-			else if (input(2)) {
+			else if (input(12)) {
 				if (canrotate(stage, nh, nw, mino, 1)) {
 					int nextmino[25];
 					for (int y = 0; y < MINOSIZE; y = y + 1) {
