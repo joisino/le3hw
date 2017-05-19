@@ -630,6 +630,7 @@ void write_if( int x ){
     int lb = labelcnt++;
     int lc = labelcnt++;
     printf( "LD r1 r7 -1\n" );
+    printf( "ADDI r7 -1\n" );    
     printf( "CMPI r1 0\n" );
     printf( "BNE L%d\n" , la );
     load_label( 1 , "L" + to_string( lb ) );
