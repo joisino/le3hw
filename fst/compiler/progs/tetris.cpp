@@ -6,21 +6,17 @@ int STAGEWIDE;
 int dx[4];
 int dy[4];
 
-int multi(int a, int b) {
-	int ans = 0;
-	int m = 1;
-	for (int i = 0; i < 8; i = i + 1) {
-		for (int j = 0; j < 8; j = j + 1) {
-			if ((a&(1 << i))) {
-				if (b&(1 << j)) {
-					ans = ans + (1 << (i + j));
-				}
-			}
-		}
-	}
-	return ans;
+int multi( int a , int b ){
+  int res = 0;
+  while( b ){
+    if( b & 1 ){
+      res = res + a;
+    }
+    a = a + a;
+    b = b >> 1;
+  }
+  return res;
 }
-
 
 int output(int led) {
 	for (int x = 3; x >= 0; x = x - 1) {
