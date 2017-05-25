@@ -45,14 +45,14 @@ module ledout( input logic        clk,
          controll <= 0;
       end else begin
          controll <= ( 8'b0000_0001 << cnt[3:1] );
-         seg_a <= segs[ ( cnt[3:1] << 3 ) + 0 ];
-         seg_b <= segs[ ( cnt[3:1] << 3 ) + 1 ];
-         seg_c <= segs[ ( cnt[3:1] << 3 ) + 2 ];
-         seg_d <= segs[ ( cnt[3:1] << 3 ) + 3 ];
-         seg_e <= segs[ ( cnt[3:1] << 3 ) + 4 ];
-         seg_f <= segs[ ( cnt[3:1] << 3 ) + 5 ];
-         seg_g <= segs[ ( cnt[3:1] << 3 ) + 6 ];
-         seg_h <= segs[ ( cnt[3:1] << 3 ) + 7 ];
+         seg_a <= segs[ ( cnt[3:1] << 3 ) + 4 ];
+         seg_b <= segs[ ( cnt[3:1] << 3 ) + 5 ];
+         seg_c <= segs[ ( cnt[3:1] << 3 ) + 6 ];
+         seg_d <= segs[ ( cnt[3:1] << 3 ) + 7 ];
+         seg_e <= segs[ ( cnt[3:1] << 3 ) + 0 ];
+         seg_f <= segs[ ( cnt[3:1] << 3 ) + 1 ];
+         seg_g <= segs[ ( cnt[3:1] << 3 ) + 2 ];
+         seg_h <= segs[ ( cnt[3:1] << 3 ) + 3 ];
       end
    end
    

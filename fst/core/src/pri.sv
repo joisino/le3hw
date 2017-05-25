@@ -9,9 +9,6 @@ module pri ( input logic [7:0] a,
    assign b = { a , a } >> c;
    assign q = res + c;
    
-   // assign b = a;
-   // assign q = res;
-
    always_comb begin
       res <= 0;
       en <= 1;

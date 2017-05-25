@@ -24,17 +24,17 @@ module music( input logic       clk,
       end else begin
          periodb <= period;
          perioda <= ( periodb >> 1 );
-         cnta <= cnta + 1;
+         cnta <= cnta + 16'b1;
          if( cnta[10] ) begin
-            cntb <= cntb + 1;
+            cntb <= cntb + 16'b1;
             cntc <= cntc + 1;
             cnta <= 0;
          end
          if( periodb[14] ) begin
             adr <= 0;
          end
-         if( cntc == ( mperiod << 11 ) ) begin
-            adr <= adr + 1;
+         if( cntc[14:11] == mperiod ) begin
+            adr <= adr + 16'b1;
             cntb <= 0;
             cntc <= 0;
          end

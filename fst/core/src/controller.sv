@@ -128,6 +128,8 @@ module controller( input logic        flushed,
                        jump_inst <= 4;
                      3: // BNE
                        jump_inst <= 5;
+                     default:
+                       is_halt_id <= 1;
                    endcase
                 end
               endcase
@@ -170,6 +172,9 @@ module controller( input logic        flushed,
                    out_en_id <= 1;
                 end
                 15: begin
+                   is_halt_id <= 1;
+                end
+                default: begin
                    is_halt_id <= 1;
                 end
               endcase

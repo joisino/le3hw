@@ -18,7 +18,6 @@ module main_mem
    logic [15:0] read_adr, write_adr;
    logic [15:0] write_dat;
    logic iswrite;
-   // logic [1023:0] mutex;
    logic [15:0] mutex;
 
    logic [2:0] main_mem_write_request_q;
@@ -45,8 +44,6 @@ module main_mem
    logic enlock_do;
    logic unlock_do;
 
-   logic [15:0] adr;
-
    pri pri_write_request( main_mem_write_request, cnt, main_mem_write_request_q, main_mem_write_request_en );
    pri pri_read_request( main_mem_read_request, cnt, main_mem_read_request_q, main_mem_read_request_en );
 
@@ -71,18 +68,6 @@ module main_mem
    end
 
    assign main_mem_ac = main_mem_write_ac | main_mem_read_ac;
-
-   /*
-   always_comb begin
-      main_mem_ac <= 0;
-      if( main_mem_write_request_en ) begin
-         main_mem_ac <= 8'b0000_0001 << main_mem_write_request_q;
-      end else if( main_mem_read_request_en ) begin
-         main_mem_ac <= 8'b0000_0001 << main_mem_read_request_q;
-      end
-   end
-    */
-
    
    always_comb begin
       write_adr <= main_mem_write_adr[ main_mem_write_q ];
@@ -91,14 +76,6 @@ module main_mem
 
    always_comb begin
       read_adr <= main_mem_read_adr[ main_mem_read_q ];
-   end
-
-   always_comb begin
-      if( iswrite ) begin
-	 adr <= write_adr;
-      end else begin
-	 adr <= read_adr;
-      end
    end
 
    always_comb begin
@@ -123,19 +100,6 @@ module main_mem
    end
     
    assign lock_ac = enlock_ac | unlock_ac;
-   // assign lock_ac = 8'b1111_1111;
-   // assign lock_ac = lock_en_can;
-
-   /*
-   always_comb begin
-      lock_ac <= 0;
-      if( unlock_do ) begin
-         lock_ac <= 8'b0000_0001 << unlock_q;
-      end else if( enlock_do ) begin
-         lock_ac <= 8'b0000_0001 << enlock_q;
-      end
-   end
-    */
 
    always_ff @( negedge clk ) begin
       if( reset ) begin
@@ -149,20 +113,6 @@ module main_mem
          end
       end
    end
-
-   /*
-   always_ff @( negedge clk ) begin
-      if( reset ) begin
-         mutex <= 0;
-      end else begin
-         if( unlock_do ) begin
-            mutex[ lock_adr[unlock_q] ] <= 0;
-         end else if( enlock_do ) begin
-            mutex[ lock_adr[enlock_q] ] <= 1;
-         end
-      end
-   end
-   */
    
    always_ff @( negedge clk ) begin
       if( reset ) begin
@@ -170,11 +120,10 @@ module main_mem
       end else if( cnt == 7 ) begin
          cnt <= 0;
       end else begin
-         cnt <= cnt + 1;
+         cnt <= cnt + 3'b1;
       end
    end
 
-   // dmem dmem( adr, clk, write_dat, iswrite, main_mem_dat );
    dmemd dmemd( clk, write_dat, read_adr, write_adr, iswrite, main_mem_dat );
 
    logic dmemr_write;

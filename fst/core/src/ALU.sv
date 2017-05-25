@@ -30,7 +30,7 @@ module ALU( input logic [3:0] op,
            { res, C } <= { a , 1'b0 } >>> b;
         12:
           res <= a + b;
-        15:
+        default:
           res <= a + b;
       endcase // case ( op )
    end

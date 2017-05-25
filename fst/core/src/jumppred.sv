@@ -16,13 +16,14 @@ module jumppred( input logic         clk, reset,
    logic [1:0] pred_shift_register;
    logic [9:0] pcinc_history;
    logic [4:0] predicted_pcinc;
+   logic       jump_cannot_predict;
 
    assign jump_cannot_predict = jump & (!pred_shift_register[1]);
    assign jump_pred_adr_miss = ( jump & pred_shift_register[1] & ( jump_table[predicted_pcinc] != ALUres_mem ) ) | jump_cannot_predict;
    assign jump_pred_miss = (!jump) & pred_shift_register[1];
    assign jump_pred = (!jump_pred_busy) & (jump_inst != 0) & ( jump_table_valid[ pcinc_id[4:0] ] >= 2 );
    assign jump_pred_adr = jump_table[ pcinc_id[4:0] ];
-   assign jump_pred_busy = pred_shift_register[0]; // | pred_shift_register[1];
+   assign jump_pred_busy = pred_shift_register[0];
    assign predicted_pcinc = pcinc_history[9:5];
    
    integer i;
