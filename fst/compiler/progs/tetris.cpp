@@ -1,8 +1,3 @@
-int MINOSIZE;
-int MINOCENTERH;
-int MINOCENTERW;
-int STAGEWIDE;
-
 int dx[4];
 int dy[4];
 
@@ -47,13 +42,10 @@ int showled(int digital) {
 
 int showdigital(int ans) {
 	int digital[64];
-	for (int i = 0; i < 64; i = i + 1) {
-		digital[i] = -1;
-	}
 	for (int h = 4; h <20; h = h + 1) {
 		for (int w = 0; w < 4; w = w + 1) {
-			int fieldindex = multi(h, STAGEWIDE) + w;
-			int digindex = multi(h - 4, STAGEWIDE) + w;
+			int fieldindex = multi(h,  4 ) + w;
+			int digindex = multi(h - 4,  4 ) + w;
 			if (ans[fieldindex] == 1) {
 				digital[digindex] = 8;
 			}
@@ -75,17 +67,17 @@ int showdigital(int ans) {
 int show(int mp, int nh, int nw, int mino) {
 	int ans[84];
 	for (int i = 0; i < 84; i = i + 1)ans[i] = 0;
-	for (int h = 4; h <20; h = h + 1) {
-		for (int w = 0; w <STAGEWIDE; w = w + 1) {
-			ans[multi(h, STAGEWIDE) + w] = mp[multi(h, STAGEWIDE) + w];
+	for (int h = 4; h < 20; h = h + 1) {
+		for (int w = 0; w < 4; w = w + 1) {
+			ans[multi(h,  4 ) + w] = mp[multi(h,  4 ) + w];
 		}
 	}
-	for (int y = 0; y < MINOSIZE; y = y + 1) {
-		for (int x = 0; x < MINOSIZE; x = x + 1) {
-			if (mino[multi(y, MINOSIZE) + x]) {
-				int h = y + nh - MINOCENTERH;
-				int w = x + nw - MINOCENTERW;
-				ans[multi(h, STAGEWIDE) + w] = 2;
+	for (int y = 0; y < 5; y = y + 1) {
+		for (int x = 0; x < 5; x = x + 1) {
+			if (mino[multi(y, 5) + x]) {
+				int h = y + nh -  2 ;
+				int w = x + nw -  2 ;
+				ans[multi(h,  4 ) + w] = 2;
 			}
 		}
 	}
@@ -98,16 +90,13 @@ int input(int k) {
   return ( in() & ( 1 << k ) ) == 0;
 }
 int canmove(int mp, int nh, int nw, int mino, int way) {
-	for (int y = 0; y < MINOSIZE; y = y + 1) {
-		for (int x = 0; x < MINOSIZE; x = x + 1) {
-			if (mino[multi(y, MINOSIZE) + x]) {
-				int nexth = y + nh - MINOCENTERH + dy[way];
-				int nextw = x + nw - MINOCENTERW + dx[way];
-				if (nexth > 19)return 0;
-				if (nexth < 0)return 0;
-				if (nextw >= STAGEWIDE)return 0;
-				if (nextw < 0)return 0;
-				if (mp[multi(nexth, STAGEWIDE) + nextw]) {
+	for (int y = 0; y <  5 ; y = y + 1) {
+		for (int x = 0; x <  5 ; x = x + 1) {
+			if (mino[multi(y,  5 ) + x]) {
+				int nexth = y + nh -  2  + dy[way];
+				int nextw = x + nw -  2  + dx[way];
+				if ((nexth > 19)|(nexth < 0)|(nextw >=  4 )|(nextw < 0))return 0;
+				if (mp[multi(nexth,  4 ) + nextw]) {
 					return 0;
 				}
 			}
@@ -116,11 +105,11 @@ int canmove(int mp, int nh, int nw, int mino, int way) {
 	return 1;
 }
 int canrotate(int mp, int nh, int nw, int mino, int clockwise) {
-	for (int y = 0; y < MINOSIZE; y = y + 1) {
-		for (int x = 0; x < MINOSIZE; x = x + 1) {
-			int  nowh = y + nh - MINOCENTERH;
-			int noww = x + nw - MINOCENTERW;
-			if (mino[multi(y, MINOSIZE) + x]) {
+	for (int y = 0; y <  5 ; y = y + 1) {
+		for (int x = 0; x <  5 ; x = x + 1) {
+			int nowh = y + nh -  2 ;
+			int noww = x + nw -  2 ;
+			if (mino[multi(y,  5 ) + x]) {
 				int nexth = 0;
 				int nextw = 0;
 				if (clockwise) {
@@ -131,13 +120,10 @@ int canrotate(int mp, int nh, int nw, int mino, int clockwise) {
 					nexth = nh - (noww - nw);
 					nextw = nw - (nh - nowh);
 				}
-				if ((nexth > 19) | (nexth < 0)) {
+				if ((nexth > 19) | (nexth < 0)|(nextw >=  4 )|(nextw < 0)) {
 					return 0;
 				}
-				if ((nextw >= STAGEWIDE) | (nextw < 0)) {
-					return 0;
-				}
-				if (mp[multi(nexth, STAGEWIDE) + nextw]) {
+				if (mp[multi(nexth,  4 ) + nextw]) {
 					return 0;
 				}
 			}
@@ -147,12 +133,12 @@ int canrotate(int mp, int nh, int nw, int mino, int clockwise) {
 }
 
 int land(int mp, int nh, int nw, int mino) {
-	for (int y = 0; y < MINOSIZE; y = y + 1) {
-		for (int x = 0; x < MINOSIZE; x = x + 1) {
-			int  nowh = y + nh - MINOCENTERH;
-			int noww = x + nw - MINOCENTERW;
-			if (mino[multi(y, MINOSIZE) + x]) {
-				mp[multi(nowh, STAGEWIDE) + noww] = 1;
+	for (int y = 0; y <  5 ; y = y + 1) {
+		for (int x = 0; x <  5 ; x = x + 1) {
+			int  nowh = y + nh -  2 ;
+			int noww = x + nw -  2 ;
+			if (mino[multi(y,  5 ) + x]) {
+				mp[multi(nowh,  4 ) + noww] = 1;
 			}
 		}
 	}
@@ -167,14 +153,14 @@ int del(int mp) {
 	}
 	for (int y = 0; y < 20; y = y + 1) {
 		int flag = 1;
-		for (int x = 0; x < STAGEWIDE; x = x + 1) {
-			if (mp[multi(y, STAGEWIDE) + x] == 0) {
+		for (int x = 0; x <  4 ; x = x + 1) {
+			if (mp[multi(y,  4 ) + x] == 0) {
 				flag = 0;
 			}
 		}
 		if (flag == 1) {
-			for (int x = 0; x < STAGEWIDE; x = x + 1) {
-				mp[multi(y, STAGEWIDE) + x] = 42;
+			for (int x = 0; x <  4 ; x = x + 1) {
+				mp[multi(y,  4 ) + x] = 42;
 			}
 			sum = sum + 1;
 		}
@@ -189,16 +175,16 @@ int fall(int mp) {
 	for (int k = 0; k < 24; k = k + 1) {
 		for (int y = 19; y >= 1; y = y - 1) {
 			int flag = 1;
-			for (int x = 0; x < STAGEWIDE; x = x + 1) {
-				if (mp[multi(y, STAGEWIDE) + x]) {
+			for (int x = 0; x <  4 ; x = x + 1) {
+				if (mp[multi(y,  4 ) + x]) {
 					flag = 0;
 				}
 			}
 			if (flag == 1) {
-				for (int x = 0; x < STAGEWIDE; x = x + 1) {
-					int t = nextmp[multi(y, STAGEWIDE) + x];
-					nextmp[multi(y, STAGEWIDE) + x] = nextmp[multi(y - 1, STAGEWIDE) + x];
-					nextmp[multi(y - 1, STAGEWIDE) + x] = t;
+				for (int x = 0; x <  4 ; x = x + 1) {
+					int t = nextmp[multi(y,  4 ) + x];
+					nextmp[multi(y,  4 ) + x] = nextmp[multi(y - 1,  4 ) + x];
+					nextmp[multi(y - 1,  4 ) + x] = t;
 				}
 			}
 		}
@@ -214,10 +200,6 @@ int fall(int mp) {
 }
 
 int main() {
-	MINOSIZE = 5;
-	MINOCENTERH = 2;
-	MINOCENTERW = 2;
-	STAGEWIDE = 4;
 	int tetonum = 3;
 	dx[0] = -1;
         dx[1] = 0;
@@ -273,13 +255,15 @@ int main() {
 				nh = 1;
 				nw = 1;
 				status = 1;
-                                for( int i = 0; i < 25; i = i + 1 ) {
+			        k = (multi(k,123) + 22);
+				k = (k & 16383) >> 3;
+				while ((k & 3) > 2) {
+				  k = (multi(k,123) + 22);
+					k = (k & 16383) >> 3;
+				}
+				for( int i = 0; i < 25; i = i + 1 ) {
                                   mino[i] = B[multi(25,k)+i];
                                 }
-				k = k + 1;
-				if (k >= 3) {
-					k = k - 3;
-				}
 
 			}
 			if (input(4)) {
@@ -294,14 +278,14 @@ int main() {
 			}
 			else if (input(12)) {
 				if (canrotate(stage, nh, nw, mino, 1)) {
-					for (int y = 0; y < MINOSIZE; y = y + 1) {
-						for (int x = 0; x < MINOSIZE; x = x + 1) {
-							nextmino[multi(MINOCENTERH + (x - MINOCENTERW), MINOSIZE) + MINOCENTERW + (MINOCENTERH - y)] = mino[multi(y, MINOSIZE) + x];
+					for (int y = 0; y <  5 ; y = y + 1) {
+						for (int x = 0; x <  5 ; x = x + 1) {
+							nextmino[multi( 2  + (x -  2 ),  5 ) +  2  + ( 2  - y)] = mino[multi(y,  5 ) + x];
 						}
 					}
-					for (int y = 0; y < MINOSIZE; y = y + 1) {
-						for (int x = 0; x < MINOSIZE; x = x + 1) {
-							mino[multi(y, MINOSIZE) + x] = nextmino[multi(y, MINOSIZE) + x];
+					for (int y = 0; y <  5 ; y = y + 1) {
+						for (int x = 0; x <  5 ; x = x + 1) {
+							mino[multi(y,  5 ) + x] = nextmino[multi(y,  5 ) + x];
 						}
 					}
 				}
