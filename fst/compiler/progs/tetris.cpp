@@ -262,7 +262,7 @@ int main() {
 					k = (k & 16383) >> 3;
 				}
 				for( int i = 0; i < 25; i = i + 1 ) {
-                                  mino[i] = B[multi(25,k)+i];
+                                  mino[i] = B[multi(25,(k&3))+i];
                                 }
 
 			}
