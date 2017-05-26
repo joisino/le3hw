@@ -339,10 +339,10 @@ int main() {
 		    if(input(12)){
 		      rotateflag=1;
 		    }
-		    if(input(8)){
+		    if(input(13)){
 		      downflag=1;
 		    }
-		    if(input(6)){
+		    if(input(8)){
 		      rotateflag=-1;
 		    }
 		  }
