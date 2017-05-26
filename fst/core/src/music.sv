@@ -47,6 +47,6 @@ module music( input logic       clk,
       end
    end
 
-   mmem mmem( adr, clk, period );
+   mmem mmem( adr[8:0], clk, period );
 
 endmodule
