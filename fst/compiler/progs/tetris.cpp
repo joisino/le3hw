@@ -6,6 +6,9 @@ int rotateflag;
 int downflag;
 int rooptime;
 
+int score;
+int scoremp[5];
+
 int multi( int a , int b ){
   int res = 0;
   while( b ){
@@ -39,6 +42,8 @@ int showled(int digital) {
 				num = num + digital[index];
 			}
 			led[multi(x, 4) + y] = num;
+
+			
 		}
 	}
 	output(led);
@@ -47,9 +52,7 @@ int showled(int digital) {
 
 int showdigital(int ans) {
 	int digital[64];
-	for(int i = 0;i < 64 ; i = i + 1){
-	  digital[i]=0;
-	}
+
 	for (int h = 4; h <19; h = h + 1) {
 		for (int w = 0; w < 4; w = w + 1) {
 			int fieldindex = multi(h,  4 ) + w;
@@ -67,6 +70,10 @@ int showdigital(int ans) {
 				digital[digindex] = 1;
 			}
 		}
+	}
+	for(int i = 60 ; i < 64 ; i = i + 1){
+	  
+		digital[i] = (score >> ((i - 60) << 2 )) & 15;
 	}
 	showled(digital);
 	return 0;
@@ -221,6 +228,11 @@ int main() {
 	dy[1] = 1;
         dy[2] = 0;
 	dy[3] = -1;
+	scoremp[0]=0;
+	scoremp[1]=1;
+	scoremp[2]=3;
+	scoremp[3]=7;
+	scoremp[4]=20;
         int B[75];
 	int Dummy[25];
 	for (int i = 0; i < 25; i = i + 1) {
@@ -307,13 +319,14 @@ int main() {
 			}
 			else {
 				land(stage, nh, nw, mino);
-				int flag = del(stage);
+				int dellinecount = del(stage);
 				for (int i = 0; i < 25; i = i + 1) {
 					mino[i] = 0;
 				}
 				nh = 1;
 				nw = 1;
-				if (flag == 0) {
+				score = score + scoremp[dellinecount];
+				if (dellinecount == 0) {
 					status = 0;
 				}
 				else {
