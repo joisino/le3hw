@@ -1,3 +1,5 @@
+`include "timer_count.sv"
+
 module main_mem
   #( parameter C = 8 )
    ( input logic clk, reset,
@@ -19,6 +21,8 @@ module main_mem
    logic [15:0] write_dat;
    logic iswrite;
    logic [15:0] mutex;
+
+   logic [15:0] main_mem_out;
 
    logic [2:0] main_mem_write_request_q;
    logic main_mem_write_request_en;
@@ -43,6 +47,9 @@ module main_mem
    
    logic enlock_do;
    logic unlock_do;
+
+   logic use_timer;
+   logic [15:0] timer_out;
 
    pri pri_write_request( main_mem_write_request, cnt, main_mem_write_request_q, main_mem_write_request_en );
    pri pri_read_request( main_mem_read_request, cnt, main_mem_read_request_q, main_mem_read_request_en );
@@ -124,7 +131,25 @@ module main_mem
       end
    end
 
-   dmemd dmemd( clk, write_dat, read_adr, write_adr, iswrite, main_mem_dat );
+   timer_count tim( .* );
+
+   always_ff @( posedge clk ) begin
+      if( read_adr == 16'b1000_0000_0000_0000 ) begin
+         use_timer <= 1;
+      end else begin
+         use_timer <= 0;
+      end
+   end
+
+   always_comb begin
+      if( use_timer ) begin
+         main_mem_dat <= timer_out;
+      end else begin
+         main_mem_dat <= main_mem_out;
+      end
+   end
+
+   dmemd dmemd( clk, write_dat, read_adr, write_adr, iswrite, main_mem_out );
 
    logic dmemr_write;
    logic [15:0] dmemr_dat;
