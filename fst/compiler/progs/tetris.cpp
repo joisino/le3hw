@@ -280,11 +280,16 @@ int main() {
 					nw = nw + moveflag;
 				}
 			}
-		        if (rotateflag==1) {
-				if (canrotate(stage, nh, nw, mino, 1)) {
+		        if (rotateflag!=0) {
+			  
+			  if (canrotate(stage, nh, nw, mino, (rotateflag + 1) >> 1 )) {
 					for (int y = 0; y <  5 ; y = y + 1) {
 						for (int x = 0; x <  5 ; x = x + 1) {
-							nextmino[multi( 2  + (x -  2 ),  5 ) +  2  + ( 2  - y)] = mino[multi(y,  5 ) + x];
+						  int nextplace = multi( 2  + (x -  2 ),  5 ) +  2  + ( 2  - y);
+						  if(rotateflag == -1 ){
+						    nextplace = 24 - nextplace;
+						  }
+						  nextmino[nextplace] = mino[multi(y,  5 ) + x];
 						}
 					}
 					for (int y = 0; y <  5 ; y = y + 1) {
@@ -318,17 +323,19 @@ int main() {
                 moveflag=0;
 		rotateflag=0;
 		if(downflag==1){
-		  rooptime=5;
+		  rooptime=2;
+		}else{
+		  rooptime=10;
 		}
-                for( int i = 0; i < 30000; i = i + 1 ){
+                for( int i = 0; i < 10000; i = i + 1 ){
                   for( int j = 0; j < rooptime; j = j + 1 ){
-		    if(input(0)){
+		    if(input(4)){
 		      moveflag=-1;
 		    }
-		    if(input(12)){
+		    if(input(0)){
 		      moveflag=1;
 		    }
-		    if(input(4)){
+		    if(input(12)){
 		      rotateflag=1;
 		    }
 		    if(input(8)){
