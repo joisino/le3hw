@@ -235,17 +235,18 @@ int main() {
 	scoremp[3]=7;
 	scoremp[4]=20;
 	score=0;
-        int B[75];
+        int B[100];
 	int Dummy[25];
 	for (int i = 0; i < 25; i = i + 1) {
 		Dummy[i] = 0;
 	}
-        for( int i = 0; i < 75; i = i + 1 ){
+        for( int i = 0; i < 100; i = i + 1 ){
           B[i] = 0;
         }
 	B[6] = 1; B[7] = 1; B[8] = 1; B[12] = 1;
 	B[25 + 11] = 1; B[25 + 7] = 1; B[25 + 8] = 1; B[25 + 12] = 1;
 	B[50 + 2] = 1; B[50 + 7] = 1; B[50 + 12] = 1; B[50 + 17] = 1;
+	B[8 + 75] = 1; B[7 + 75] = 1; B[13 + 75] = 1; B[12 + 75] = 1;
 
 	int stage[84];
 	for (int i = 0; i < 80; i = i + 1) {
@@ -284,10 +285,7 @@ int main() {
 				status = 1;
 			        k = (multi(k,123) + 22);
 				k = (k & 16383) >> 3;
-				while ((k & 3) > 2) {
-				  k = (multi(k,123) + 22);
-					k = (k & 16383) >> 3;
-				}
+			
 				for( int i = 0; i < 25; i = i + 1 ) {
                                   mino[i] = B[multi(25,(k&3))+i];
                                 }
