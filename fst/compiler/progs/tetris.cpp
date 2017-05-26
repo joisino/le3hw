@@ -323,19 +323,19 @@ int main() {
                 moveflag=0;
 		rotateflag=0;
 		if(downflag==1){
-		  rooptime=5;
+		  rooptime=2;
 		}else{
 		  rooptime=10;
 		}
-                for( int i = 0; i < 30000; i = i + 1 ){
+                for( int i = 0; i < 10000; i = i + 1 ){
                   for( int j = 0; j < rooptime; j = j + 1 ){
-		    if(input(0)){
+		    if(input(4)){
 		      moveflag=-1;
 		    }
-		    if(input(12)){
+		    if(input(0)){
 		      moveflag=1;
 		    }
-		    if(input(4)){
+		    if(input(12)){
 		      rotateflag=1;
 		    }
 		    if(input(8)){
