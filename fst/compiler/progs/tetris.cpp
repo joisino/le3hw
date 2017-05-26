@@ -1,6 +1,11 @@
 int dx[4];
 int dy[4];
 
+int moveflag;
+int rotateflag;
+int downflag;
+int rooptime;
+
 int multi( int a , int b ){
   int res = 0;
   while( b ){
@@ -200,6 +205,10 @@ int fall(int mp) {
 }
 
 int main() {
+  rooptime=10;
+        moveflag=0;
+        rotateflag=0;
+        downflag=0;
 	int tetonum = 3;
 	dx[0] = -1;
         dx[1] = 0;
@@ -266,17 +275,12 @@ int main() {
                                 }
 
 			}
-			if (input(4)) {
-				if (canmove(stage, nh, nw, mino, 0)) {
-					nw = nw - 1;
+			if (moveflag!=0) {
+				if (canmove(stage, nh, nw, mino, moveflag + 1)) {
+					nw = nw + moveflag;
 				}
 			}
-			else if (input(0)) {
-				if (canmove(stage, nh, nw, mino, 2)) {
-					nw = nw + 1;
-				}
-			}
-			else if (input(12)) {
+		        if (rotateflag==1) {
 				if (canrotate(stage, nh, nw, mino, 1)) {
 					for (int y = 0; y <  5 ; y = y + 1) {
 						for (int x = 0; x <  5 ; x = x + 1) {
@@ -311,11 +315,32 @@ int main() {
 		}
 
 		show(stage, nh, nw, mino);
-                
+                moveflag=0;
+		rotateflag=0;
+		if(downflag==1){
+		  rooptime=5;
+		}
                 for( int i = 0; i < 30000; i = i + 1 ){
-                  for( int j = 0; j < 10; j = j + 1 ){
-                    1;
-                  }
+                  for( int j = 0; j < rooptime; j = j + 1 ){
+		    if(input(0)){
+		      moveflag=-1;
+		    }
+		    if(input(12)){
+		      moveflag=1;
+		    }
+		    if(input(4)){
+		      rotateflag=1;
+		    }
+		    if(input(8)){
+		      downflag=1;
+		    }
+		    if(input(6)){
+		      rotateflag=-1;
+		    }
+		    if(input(9)){
+		      downflag=0;
+		    }
+		  }
                 }
                 
 	}
