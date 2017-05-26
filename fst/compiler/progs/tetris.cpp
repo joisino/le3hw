@@ -327,6 +327,7 @@ int main() {
 		}else{
 		  rooptime=10;
 		}
+		downflag=0;
                 for( int i = 0; i < 10000; i = i + 1 ){
                   for( int j = 0; j < rooptime; j = j + 1 ){
 		    if(input(4)){
@@ -343,9 +344,6 @@ int main() {
 		    }
 		    if(input(6)){
 		      rotateflag=-1;
-		    }
-		    if(input(9)){
-		      downflag=0;
 		    }
 		  }
                 }
