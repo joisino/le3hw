@@ -9,6 +9,7 @@ int rooptime;
 int score;
 int scoremp[5];
 
+
 int multi( int a , int b ){
   int res = 0;
   while( b ){
@@ -73,7 +74,7 @@ int showdigital(int ans) {
 	}
 	for(int i = 60 ; i < 64 ; i = i + 1){
 	  
-		digital[i] = (score >> ((i - 60) << 2 )) & 15;
+	  digital[i] = (score >> ((63 - i) << 2 )) & 15;
 	}
 	showled(digital);
 	return 0;
@@ -180,7 +181,7 @@ int del(int mp) {
 			sum = sum + 1;
 		}
 	}
-	return sum > 0;
+	return sum;
 }
 int fall(int mp) {
 	int nextmp[84];
@@ -233,6 +234,7 @@ int main() {
 	scoremp[2]=3;
 	scoremp[3]=7;
 	scoremp[4]=20;
+	score=0;
         int B[75];
 	int Dummy[25];
 	for (int i = 0; i < 25; i = i + 1) {
@@ -261,6 +263,7 @@ int main() {
 	}
 	int status = 0;
 	int k = 0;
+	int pretime = ( * ( -32768 ) );
 	while (1) {
 		if (status == 3) {
 			status = 4;
@@ -344,9 +347,8 @@ int main() {
 		  rooptime=10;
 		}
 		downflag=0;
-                for( int i = 0; i < 10000; i = i + 1 ){
-                  for( int j = 0; j < rooptime; j = j + 1 ){
-		    if(input(4)){
+		while( ( ( *( -32768 ) ) - pretime) < (rooptime << 6)){
+		  if(input(4)){
 		      moveflag=-1;
 		    }
 		    if(input(0)){
@@ -361,8 +363,8 @@ int main() {
 		    if(input(8)){
 		      rotateflag=-1;
 		    }
-		  }
-                }
+		}
+		  pretime = (*(-32768));
                 
 	}
 	return 0;
