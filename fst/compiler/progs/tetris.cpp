@@ -47,7 +47,10 @@ int showled(int digital) {
 
 int showdigital(int ans) {
 	int digital[64];
-	for (int h = 4; h <20; h = h + 1) {
+	for(int i = 0;i < 64 ; i = i + 1){
+	  digital[i]=0;
+	}
+	for (int h = 4; h <19; h = h + 1) {
 		for (int w = 0; w < 4; w = w + 1) {
 			int fieldindex = multi(h,  4 ) + w;
 			int digindex = multi(h - 4,  4 ) + w;
@@ -72,7 +75,7 @@ int showdigital(int ans) {
 int show(int mp, int nh, int nw, int mino) {
 	int ans[84];
 	for (int i = 0; i < 84; i = i + 1)ans[i] = 0;
-	for (int h = 4; h < 20; h = h + 1) {
+	for (int h = 4; h < 19; h = h + 1) {
 		for (int w = 0; w < 4; w = w + 1) {
 			ans[multi(h,  4 ) + w] = mp[multi(h,  4 ) + w];
 		}
@@ -100,7 +103,7 @@ int canmove(int mp, int nh, int nw, int mino, int way) {
 			if (mino[multi(y,  5 ) + x]) {
 				int nexth = y + nh -  2  + dy[way];
 				int nextw = x + nw -  2  + dx[way];
-				if ((nexth > 19)|(nexth < 0)|(nextw >=  4 )|(nextw < 0))return 0;
+				if ((nexth > 18)|(nexth < 0)|(nextw >=  4 )|(nextw < 0))return 0;
 				if (mp[multi(nexth,  4 ) + nextw]) {
 					return 0;
 				}
@@ -125,7 +128,7 @@ int canrotate(int mp, int nh, int nw, int mino, int clockwise) {
 					nexth = nh - (noww - nw);
 					nextw = nw - (nh - nowh);
 				}
-				if ((nexth > 19) | (nexth < 0)|(nextw >=  4 )|(nextw < 0)) {
+				if ((nexth > 18) | (nexth < 0)|(nextw >=  4 )|(nextw < 0)) {
 					return 0;
 				}
 				if (mp[multi(nexth,  4 ) + nextw]) {
@@ -156,7 +159,7 @@ int del(int mp) {
 	for (int i = 0; i < 84; i = i + 1) {
 		nextmp[i] = mp[i];
 	}
-	for (int y = 0; y < 20; y = y + 1) {
+	for (int y = 0; y < 19; y = y + 1) {
 		int flag = 1;
 		for (int x = 0; x <  4 ; x = x + 1) {
 			if (mp[multi(y,  4 ) + x] == 0) {
@@ -178,7 +181,7 @@ int fall(int mp) {
 		nextmp[i] = mp[i];
 	}
 	for (int k = 0; k < 24; k = k + 1) {
-		for (int y = 19; y >= 1; y = y - 1) {
+		for (int y = 18; y >= 1; y = y - 1) {
 			int flag = 1;
 			for (int x = 0; x <  4 ; x = x + 1) {
 				if (mp[multi(y,  4 ) + x]) {
