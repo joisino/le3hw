@@ -1,3 +1,6 @@
+`ifndef DEFINE_IFID
+`define DEFINE_IFID
+
 module ifid( input logic clk, reset, en_ifid, flush_ifid,
              input logic [15:0]  pcinc,
              input logic [15:0]  inst,
@@ -10,3 +13,5 @@ module ifid( input logic clk, reset, en_ifid, flush_ifid,
    flopr #(1) flushed_flop( clk, 1'b0, 1'b1, reset | flush_ifid, flushed );
    
 endmodule
+
+`endif

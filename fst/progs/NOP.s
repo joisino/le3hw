@@ -1,0 +1,6 @@
+MAIN:
+	B MAIN
+	NOP
+	NOP
+	NOP
+	NOP
