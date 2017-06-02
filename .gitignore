@@ -1,8 +1,8 @@
 fst/core/modelsim
 fst/core/assembler
 fst/arch_simulator/arch_simulator
-fst/arch_simulator/sim
 fst/arch_simulator/mem.out
+fst/arch_simulator/sim
 fst/assembler/asm
 fst/compiler/test.c
 fst/compiler/a.o
