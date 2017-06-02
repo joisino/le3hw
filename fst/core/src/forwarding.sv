@@ -1,3 +1,7 @@
+`ifndef DEFINE_FORWARDING
+`define DEFINE_FORWARDING
+
+
 module forwarding( input logic [1:0]  ALUsrcA_controll_id, ALUsrcB_controll_id,
                    input logic [2:0]  register_invalid [7:0],
                    input logic [2:0]  ra, rb,
@@ -42,3 +46,5 @@ module forwarding( input logic [1:0]  ALUsrcA_controll_id, ALUsrcB_controll_id,
    end
    
 endmodule
+
+`endif

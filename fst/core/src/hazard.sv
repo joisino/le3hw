@@ -1,3 +1,7 @@
+`ifndef DEFINE_HAZARD
+`define DEFINE_HAZARD
+
+
 module hazard( input logic       use_ra, use_rb,
                input logic [2:0] ra, rb,
                input logic [2:0] register_invalid [7:0],
@@ -65,3 +69,5 @@ module hazard( input logic       use_ra, use_rb,
    end
    
 endmodule
+
+`endif

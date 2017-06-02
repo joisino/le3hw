@@ -74,7 +74,6 @@ module decode( input logic         clk, reset,
    reginvalid reginvalid( .reset(reset|flush_decode), .* );
    mux #(3) mux_regwrite_adr( inst_id[10:8], inst_id[13:11], regwrite_adr_controll, regwrite_adr_id );
    regfile register_file( clk, reset, regwrite, inst_id[13:11], inst_id[10:8], regwrite_adr, regwrite_dat, register_invalid, rd1_id, rd2_id );
-   // extend extend( inst_id[7:0], extended_d_id );
    signext signext( inst_id[7:0], extended_d_id );
    mux #(4) mux_lock_adr( rd2_id[3:0], ALUres_mem[3:0], forwarding_lock_controll, lock_adr );
    

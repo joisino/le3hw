@@ -1,3 +1,6 @@
+`ifndef DEFINE_REGINVALID
+`define DEFINE_REGINVALID
+
 module reginvalid( input logic        clk, reset,
                    input logic        flush_decode,
                    input logic        regwrite_cur,
@@ -29,3 +32,5 @@ module reginvalid( input logic        clk, reset,
    end
 
 endmodule
+
+`endif

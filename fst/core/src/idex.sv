@@ -1,3 +1,7 @@
+`ifndef DEFINE_IDEX
+`define DEFINE_IDEX
+
+
 module idex( input logic clk, reset, en_idex, flush_idex,
              input logic [15:0]  pcinc_id,
              input logic [15:0]  rd1_id, rd2_id,
@@ -58,3 +62,5 @@ module idex( input logic clk, reset, en_idex, flush_idex,
    
 
 endmodule
+
+`endif

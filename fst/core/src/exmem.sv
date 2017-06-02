@@ -1,3 +1,7 @@
+`ifndef DEFINE_EXMEM
+`define DEFINE_EXMEM
+
+
 module exmem( input logic clk, reset, en_exmem, flush_exmem,
               input logic [15:0]  ALUres_ex,
               input logic         S_ex, C_ex, Z_ex, V_ex,
@@ -47,3 +51,5 @@ module exmem( input logic clk, reset, en_exmem, flush_exmem,
    flopr #(4) out_pos_flop( clk, reset | flush_exmem, en_exmem, rd2_ex2[3:0], out_pos );
 
 endmodule
+
+`endif
